@@ -59,8 +59,9 @@ to_text.exe: to_text.c
 to_2D.exe: to_2D.c 
 	$(comp) $? -o $@ $(ldflags) $(opt)
 
+to_landau.exe: to_landau.c
+	$(comp) $? -o $@ $(ldflags) $(gslflags) $(opt)
+
 # target: to delete the products of the compilation (executable, object files, modules...)
 clean:
 		  \rm *.exe
-
-
