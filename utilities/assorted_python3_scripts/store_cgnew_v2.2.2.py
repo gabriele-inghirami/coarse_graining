@@ -1,7 +1,8 @@
-# store_cg_new.py - version 2.1.0 - 22/05/2020
+# store_cg_new.py - version 2.2.2 - 10/05/2021
 # it reads the energy and number densities and returns the temperatures, with/without the anisotropic correction as in PhysRevC.83.034907
 # we assume that, in addition to tensor_densities_* files, there are corresponding tensor_Tmunu_* files
 # in this version, we save also the number of hadrons in each cell and the total baryon + antibaryon density
+# this version works with cg 2.1.x, which saves also the coordinates of the grid corner
 
 import fileinput
 import math
@@ -184,25 +185,28 @@ for ff in range(nt):
       print("Grid size: "+str(nx)+", "+str(ny)+", "+str(nz))
       dx,dy,dz=np.fromfile(cdata,dtype=np.float64,count=3) 
       print("Grid resolution: "+str(dx)+", "+str(dy)+", "+str(dz))
+      xstart,ystart,zstart=np.fromfile(cdata,dtype=np.float64,count=3) 
+      print("Grid starting coordinates: "+str(xstart)+", "+str(ystart)+", "+str(zstart))
       datas=np.fromfile(cdata,dtype=np.float64,count=nx*ny*nz*(15+3*num_part)).reshape([nx,ny,nz,15+3*num_part])
       cdata.close()
 
-      #we calculate the extrema of the grid, assuming that it symmetric
-      lx=nx*dx
-      xstart=-lx/2.+dx/2.
-      xend=-xstart
-      ly=ny*dy
-      ystart=-ly/2.+dy/2.
-      yend=-ystart
-      lz=nz*dz
-      zstart=-lz/2.+dz/2.
-      zend=-zstart
+      #we calculate the extrema of the grid
+      xend=xstart+nx*dx-dx/2.
+      yend=ystart+ny*dy-dx/2.
+      zend=zstart+nz*dz-dx/2.
 
       #we get the extrema of the grid and the position of the cells
-      xx=np.linspace(xstart,xend,num=nx)
-      yy=np.linspace(ystart,yend,num=ny)
-      zz=np.linspace(zstart,zend,num=nz)
+      xx=np.linspace(xstart+dx/2.,xend,num=nx, endpoint=True)
+      yy=np.linspace(ystart+dy/2.,yend,num=ny, endpoint=True)
+      zz=np.linspace(zstart+dz/2.,zend,num=nz, endpoint=True)
 
+      print("Array with x axis coordinates:")
+      print(str(xx))
+      print("Array with y axis coordinates:")
+      print(str(yy))
+      print("Array with z axis coordinates:")
+      print(str(zz))
+   
       #arrays to store coarse graining data
       print("Allocating and initializing arrays... ")
       vx=np.zeros((nt,nx,ny,nz),dtype=np.float64)
@@ -248,6 +252,10 @@ for ff in range(nt):
       if((dx_new != dx) or (dy_new != dy) or (dz_new != dz)):
         print("FATAL ERROR: different grid resolution!!! Expected: "+str(dx)+", "+str(dy)+", "+str(dz)+", read now: "+str(dx_new)+", "+str(dy_new)+", "+str(dz_new))
         sys.exit(2)
+      xstart_new,ystart_new,zstart_new=np.fromfile(cdata,dtype=np.float64,count=3) 
+      if((xstart_new != xstart) or (ystart_new != ystart) or (zstart_new != zstart)):
+        print("FATAL ERROR: different grid resolution!!! Expected: "+str(xstart)+", "+str(ystart)+", "+str(zstart)+", read now: "+str(xstart_new)+", "+str(ystart_new)+", "+str(zstart_new))
+        sys.exit(2)
       datas=np.fromfile(cdata,dtype=np.float64,count=nx*ny*nz*(15+3*num_part)).reshape([nx,ny,nz,15+3*num_part])
       cdata.close()
 
@@ -272,6 +280,10 @@ for ff in range(nt):
     dx_T,dy_T,dz_T=np.fromfile(Tdata,dtype=np.float64,count=3) 
     if((dx_T != dx) or (dy_T != dy) or (dz_T != dz)):
       print("FATAL ERROR: different grid resolution between energy-momentum and densities tensors!!! Expected: "+str(dx)+", "+str(dy)+", "+str(dz)+", read now: "+str(dx_T)+", "+str(dy_T)+", "+str(dz_T))
+      sys.exit(2)
+    xstart_T,ystart_T,zstart_T=np.fromfile(Tdata,dtype=np.float64,count=3) 
+    if((xstart_T != xstart) or (ystart_T != ystart) or (zstart_T != zstart)):
+      print("FATAL ERROR: different grid resolution between energy-momentum and densities tensors!!! Expected: "+str(xstart)+", "+str(ystart)+", "+str(zstart)+", read now: "+str(xstart_T)+", "+str(ystart_T)+", "+str(zstart_T))
       sys.exit(2)
     Tp=np.fromfile(Tdata,dtype=np.float64,count=nx*ny*nz*num_part*10).reshape([nx,ny,nz,num_part,10])
     Jb=np.fromfile(Tdata,dtype=np.float64,count=nx*ny*nz*4,offset=nx*ny*nz*num_part*4*8).reshape([nx,ny,nz,4])
