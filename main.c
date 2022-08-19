@@ -54,6 +54,8 @@ const int index_of_output_file=3;//index of the output file in argv
 
 const int start_index=4;//index of the argument reporting the first input file. 
 
+const int shift_resonance_index = 10000; //index offset to distinguish resonances and stable particles
+
 double *time_int_array; //array with the selected times
 
 /** @brief main function

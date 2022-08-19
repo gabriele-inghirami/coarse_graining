@@ -1,4 +1,4 @@
-#ifndef DEFINE
+#ifndef DEF_MAIN
 #include "definitions.h"
 #endif
 

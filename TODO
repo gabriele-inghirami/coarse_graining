@@ -1,4 +1,7 @@
+SHORT - MEDIUM TERM:
 - check and test to_landau.c
 - extend to_text.c to the output of to_landau.exe
 - extend to_2D.c to the output of to_landau.exe
 
+LONG TERM:
+- use a different procedure to identify particles, the current hardcoded switch/if scheme makes difficult to include new hadrons

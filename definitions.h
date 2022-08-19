@@ -135,6 +135,11 @@
 #error NP cannot be larger than 35!
 #endif
 
+/**
+* INCLUDE_RESONANCES if defined we compute also the energy momentum tensor and the four current of rho0 mesons and Delta++ baryons 
+*/
+#define INCLUDE_RESONANCES 
+
 #ifdef URQMD
 /**
 * \struct pdata (UrQMD) 

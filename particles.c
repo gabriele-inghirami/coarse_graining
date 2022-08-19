@@ -7,6 +7,8 @@
 *   @brief this file contains the functions dealing with the particles to include in the computation: get_particle_index and associate_particle_array_index
 */
 
+extern shift_resonance_index;
+
 #ifdef URQMD
 //given the UrQMD particle itpye and iso3, it return the particle index
 int get_particle_index(int itype, int iso3)
@@ -97,11 +99,23 @@ case(55):
 case(-55):
 	result=34; //Anti-Omega1672
 	break;
+#ifdef INCLUDE_RESONANCES
+case(104):
+    if(iso3==0) result=0+shift_resonance_index; //rho0 meson
+    break;
+case(17):
+    if(iso3==3) result=1+shift_resonance_index; //Delta++
+    break;
+#endif
 //index for other particles
 default:
 	result=NP; //all other particles
 }
+#ifdef INCLUDE_RESONANCES
+if((result > NP) && (result<shift_resonance_index)) result=NP;
+#else
 if(result > NP) result=NP;
+#endif
 return result;
 }
 
@@ -224,11 +238,23 @@ case(3334):
 case(-3334):
 	result=34; //Anti-Omega1672
 	break;
+#ifdef INCLUDE_RESONANCES
+case(113):
+    result=0+shift_resonance_index; //rho0 meson
+    break;
+case(2224):
+    result=1+shift_resonance_index; //Delta++
+    break;
+#endif
 //index for other particles
 default:
 	result=NP; //all other particles
 }
+#ifdef INCLUDE_RESONANCES
+if((result > NP) && (result<shift_resonance_index)) result=NP;
+#else
 if(result > NP) result=NP;
+#endif
 return result;
 }
 
@@ -347,7 +373,23 @@ case(34):
         break;
 default:
         return "All other particles"; 
+    }
 }
+
+//it returns the name of the resonance given its array index
+const char* associate_resonance_array_index(int index)
+{
+switch(index) {
+case(0):
+	return "Rho0- * UrQMD itype 104, 2iso3 3, charge 0 * PDG ID 113";
+        break;
+case(1):
+	return "Pion+ * UrQMD itype 101, 2iso3 2, charge +1 * PDG ID 211";
+        break;
+default:
+    printf("Warning, unhandled resonance!!!!");
+    return "Unknown resonance";
+    }
 }
 
 #ifdef URQMD
