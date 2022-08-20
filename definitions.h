@@ -113,12 +113,6 @@
 */
 #define BMAX 3.5
 
-/**
-* MAX_MEMORY_ALLOC defines the maximum fraction of the total memory of the system that the program should use. If this value is exceeded, the data must processed in intermediate steps.
-*
-*/
-#define MAX_MEMORY_ALLOC 0.98
-
 //in a previous version we used long int for all variable to avoid type casting, we should check if there is a significant difference in the speed of execution
 #define TLOC 10*(p+np*(k+nz*(j+ny*(i+(long)h*nx))))
 #define JPL 4*(p+np*(k+nz*(j+ny*(i+(long)h*nx))))
@@ -139,6 +133,11 @@
 * INCLUDE_RESONANCES if defined we compute also the energy momentum tensor and the four current of rho0 mesons and Delta++ baryons 
 */
 #define INCLUDE_RESONANCES 
+
+/**
+* NR the number of resonance, it is hardcoded. Right now we have just rho0 mesons and Delta++ baryons.
+*/
+#define NR 2 
 
 #ifdef URQMD
 /**

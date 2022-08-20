@@ -7,7 +7,7 @@
 *   @brief this file contains the functions dealing with the particles to include in the computation: get_particle_index and associate_particle_array_index
 */
 
-extern shift_resonance_index;
+extern const int shift_resonance_index;
 
 #ifdef URQMD
 //given the UrQMD particle itpye and iso3, it return the particle index

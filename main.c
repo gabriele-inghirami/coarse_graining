@@ -24,6 +24,7 @@ int const nx = NX_DEF;
 int const ny = NY_DEF;
 int const nz = NZ_DEF;
 int const np = NP+1;
+int const nr = NR;
 
 const char Tplabel[]="_Tmunu_";
 const char infolabel[]="_Tmunu_info.dat";
@@ -80,6 +81,11 @@ double *Jc; //< The array containing the net electric four current. It is a line
 double *Js; //< The array containing the net strangeness four current. It is a linear array of dimensions: nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively and 4 corresponds to the four covariant components.
 double *Jt; //< The array containing the total baryon four current. It is a linear array of dimensions: nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively and 4 corresponds to the four covariant components.
 long int *Pnum; //< The array containing the total number of individual particle species. It is a linear array of dimensions: nt*nx*ny*nz*np, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, np is the number of particles. Each entry tells the total number of particles of the species p.
+#ifdef INCLUDE_RESONANCES
+long int *Rnum; //< The array containing the total number of individual resonance species. It is a linear array of dimensions: nt*nx*ny*nz*nr, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, nr is the number of resonances. Each entry tells the total number of resonances of the species r.
+double *Jr; //< The array containing the four current of resonances. It is a linear array of dimensions: nt*nx*ny*nz*nr*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, nr is the number of resonances and 4 corresponds to the four covariant components for each particle.
+double *Tr; //< The array containing the T_munu tensor for resonances. It is a linear array of dimensions: nt*nx*ny*nz*nr*10, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, nr is the number of particles and 10 corresponds to the ten energy momentum tensor components for each particle. 
+#endif
 
 long int nevents=0;//< The number of events
 char * outputfile;
@@ -109,8 +115,6 @@ else
 	outputfile=argv[3];
 }
 
-
-max_memory_allocatable_data=sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGE_SIZE)*MAX_MEMORY_ALLOC;
 
 //formal check of the parameters
 if((strncmp(argv[1],"comp",4) == 0) || (strncmp(argv[1],"avg",3) == 0))
@@ -167,17 +171,26 @@ if((strncmp(argv[1],"comp",4) == 0) || (strncmp(argv[1],"avg",3) == 0))
 	  printf("Sorry, but it is not possible to allocate the Pnum array inside main. I am forced to quit.\n");
 	  exit(4);
   }
-
-
-  big_arrays_allocated_mem=((size_t)(14*sizeof(double)*nt*np)+(size_t)(4*sizeof(double)*nt))*((size_t)(nx*ny*nz));
-  if(big_arrays_allocated_mem>max_memory_allocatable_data)
+  #ifdef INCLUDE_RESONANCES
+  Jr=(double *)calloc(nt*nx*ny*nz*nr*4,sizeof(double));
+  if(Jr==NULL)
   {
-	  printf("The memory required for the allocation of the main arrays is %zu.\n",big_arrays_allocated_mem);
-	  printf("The total ram of this system is estimated to be %zu.\n",sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGE_SIZE));
-	  printf("The ram memory usable by the program according to the parameter MAX_MEMORY_ALLOC in particle_definitions.h (which sets the fraction of the available memory) is %zu\n.",max_memory_allocatable_data);
-	  printf("Please, check your settings again. I quit.\n");
+      printf("Sorry, but it is not possible to allocate the Jr array inside main. I am forced to quit.\n");
+      exit(4);
+  }
+  Tr=(double *)calloc(nt*nx*ny*nz*nr*10,sizeof(double));
+  if(Tr==NULL)
+  {
+	  printf("Sorry, but it is not possible to allocate the Tr array inside main. I am forced to quit.\n");
 	  exit(4);
-  } 
+  }
+  Rnum=(long int *)calloc(nt*nx*ny*nz*nr,sizeof(long int));
+  if(Rnum==NULL)
+  {
+	  printf("Sorry, but it is not possible to allocate the Rnum array inside main. I am forced to quit.\n");
+	  exit(4);
+  }
+  #endif
 }
 else
 {
@@ -196,14 +209,6 @@ if((strncmp(argv[1],"comp",4) == 0))
 }
 else if(strncmp(argv[1],"avg",3) == 0)
 {
-  if(big_arrays_allocated_mem*2>max_memory_allocatable_data)
-  {
-	  printf("The memory required for the allocation of the main arrays (in the average procedure we need them twice) is %zu.\n",big_arrays_allocated_mem*2);
-	  printf("The total ram of this system is estimated to be %zu.\n",sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGE_SIZE));
-	  printf("The ram memory usable by the program according to the parameter MAX_MEMORY_ALLOC in particle_definitions.h (which sets the fraction of the available memory) is %zu\n.",max_memory_allocatable_data);
-	  printf("Please, check your settings again. I quit.\n");
-	  exit(4);
-  } 
   avg(argv,argc,Tp,Jp,Jb,Jc,Js,Jt,Pnum,&nevents);
 }
 else //we already checked all main options, so we should never come here
@@ -237,6 +242,11 @@ free(Jc);
 free(Js);
 free(Jt);
 free(Pnum);
+#ifdef INCLUDE_RESONANCES
+free(Rnum);
+free(Tr);
+free(Jr);
+#endif
 #ifdef SMASH
 free(plist);
 #endif
