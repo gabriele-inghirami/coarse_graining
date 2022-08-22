@@ -3,5 +3,9 @@ SHORT - MEDIUM TERM:
 - extend to_text.c to the output of to_landau.exe
 - extend to_2D.c to the output of to_landau.exe
 
+MEDIUM TERM:
+- take the information for the average process from the files, so that one does not need to have matching binaries
+
 LONG TERM:
 - use a different procedure to identify particles, the current hardcoded switch/if scheme makes difficult to include new hadrons
+- restructure output in a more scalable way

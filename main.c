@@ -1,3 +1,5 @@
+/* Author: Gabriele Inghirami g.inghirami@gsi.de (2019-2022) - License: GPLv3 */
+
 #ifndef DEF_MAIN
 #include "definitions.h"
 #endif
@@ -33,8 +35,6 @@ const char info_dens_label[]="_densities_info.dat";
 
 int nt;
 size_t pdata_totmem=0;
-size_t big_arrays_allocated_mem=0;
-size_t max_memory_allocatable_data;
 
 const int T10=T01;
 const int T20=T02;
@@ -56,6 +56,8 @@ const int index_of_output_file=3;//index of the output file in argv
 const int start_index=4;//index of the argument reporting the first input file. 
 
 const int shift_resonance_index = 10000; //index offset to distinguish resonances and stable particles
+
+int output_content_info = 0; //it provides information about which quantities are included in the output
 
 double *time_int_array; //array with the selected times
 
@@ -79,13 +81,11 @@ double *Jp; //< The array containing the four current of all particle species. I
 double *Jb; //< The array containing the net baryon four current. It is a linear array of dimensions: nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively and 4 corresponds to the four covariant components.
 double *Jc; //< The array containing the net electric four current. It is a linear array of dimensions: nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively and 4 corresponds to the four covariant components.
 double *Js; //< The array containing the net strangeness four current. It is a linear array of dimensions: nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively and 4 corresponds to the four covariant components.
-double *Jt; //< The array containing the total baryon four current. It is a linear array of dimensions: nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively and 4 corresponds to the four covariant components.
+double *Jt; //< The array containing the total baryon four current. It is a linear array of dimensions: nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively and 4 corresponds to the four covariant components. If INCLUDE_TOTAL_BARYON is not defined, it simply points to a 0 double.
 long int *Pnum; //< The array containing the total number of individual particle species. It is a linear array of dimensions: nt*nx*ny*nz*np, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, np is the number of particles. Each entry tells the total number of particles of the species p.
-#ifdef INCLUDE_RESONANCES
-long int *Rnum; //< The array containing the total number of individual resonance species. It is a linear array of dimensions: nt*nx*ny*nz*nr, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, nr is the number of resonances. Each entry tells the total number of resonances of the species r.
-double *Jr; //< The array containing the four current of resonances. It is a linear array of dimensions: nt*nx*ny*nz*nr*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, nr is the number of resonances and 4 corresponds to the four covariant components for each particle.
-double *Tr; //< The array containing the T_munu tensor for resonances. It is a linear array of dimensions: nt*nx*ny*nz*nr*10, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, nr is the number of particles and 10 corresponds to the ten energy momentum tensor components for each particle. 
-#endif
+long int *Rnum; //< The array containing the total number of individual resonance species. It is a linear array of dimensions: nt*nx*ny*nz*nr, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, nr is the number of resonances. Each entry tells the total number of resonances of the species. If INCLUDE_RESONANCES is not defined, it simply points to a 0 double.
+double *Jr; //< The array containing the four current of resonances. It is a linear array of dimensions: nt*nx*ny*nz*nr*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, nr is the number of resonances and 4 corresponds to the four covariant components for each particle. If INCLUDE_RESONANCES is not defined, it simply points to a 0 double.
+double *Tr; //< The array containing the T_munu tensor for resonances. It is a linear array of dimensions: nt*nx*ny*nz*nr*10, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively, nr is the number of particles and 10 corresponds to the ten energy momentum tensor components for each particle. If INCLUDE_RESONANCES is not defined, it simply points to a 0 double.
 
 long int nevents=0;//< The number of events
 char * outputfile;
@@ -159,12 +159,17 @@ if((strncmp(argv[1],"comp",4) == 0) || (strncmp(argv[1],"avg",3) == 0))
 	  printf("Sorry, but it is not possible to allocate the Js array inside main. I am forced to quit.\n");
 	  exit(4);
   }
+  #ifdef TOTAL_BARYON
+  output_content_info+=10;
   Jt=(double *)calloc(nt*nx*ny*nz*4,sizeof(double));
   if(Jt==NULL)
   {
 	  printf("Sorry, but it is not possible to allocate the Jt array inside main. I am forced to quit.\n");
 	  exit(4);
   }
+  #else
+  Jt=(double *)calloc(1,sizeof(double)); //we skip the check, if it fails we are in big troubles anyway
+  #endif
   Pnum=(long int *)calloc(nt*nx*ny*nz*np,sizeof(long int));
   if(Pnum==NULL)
   {
@@ -172,6 +177,7 @@ if((strncmp(argv[1],"comp",4) == 0) || (strncmp(argv[1],"avg",3) == 0))
 	  exit(4);
   }
   #ifdef INCLUDE_RESONANCES
+  output_content_info+=100;
   Jr=(double *)calloc(nt*nx*ny*nz*nr*4,sizeof(double));
   if(Jr==NULL)
   {
@@ -190,6 +196,11 @@ if((strncmp(argv[1],"comp",4) == 0) || (strncmp(argv[1],"avg",3) == 0))
 	  printf("Sorry, but it is not possible to allocate the Rnum array inside main. I am forced to quit.\n");
 	  exit(4);
   }
+  #else
+  //if the allocation of 3 doubles fails probably the system is unable to go on, so we skip the check
+  Jr=(double *)calloc(1,sizeof(double));
+  Tr=(double *)calloc(1,sizeof(double));
+  Rnum=(double *)calloc(1,sizeof(double));
   #endif
 }
 else
@@ -205,11 +216,11 @@ if((strncmp(argv[1],"comp",4) == 0))
   #ifdef SMASH
   prepare_smash_hadron_array(); 
   #endif
-  compute(argv,argc,Tp,Jp,Jb,Jc,Js,Jt,Pnum,&nevents);  
+  compute(argv,argc,Tp,Jp,Jb,Jc,Js,Jt,Jr,Tr,Pnum,Rnum,&nevents);  
 }
 else if(strncmp(argv[1],"avg",3) == 0)
 {
-  avg(argv,argc,Tp,Jp,Jb,Jc,Js,Jt,Pnum,&nevents);
+  avg(argv,argc,Tp,Jp,Jb,Jc,Js,Jt,Jr,Tr,Pnum,Rnum,&nevents);
 }
 else //we already checked all main options, so we should never come here
 {
@@ -217,7 +228,7 @@ else //we already checked all main options, so we should never come here
   exit(1);
 }
 printf("Writing the energy momentum tensor and the four currents.\n");
-write_results(outputfile,Tp,Jp,Jb,Jc,Js,Jt,Pnum,nevents);
+write_results(outputfile,Tp,Jp,Jb,Jc,Js,Jt,Jr,Tr,Pnum,Rnum,nevents);
 
 print_dens=atoi(argv[2]);
 switch(print_dens)
@@ -227,7 +238,7 @@ switch(print_dens)
 	break;
 	
 	case 1:
-	write_densities(outputfile,Tp,Jp,Jb,Jc,Js,Jt,Pnum,nevents);
+	write_densities(outputfile,Tp,Jp,Jb,Jc,Js,Jt,Jr,Tr,Pnum,Rnum,nevents);
 	break;
 	
 	default:
@@ -242,15 +253,12 @@ free(Jc);
 free(Js);
 free(Jt);
 free(Pnum);
-#ifdef INCLUDE_RESONANCES
 free(Rnum);
 free(Tr);
 free(Jr);
-#endif
 #ifdef SMASH
 free(plist);
 #endif
-big_arrays_allocated_mem=0;
 return 0;
 }
 

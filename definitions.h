@@ -1,3 +1,5 @@
+/* Author: Gabriele Inghirami (2018-2022) - License: GPLv3 */
+
 /**
 * @file definitions.h
 *
@@ -118,6 +120,8 @@
 #define JPL 4*(p+np*(k+nz*(j+ny*(i+(long)h*nx))))
 #define JBL 4*(k+nz*(j+ny*(i+(long)h*nx)))
 #define PNLOC (p+np*(k+nz*(j+ny*(i+(long)h*nx))))
+#define RTLOC 10*(r+nr*(k+nz*(j+ny*(i+(long)h*nx))))
+#define RNLOC (r+nr*(k+nz*(j+ny*(i+(long)h*nx))))
 
 /**
 * NP the number of particles: from 0 to all "stable" (lifetime > 10 fm) particles (maximum 35)
@@ -131,8 +135,15 @@
 
 /**
 * INCLUDE_RESONANCES if defined we compute also the energy momentum tensor and the four current of rho0 mesons and Delta++ baryons 
+* comment the next line to disable it
 */
 #define INCLUDE_RESONANCES 
+
+/**
+* INCLUDE_TOTAL_BARYON if defined we compute also the four current of the total baryons 
+* comment the next line to disable it
+*/
+#define INCLUDE_TOTAL_BARYON
 
 /**
 * NR the number of resonance, it is hardcoded. Right now we have just rho0 mesons and Delta++ baryons.
@@ -250,7 +261,7 @@ enum {J0=0,J1,J2,J3}; /**< \enum The flattened indexes of four momentum componen
 *
 *   @param[in] *Tp a pointer to the energy momentum tensor of the particle species
 *
-*   @param[in] *Jp a pointer to the partticle species four current
+*   @param[in] *Jp a pointer to the particle species four currents
 *
 *   @param[in] *Jb a pointer to the net baryon four current
 *
@@ -260,11 +271,17 @@ enum {J0=0,J1,J2,J3}; /**< \enum The flattened indexes of four momentum componen
 *
 *   @param[in] *Jt a pointer to the total baryon four current
 *
+*   @param[in] *Jr a pointer to the resonance species four currents
+*
+*   @param[in] *Tr a pointer to the energy momentum tensor of the resonance species
+*
 *   @param[in] *Pnum a pointer to the number of hadrons for each species 
+*
+*   @param[in] *Rnum a pointer to the number of resonances for each species 
 *
 *   @param[out] nevents the number of events (long int)
 */
-int compute(char **, int, double_t *, double_t *, double_t *,  double_t *, double_t *, double_t*, long int *, long int *);
+int compute(char **, int, double_t *, double_t *, double_t *,  double_t *, double_t *, double_t*, double_t *, double_t*, long int *, long int *, long int *);
 
 
 /** @brief It averages the results of previously computed energy momentum tensors and four currents
@@ -275,7 +292,7 @@ int compute(char **, int, double_t *, double_t *, double_t *,  double_t *, doubl
 *
 *   @param[in] *Tp a pointer to the energy momentum tensor of the particle species
 *
-*   @param[in] *Jp a pointer to the partticle species four current
+*   @param[in] *Jp a pointer to the particle species four current
 *
 *   @param[in] *Jb a pointer to the net baryon four current
 *
@@ -285,18 +302,24 @@ int compute(char **, int, double_t *, double_t *, double_t *,  double_t *, doubl
 *
 *   @param[in] *Jt a pointer to the total baryon four current
 *
+*   @param[in] *Jr a pointer to the resonance species four currents
+*
+*   @param[in] *Tr a pointer to the energy momentum tensor of the resonance species
+*
 *   @param[in] *Pnum a pointer to the number of hadrons for each species 
+*
+*   @param[in] *Rnum a pointer to the number of resonances for each species 
 *
 *   @param[out] nevents the number of events (long int)
 *
 */
-int avg(char **, int, double_t *, double_t *, double_t *,  double_t *, double_t *, double_t *, long int *, long int *);
+int avg(char **, int, double_t *, double_t *, double_t *,  double_t *, double_t *, double_t *, double_t *, double_t*, long int *, long int *, long int *);
 
 
 /** @brief It processes data
 */
 
-int process_data(double_t *, double_t *, double_t *,  double_t *, double_t *, double_t *, long int *, long int, pdata *);
+int process_data(double_t *, double_t *, double_t *,  double_t *, double_t *, double_t *, double_t *, double_t*, long int *, long int*, long int, pdata *);
 
 /** @brief It returns the index of the particle in Tmunu or the number of Tmunu entries if 0,0 (UrQMD) or 0 (SMASH) are given as arguments
  * The version for UrQMD takes itype and iso3, the version for SMASH takes pdg_id
@@ -316,13 +339,13 @@ int get_particle_index(int);
  * */
 int get_strangeness(int);
 
-/** @brief it reads the datta from an UrQMD output file or a SMASH binary output file
+/** @brief it reads the data from an UrQMD output file or a SMASH binary output file
 *
 *   @param[in] a char pointer to the name of the file
 *
 *   @param[in] *Tp a pointer to the energy momentum tensor of the particle species
 *
-*   @param[in] *Jp a pointer to the partticle species four current
+*   @param[in] *Jp a pointer to the particle species four current
 *
 *   @param[in] *Jb a pointer to the net baryon four current
 *
@@ -332,7 +355,13 @@ int get_strangeness(int);
 *
 *   @param[in] *Jt a pointer to the total baryon four current
 *
+*   @param[in] *Jr a pointer to the resonance species four currents
+*
+*   @param[in] *Tr a pointer to the energy momentum tensor of the resonance species
+*
 *   @param[in] *Pnum a pointer to the number of hadrons for each species 
+*
+*   @param[in] *Rnum a pointer to the number of resonances for each species 
 *
 *   @param[out] nevents the number of events (long int)
 *   
@@ -341,7 +370,7 @@ int get_strangeness(int);
 *   \callgraph
 */
 
-void read_data(char *, double_t *, double_t *, double_t *,  double_t *, double_t *, double_t*, long int *, long int *, double_t *);
+void read_data(char *, double_t *, double_t *, double_t *,  double_t *, double_t *, double_t*, double_t *, double_t*, long int *, long int *, long int *, double_t *);
 
 /** @brief it takes the timesteps to analize from a text files and it stores them into an array
 *
@@ -360,7 +389,7 @@ void get_timesteps(char *, int *, double **);
 *
 *   @param[in] *Tp a pointer to the energy momentum tensor of the particle species
 *
-*   @param[in] *Jp a pointer to the partticle species four current
+*   @param[in] *Jp a pointer to the particle species four current
 *
 *   @param[in] *Jb a pointer to the net baryon four current
 *
@@ -370,12 +399,18 @@ void get_timesteps(char *, int *, double **);
 *
 *   @param[in] *Jt a pointer to the total baryon four current
 *
+*   @param[in] *Jr a pointer to the resonance species four currents
+*
+*   @param[in] *Tr a pointer to the energy momentum tensor of the resonance species
+*
 *   @param[in] *Pnum a pointer to the number of hadrons for each species 
+*
+*   @param[in] *Rnum a pointer to the number of resonances for each species 
 *
 *   @param[out] nevents the number of events (long int)
 *   \callgraph
 */
-void write_densities(char *, double_t *, double_t *, double_t *,  double_t *, double_t *, double_t*, long int *, long int);
+void write_densities(char *, double_t *, double_t *, double_t *,  double_t *, double_t *, double_t*, double_t *, double_t*, long int *, long int *, long int);
 
 
 
@@ -395,12 +430,18 @@ void write_densities(char *, double_t *, double_t *, double_t *,  double_t *, do
 *
 *   @param[in] *Jt a pointer to the total baryon four current
 *
+*   @param[in] *Jr a pointer to the resonance species four currents
+*
+*   @param[in] *Tr a pointer to the energy momentum tensor of the resonance species
+*
 *   @param[in] *Pnum a pointer to the number of hadrons for each species 
+*
+*   @param[in] *Rnum a pointer to the number of resonances for each species 
 *
 *   @param[in] nevents the number of events (long int)
 *   \callgraph
 */
-void write_results(char *, double_t *, double_t *, double_t *,  double_t *, double_t *, double_t*, long int *, long int);
+void write_results(char *, double_t *, double_t *, double_t *,  double_t *, double_t *, double_t*, double_t *, double_t*, long int *, long int *, long int);
 
 /** @brief it checks all input files exist. If not, it stops the program execution.
 *   \callgraph
@@ -411,6 +452,10 @@ void check_input_files(char **, int);
 /** @brief it returns the name of a particle from its index
 */
 const char* associate_particle_array_index(int);
+
+/** @brief it returns the name of a resonance from its index
+*/
+const char* associate_resonance_array_index(int);
 
 /** @brief it associates to a hadron it baryon number, strangeness, total spin and electric charge from its PDG id
  *

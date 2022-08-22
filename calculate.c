@@ -1,3 +1,5 @@
+/* Author: Gabriele Inghirami g.inghirami@gsi.de (2019-2022) - License: GPLv3 */
+
 #ifndef DEF_MAIN
 #include "definitions.h"
 #endif
@@ -8,8 +10,8 @@
 *
 */
 
-extern size_t pdata_totmem, max_memory_allocatable_data, big_arrays_allocated_mem;
-extern int nt, np;
+extern size_t pdata_totmem;
+extern int nt, np, nr;
 extern const int nx, ny, nz;
 extern const double dx, dy, dz;
 extern const double xmin, ymin, zmin;
@@ -19,8 +21,9 @@ extern short int b_selection;
 extern double *time_int_array;
 extern const char Tplabel[];
 extern const char infolabel[];
+extern const int shift_resonance_index;
 
-int compute(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double *Jt, long int *Pnum, long int *nevents)
+int compute(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double *Jt, double *Jr, double *Tr, long int *Pnum, long int *Rnum, long int *nevents)
 {
 char *fout; //name of the output file
 int k,idx,nf,it; //number of timesteps to examine, number of input files
@@ -141,17 +144,12 @@ for(idx=0;idx<nf;idx++)
 	}		
 	fclose(infile);
 	printf("File %s read.\n",files[idx+start_index]);
-	if(((pdata_totmem+big_arrays_allocated_mem)>max_memory_allocatable_data) && (idx<nf-1))//if we are working on the last file, we will process the data anyway
-	{
-		process_data(Tp, Jp, Jb, Jc, Js, Jt, Pnum, *nevents, pdata_start);
-		//process_data, hopefully, should deallocate all the memory for pdata structures in the linked list,
-		//so we reset the memory counter and we repeat the initial allocation step
-		pdata_totmem=0;
-		pdata_current=(pdata *)malloc(sizeof(pdata));
-		pdata_start=pdata_current;
-		
-	}
-	
+	process_data(Tp, Jp, Jb, Jc, Js, Jt, Jt, Tr, Pnum, Rnum, *nevents, pdata_start);
+	//process_data, hopefully, should deallocate all the memory for pdata structures in the linked list,
+	//so we reset the memory counter and we repeat the initial allocation step
+	pdata_totmem=0;
+	pdata_current=(pdata *)malloc(sizeof(pdata));
+	pdata_start=pdata_current;
  }
 
    
@@ -338,17 +336,12 @@ for(idx=0;idx<nf;idx++)
     }
     fclose(infile);
     printf("File %s read, with events %u.\n",files[idx+start_index],event_number+1);
-    if(((pdata_totmem+big_arrays_allocated_mem)>max_memory_allocatable_data) && (idx<nf-1))//if we are working on the last file, we will process the data anyway
-    {
-	process_data(Tp, Jp, Jb, Jc, Js, Jt, Pnum, *nevents, pdata_start);
+	process_data(Tp, Jp, Jb, Jc, Js, Jt, Jr, Tr, Pnum, Rnum, *nevents, pdata_start);
 	//process_data, hopefully, should deallocate all the memory for pdata structures in the linked list,
 	//so we reset the memory counter and we repeat the initial allocation step
 	pdata_totmem=0;
 	pdata_current=(pdata *)malloc(sizeof(pdata));
 	pdata_start=pdata_current;
-		
-    }
-	
 }
 
    
@@ -361,7 +354,7 @@ buffer_smash=NULL;
 #endif
 
 
-process_data(Tp, Jp, Jb, Jc, Js, Jt, Pnum, *nevents, pdata_start);
+process_data(Tp, Jp, Jb, Jc, Js, Jt, Jr, Tr, Pnum, Rnum, *nevents, pdata_start);
 
 printf("Number of events: %ld\n",*nevents);
 
@@ -370,12 +363,12 @@ return 0;
 }
 
 
-int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double *Jt, long int *Pnum, long int *nevents)
+int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double *Jt, double *Jr, double *Tr, long int *Pnum, long int *Rnum, long int *nevents)
 {
-    double *Tp2, *Jp2, *Jb2, *Jc2, *Js2, *Jt2;
-    long int *Pnum2;
+    double *Tp2, *Jp2, *Jb2, *Jc2, *Js2, *Jt2, *Tr2, *Jr2;
+    long int *Pnum2, *Rnum2;
     double time_check;
-    int nf,h,f,i,j,k,p,r;
+    int nf,h,f,i,j,k,l,p,r;
     long int nevents2;
     char *input_filename_Tp;
     char time_suffix[8];
@@ -416,18 +409,49 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
 	  printf("Sorry, but it is not possible to allocate the Js2 array inside main. I am forced to quit.\n");
 	  exit(4);
     }
+    #ifdef INCLUDE_TOTAL_BARYON
     Jt2=(double *)malloc(sizeof(double)*nx*ny*nz*4);
     if(Jt2==NULL)
     {
 	  printf("Sorry, but it is not possible to allocate the Jt2 array inside main. I am forced to quit.\n");
 	  exit(4);
     }
+    #else
+    Jt2=(double *)malloc(sizeof(double));
+    #endif
+    #ifdef INCLUDE_RESONANCES
+    Jr2=(double *)malloc(sizeof(double)*nx*ny*nz*nr*4);
+    if(Jr2==NULL)
+    {
+	  printf("Sorry, but it is not possible to allocate the Jr2 array inside avg. I am forced to quit.\n");
+	  exit(4);
+    }
+    Tr2=(double *)malloc(sizeof(double)*nx*ny*nz*nr*10);
+    if(Tr2==NULL)
+	{
+	  printf("Sorry, but it is not possible to allocate the Tr2 array inside avg. I am forced to quit.\n");
+	  exit(4);
+    }
+    #else
+    Jr2=(double *)malloc(sizeof(double));
+    Tr2=(double *)malloc(sizeof(double));
+    #endif
     Pnum2=(long int *)malloc(sizeof(long int)*nx*ny*nz*np);
     if(Pnum2==NULL)
     {
 	  printf("Sorry, but it is not possible to allocate the Pnum2 array inside main. I am forced to quit.\n");
 	  exit(4);
     }
+    #ifdef INCLUDE_RESONANCES
+    Rnum2=(long int *)malloc(sizeof(long int)*nx*ny*nz*nr);
+    if(Rnum2==NULL)
+    {
+	  printf("Sorry, but it is not possible to allocate the Rnum2 array inside main. I am forced to quit.\n");
+	  exit(4);
+    }
+    #else
+    Rnum2=(long int *)malloc(sizeof(long int));
+    #endif
     //we already checked that the allocated memory was less than the maximum allocatable in the first part of the main function, so we do not do it again here
     nf=ninfiles-start_index;//the number of input files with Tmunu data
     
@@ -435,7 +459,7 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
     {  
         inputfile=files[start_index+f];
          
-	read_data(inputfile,Tp2,Jp2,Jb2,Jc2,Js2,Jt2,Pnum2,&nevents2,&time_check);
+	read_data(inputfile,Tp2,Jp2,Jb2,Jc2,Js2,Jt2,Jr2,Tr2,Pnum2,Rnum2,&nevents2,&time_check);
         if(timeref < 0)
         {
           timeref=time_check;
@@ -450,7 +474,7 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
 	  }
         }
 	*nevents+=nevents2;
-       	for(i=0;i<nx;i++)
+    for(i=0;i<nx;i++)
 	{
 	   for(j=0;j<ny;j++)
 	   {
@@ -506,6 +530,7 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
 	      }
            }				
 	}
+    #ifdef INCLUDE_TOTAL_BARYON
 	for(i=0;i<nx;i++)
 	{
 	   for(j=0;j<ny;j++)
@@ -516,6 +541,48 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
 	      }
            }				
 	}
+    #endif
+    #ifdef INCLUDE_RESONANCES
+	for(i=0;i<nx;i++)
+	{
+	   for(j=0;j<ny;j++)
+	   {
+	      for(k=0;k<nz;k++)					
+          {
+             for(r=0;r<nr;r++)					
+		     {
+                for(l=0;l<4;l++) Jr[l+RNLOC]+=Jr2[r+RNLOC];
+		     }
+	      }
+	   }				
+	}
+    for(i=0;i<nx;i++)
+	{
+	   for(j=0;j<ny;j++)
+	   {
+	      for(k=0;k<nz;k++)					
+	      {
+             for(r=0;r<nr;r++)					
+	         {
+	            for(l=0;l<10;l++) Tr[l+RTLOC]+=Tr2[l+RTLOC];
+		     }
+	      }
+	    }				
+	}
+	for(i=0;i<nx;i++)
+	{
+	   for(j=0;j<ny;j++)
+	   {
+	      for(k=0;k<nz;k++)					
+	      {
+             for(r=0;r<nr;r++)					
+		     {
+	            Rnum[RNLOC]+=Rnum2[RNLOC];
+		     }
+	      }
+       }				
+	}
+    #endif
 	for(i=0;i<nx;i++)
 	{
 	   for(j=0;j<ny;j++)
@@ -538,15 +605,18 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
     free(Jc2);
     free(Js2);
     free(Jt2);
+    free(Jr2);
+    free(Tr2);
     free(Pnum2);
+    free(Rnum2);
 return 0;
 }
 
 
 
-int process_data(double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double *Jt, long int *Pnum, long int nevents, pdata *pdata_input)
+int process_data(double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double *Jt, double *Jr, double *Tr, long int *Pnum, long int *Rnum, long int nevents, pdata *pdata_input)
 {
-	int h, i, j, k, p;
+	int h, i, j, k, p, r;
 	int jsign;
 	int continue_flag;
         int strangeness, baryon_number;
@@ -621,18 +691,39 @@ int process_data(double *Tp, double *Jp, double *Jb, double *Jc, double *Js, dou
 			}
 			continue;
 		}
-            h=pdata_entry->t_index;
-            #if (NP==0)
-              p=0;
-            #else
-              #ifdef URQMD
-	      p=get_particle_index(pdata_entry->itype,pdata_entry->iso3);
-              #elif defined(SMASH)
-	      p=get_particle_index(pdata_entry->pdg_id);
-              #endif
-            #endif
+        h=pdata_entry->t_index;
+        #if (NP==0)
+        p=0;
+        #else
+        #ifdef URQMD
+	    p=get_particle_index(pdata_entry->itype,pdata_entry->iso3);
+        #elif defined(SMASH)
+	    p=get_particle_index(pdata_entry->pdg_id);
+        #endif
+        #endif
+        #ifdef INCLUDE_RESONANCES
+        if (p>=shift_resonance_index) {
+           r=p-shift_resonance_index; //we remove the offset
+           p=np-1; //we set the rsonance to the catch-all entry
+        }
+        Rnum[RNLOC]+=1;
+	    Tr[T00+RTLOC]+=pdata_entry->en;
+	    Tr[T01+RTLOC]+=pdata_entry->px;
+	    Tr[T02+RTLOC]+=pdata_entry->py;
+	    Tr[T03+RTLOC]+=pdata_entry->pz;
+	    Tr[T11+RTLOC]+=(pdata_entry->px*pdata_entry->px)/(pdata_entry->en);
+	    Tr[T12+RTLOC]+=(pdata_entry->px*pdata_entry->py)/(pdata_entry->en);
+	    Tr[T13+RTLOC]+=(pdata_entry->px*pdata_entry->pz)/(pdata_entry->en);
+	    Tr[T22+RTLOC]+=(pdata_entry->py*pdata_entry->py)/(pdata_entry->en);
+	    Tr[T23+RTLOC]+=(pdata_entry->py*pdata_entry->pz)/(pdata_entry->en);
+	    Tr[T33+RTLOC]+=(pdata_entry->pz*pdata_entry->pz)/(pdata_entry->en);
+	    Jr[J0+RNLOC]+=1;
+        Jr[J1+RNLOC]+=(pdata_entry->px)/pdata_entry->en;
+        Jr[J2+RNLOC]+=(pdata_entry->py)/pdata_entry->en;
+        Jr[J3+RNLOC]+=(pdata_entry->pz)/pdata_entry->en;	    
+        #endif
 	    //tot2=tot2+1;
-            Pnum[PNLOC]+=1;
+        Pnum[PNLOC]+=1;
 	    Tp[T00+TLOC]+=pdata_entry->en;
 	    Tp[T01+TLOC]+=pdata_entry->px;
 	    Tp[T02+TLOC]+=pdata_entry->py;
@@ -644,18 +735,18 @@ int process_data(double *Tp, double *Jp, double *Jb, double *Jc, double *Js, dou
 	    Tp[T23+TLOC]+=(pdata_entry->py*pdata_entry->pz)/(pdata_entry->en);
 	    Tp[T33+TLOC]+=(pdata_entry->pz*pdata_entry->pz)/(pdata_entry->en);
 	    Jp[J0+JPL]+=1;
-            Jp[J1+JPL]+=(pdata_entry->px)/pdata_entry->en;
-            Jp[J2+JPL]+=(pdata_entry->py)/pdata_entry->en;
-            Jp[J3+JPL]+=(pdata_entry->pz)/pdata_entry->en;	    
-            #ifdef URQMD
-            strangeness=get_strangeness(pdata_entry->itype);
+        Jp[J1+JPL]+=(pdata_entry->px)/pdata_entry->en;
+        Jp[J2+JPL]+=(pdata_entry->py)/pdata_entry->en;
+        Jp[J3+JPL]+=(pdata_entry->pz)/pdata_entry->en;	    
+        #ifdef URQMD
+        strangeness=get_strangeness(pdata_entry->itype);
 	    if(abs(pdata_entry->itype)<100)
 	    {
 			if(pdata_entry->itype > 0) { jsign=1;}
 			else {jsign=-1;}
 	    #elif defined(SMASH)
 	    get_hadron_info(pdata_entry->pdg_id, &strangeness, &baryon_number);
-            //printf("hadron: %d p: %d strangeness: %d B: %d\n",pdata_entry->pdg_id,p,strangeness, baryon_number);
+        //printf("hadron: %d p: %d strangeness: %d B: %d\n",pdata_entry->pdg_id,p,strangeness, baryon_number);
 	    if(baryon_number!=0)
 	    {
 			jsign=baryon_number;
@@ -670,7 +761,7 @@ int process_data(double *Tp, double *Jp, double *Jb, double *Jc, double *Js, dou
 			Jt[J3+JBL]+=(pdata_entry->pz)/pdata_entry->en;	    
 
 	    }
-            Jc[J0+JBL]+=(pdata_entry->charge);
+        Jc[J0+JBL]+=(pdata_entry->charge);
 	    Jc[J1+JBL]+=(pdata_entry->charge)*(pdata_entry->px)/pdata_entry->en;
 	    Jc[J2+JBL]+=(pdata_entry->charge)*(pdata_entry->py)/pdata_entry->en;
 	    Jc[J3+JBL]+=(pdata_entry->charge)*(pdata_entry->pz)/pdata_entry->en;	    
@@ -694,7 +785,7 @@ int process_data(double *Tp, double *Jp, double *Jb, double *Jc, double *Js, dou
 		continue;
 			
 	}
-	printf("Tmunu, Jp, Jb, Jc, Js, Jt and Pnum computed\n");
+	printf("Four current and energy momentum tensor arrays computed\n");
 	//printf("tot1: %d, tot2: %d\n",tot1,tot2);
 	return 0;
 }

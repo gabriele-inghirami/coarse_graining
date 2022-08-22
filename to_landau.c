@@ -1,3 +1,5 @@
+/* Author: Gabriele Inghirami g.inghirami@gsi.de (2019-2022) - License: GPLv3 */
+
 #define TLOC 10*(p+np*(k+nz*(j+ny*(i+h*nx))))
 #define JPL 4*(p+np*(k+nz*(j+ny*(i+h*nx))))
 #define JBL 4*(k+nz*(j+ny*(i+h*nx)))

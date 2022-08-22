@@ -1,3 +1,5 @@
+/* Author: Gabriele Inghirami g.inghirami@gsi.de (2019-2022) - License: GPLv3 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
