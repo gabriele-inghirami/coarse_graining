@@ -71,7 +71,7 @@ void write_results(char *outputprefix, double *Tp, double *Jp, double *Jb, doubl
         fprintf(finfo,"Events (long int):    %ld\n",nevents);
         fprintf(finfo,"Time (double)\n");
         fprintf(finfo,"Output content flag:    %d\n",output_content_info);
-        fprintf(finfo,"Hadrons species np (int):    %d\n",np);
+        fprintf(finfo,"Number of hadron species np (int):    %d\n",np);
         fprintf(finfo,"x cells nx (int):    %d\n",nx);
         fprintf(finfo,"y cells ny (int):    %d\n",ny);
         fprintf(finfo,"z cells nz (int):    %d\n",nz);
@@ -93,7 +93,7 @@ void write_results(char *outputprefix, double *Tp, double *Jp, double *Jb, doubl
         fprintf(finfo,"Jt placeholder, type double, size 1\n");
         #endif
         #ifdef INCLUDE_RESONANCES
-        fprintf(finfo,"Resonces species nr (int):    %d\n",nr);
+        fprintf(finfo,"Number of resonance species nr (int):    %d\n",nr);
         fprintf(finfo,"Jr, resonance four current, type double, size nx*ny*nz*np*4\n");
         fprintf(finfo,"Tr, resonance enery momentum tensor, type double, size nx*ny*nz*nr*10\n");
         #else
@@ -481,7 +481,7 @@ void read_data(char *inputfile, double *data_Tp, double *data_Jp, double *data_J
 	  fread(data_Jt,sizeof(double),1,infile);
       #endif
       #ifdef INCLUDE_RESONANCES
-	  fread(nr,sizeof(double),1,infile);
+	  fread(nr,sizeof(int),1,infile);
 	  fread(data_Jr,sizeof(double),nx*ny*nz*4,infile);
 	  fread(data_Tr,sizeof(double),nx*ny*nz*nr*10,infile);
       #else

@@ -59,6 +59,10 @@ const int shift_resonance_index = 10000; //index offset to distinguish resonance
 
 int output_content_info = 0; //it provides information about which quantities are included in the output
 
+const int shift_total_baryon_on = 10; //value added to output_content_info if the total baryons are considered
+
+const int shift_resonances_on = 100; //value added to output_content_info if the resonances are considered
+
 double *time_int_array; //array with the selected times
 
 /** @brief main function
@@ -160,7 +164,7 @@ if((strncmp(argv[1],"comp",4) == 0) || (strncmp(argv[1],"avg",3) == 0))
 	  exit(4);
   }
   #ifdef TOTAL_BARYON
-  output_content_info+=10;
+  output_content_info+=shift_total_baryon_on;
   Jt=(double *)calloc(nt*nx*ny*nz*4,sizeof(double));
   if(Jt==NULL)
   {
@@ -177,7 +181,7 @@ if((strncmp(argv[1],"comp",4) == 0) || (strncmp(argv[1],"avg",3) == 0))
 	  exit(4);
   }
   #ifdef INCLUDE_RESONANCES
-  output_content_info+=100;
+  output_content_info+=shift_resonances_on;
   Jr=(double *)calloc(nt*nx*ny*nz*nr*4,sizeof(double));
   if(Jr==NULL)
   {

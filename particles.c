@@ -19,38 +19,38 @@ int result;
 // Warning: this index has to be manually updated and, every time it is modified, the function associate_particle_array_index must be modified, too.
 switch(itype) {
 case(101):
-        if(iso3==-2) result=0; //pion -
-        else if(iso3==2) result=1; //pion + 
-        else result=2; //pion 0 
+    if(iso3==-2) result=0; //pion -
+    else if(iso3==2) result=1; //pion + 
+    else result=2; //pion 0 
 	break; //the break statemets here are not really useful, but not even dangerous. 
 case(106):
-        if(iso3==-1) result=3; //Kaon 0
-        else result=4; //Kaon +
-        break;
+    if(iso3==-1) result=3; //Kaon 0
+    else result=4; //Kaon +
+    break;
 case(-106):
-        if(iso3==-1) result=5; //Kaon -
-        else result=6; //Kaon 0 bar
+    if(iso3==-1) result=5; //Kaon -
+    else result=6; //Kaon 0 bar
 	break;
 case(1):
-        if(iso3==-1) result=7; //Neutron
-        else result=8; //Proton
-        break;
+    if(iso3==-1) result=7; //Neutron
+    else result=8; //Proton
+    break;
 case(-1):
-        if(iso3==-1) result=9; //Anti-proton
-        else result=10; //Anti-neutron
+    if(iso3==-1) result=9; //Anti-proton
+    else result=10; //Anti-neutron
 	break;
 case(102):
-        result=11; //eta
-        break;
+    result=11; //eta
+    break;
 case(103):
-        result=12; //omega meson
-        break;
+    result=12; //omega meson
+    break;
 case(107):
-        result=13; //eta'
-        break;
+    result=13; //eta'
+    break;
 case(109):
-        result=14; //phi
-        break;
+    result=14; //phi
+    break;
 case(27):
 	result=15; //Lambda1116
 	break;
@@ -59,42 +59,42 @@ case(-27):
 	break;
 case(40):
 	//Sigma1192
-        if(iso3==-2) result=17; //Sigma -
-        else if(iso3==2) result=18; //Sigma + 
-        else result=19; //Sigma 0 
+    if(iso3==-2) result=17; //Sigma -
+    else if(iso3==2) result=18; //Sigma + 
+    else result=19; //Sigma 0 
 	break;
 case(-40):
 	//Anti-Sigma1192
-        if(iso3==-2) result=20; //Anti-Sigma (charge -)
-        else if(iso3==2) result=21; //Anti-Sigma (charge +) 
-        else result=22; //Anti-Sigma 0 
+    if(iso3==-2) result=20; //Anti-Sigma (charge -)
+    else if(iso3==2) result=21; //Anti-Sigma (charge +) 
+    else result=22; //Anti-Sigma 0 
 	break;
 case(49):
 	//Xi1317
-        if(iso3==-1) result=23; //Xi -
-        else result=24; //Xi 0 
+    if(iso3==-1) result=23; //Xi -
+    else result=24; //Xi 0 
 	break;
 case(-49):
 	//Anti-Xi1317
-        if(iso3==-1) result=25; //Anti-Xi 0
-        else result=26; //Xi + 
-        break;
+    if(iso3==-1) result=25; //Anti-Xi 0
+    else result=26; //Xi + 
+    break;
 case(29): 
-        result=27;//Lambda1520
-        break; 
+    result=27;//Lambda1520
+    break; 
 case(-29): 
-        result=28;//Anti-Lambda1520
-        break; 
+    result=28;//Anti-Lambda1520
+    break; 
 case(50):
 	//Xi1530
-        if(iso3==-1) result=29; //Xi -
-        else result=30; //Xi 0 
-        break; //Xi1530
+    if(iso3==-1) result=29; //Xi -
+    else result=30; //Xi 0 
+    break; //Xi1530
 case(-50):
 	//Anti-Xi1530
-        if(iso3==-1) result=31; //Anti-Xi 0
-        else result=32; //Xi +
-        break;
+    if(iso3==-1) result=31; //Anti-Xi 0
+    else result=32; //Xi +
+    break;
 case(55):
 	result=33; //Omega1672
 	break;
@@ -130,50 +130,50 @@ int result;
 // Warning: this index has to be manually updated and, every time it is modified, the function associate_particle_array_index must be modified, too.
 switch(pdg_id) {
 case(-211):
-        result=0; //pion -
+    result=0; //pion -
 	break;
 case(211):
-        result=1; //pion + 
+    result=1; //pion + 
 	break;
 case(111):
 	result=2; //pion 0 
 	break;  
 case(311):
-        result=3; //Kaon 0
+    result=3; //Kaon 0
 	break;
 case(321):
-        result=4; //Kaon +
-        break;
+    result=4; //Kaon +
+    break;
 case(-321):
-        result=5; //Kaon -
+    result=5; //Kaon -
 	break;
 case(-311):
 	result=6; //Kaon 0 bar
 	break;
 case(2112):
-        result=7; //Neutron
+    result=7; //Neutron
 	break;
 case(2212):
-        result=8; //Proton
-        break;
+    result=8; //Proton
+    break;
 case(-2212):
-        result=9; //Anti-proton
+    result=9; //Anti-proton
 	break;
 case(-2112):
-        result=10; //Anti-neutron
+    result=10; //Anti-neutron
 	break;
 case(221):
-        result=11; //eta
-        break;
+    result=11; //eta
+    break;
 case(223):
-        result=12; //omega meson
-        break;
+    result=12; //omega meson
+    break;
 case(331):
-        result=13; //eta'
-        break;
+    result=13; //eta'
+    break;
 case(333):
-        result=14; //phi
-        break;
+    result=14; //phi
+    break;
 case(3122):
 	result=15; //Lambda1116
 	break;
@@ -182,58 +182,58 @@ case(-3122):
 	break;
 case(3112):
 	//Sigma1192
-        result=17; //Sigma -
+    result=17; //Sigma -
 	break;
 case(3222):
-        result=18; //Sigma + 
+    result=18; //Sigma + 
 	break;
 case(3212):
-        result=19; //Sigma 0 
+    result=19; //Sigma 0 
 	break;
 case(-3222):
 	//Anti-Sigma1192
-        result=20; //Anti-Sigma (charge -)
+    result=20; //Anti-Sigma (charge -)
 	break;
 case(-3112):
-        result=21; //Anti-Sigma (charge +) 
+    result=21; //Anti-Sigma (charge +) 
 	break;
 case(-3212):
-        result=22; //Anti-Sigma 0 
+    result=22; //Anti-Sigma 0 
 	break;
 case(3312):
 	//Xi1317
-        result=23; //Xi -
+    result=23; //Xi -
 	break;
 case(3322):
-        result=24; //Xi 0 
+    result=24; //Xi 0 
 	break;
 case(-3322):
 	//Anti-Xi1317
-        result=25; //Anti-Xi 0
+    result=25; //Anti-Xi 0
 	break;
 case(-3312):
-        result=26; //Xi + 
-        break;
+    result=26; //Xi + 
+    break;
 case(3124): 
-        result=27;//Lambda1520
-        break; 
+    result=27;//Lambda1520
+    break; 
 case(-3124): 
-        result=28;//Anti-Lambda1520
-        break; 
+    result=28;//Anti-Lambda1520
+    break; 
 case(3314):
 	//Xi1530
-        result=29; //Xi -
+    result=29; //Xi -
 	break;
 case(3324):
-        result=30; //Xi 0 
-        break; //Xi1530
+    result=30; //Xi 0 
+    break; //Xi1530
 case(-3324):
 	//Anti-Xi1530
-        result=31; //Anti-Xi 0
+    result=31; //Anti-Xi 0
 	break;
 case(-3314):
-        result=32; //Xi +
-        break;
+    result=32; //Xi +
+    break;
 case(3334):
 	result=33; //Omega1672
 	break;
@@ -270,10 +270,10 @@ const char* associate_particle_array_index(int index)
 switch(index) {
 case(0):
 	return "Pion- * UrQMD itype 101, 2iso3 -2, charge -1 * PDG ID -211";
-        break;
+    break;
 case(1):
 	return "Pion+ * UrQMD itype 101, 2iso3 2, charge +1 * PDG ID 211";
-        break;
+    break;
 case(2):
 	return "Pion0 * UrQMD itype 101, 2iso3 0, charge 0 * PDG ID 111";
 	break; 
@@ -291,88 +291,88 @@ case(6):
 	break; 
 case(7):
 	return "Neutron * UrQMD itype 1, 2iso3 -1, charge 0 * PDG ID 2112";
-        break;
+    break;
 case(8):
 	return "Proton * UrQMD itype 1, 2iso3 1, charge +1 * PDG ID 2212";
-        break;
+    break;
 case(9):
 	return "Anti-Proton * UrQMD itype -1, 2iso3 -1, charge -1 * PDG ID -2212";
-        break;
+    break;
 case(10):
 	return "Anti-Neutron * UrQMD itype -1, 2iso3 1, charge 0 * PDG ID -2112";
-        break;
+    break;
 case(11):
 	return "Eta meson * UrQMD itype 102, 2iso3 0, charge 0 * PDG ID 221";
-        break;
+    break;
 case(12):
 	return "omega meson * UrQMD itype 103, 2iso3 0, charge 0 * PDG ID 223";
-        break;
+    break;
 case(13):
 	return "eta' meson * UrQMD itype 107, 2iso3 0, charge 0 * PDG ID 331";
-        break;
+    break;
 case(14):
 	return "phi meson * UrQMD itype 109, 2iso3 0, charge 0 * PDG ID 333";
-        break;
+    break;
 case(15):
 	return "Lambda1116 * UrQMD itype 27, 2iso3 0, charge 0 * PDG ID 3122";
-        break;
+    break;
 case(16):
 	return "Anti-Lambda1116 * UrQMD itype -27, 2iso3 0, charge 0 * PDG ID -3122";
-        break;
+    break;
 case(17):
 	return "Sigma1192- * UrQMD itype 40, 2iso3 -2, charge -1, dds * PDG ID 3112";
-        break;
+    break;
 case(18):
 	return "Sigma1192+ * UrQMD itype 40, 2iso3 2, charge 1, uus * PDG ID 3222";
-        break;
+    break;
 case(19):
 	return "Sigma1192 * UrQMD itype 40, 2iso3 0, charge 0, uds * PDG ID 3212";
-        break;
+    break;
 case(20):
 	return "Anti-Sigma1192- * UrQMD itype -40, 2iso3 -2, charge -1, u_bar u_bar s_bar * PDG ID -3222";
-        break;
+    break;
 case(21):
 	return "Anti-Sigma1192+ * UrQMD itype -40, 2iso3 2, charge +1, d_bar d_bar s_bar * PDG ID -3112";
-        break;
+    break;
 case(22):
 	return "Anti-Sigma1192 * UrQMD itype -40, 2iso3 0, charge 0, u_bar d_bar s_bar * PDG ID -3212";
-        break;
+    break;
 case(23):
 	return "Xi1317- * UrQMD itype 49, 2iso3 -1, charge -1 * PDG ID 3312";
-        break;
+    break;
 case(24):
 	return "Xi1317 0 * UrQMD itype 49, 2iso3 1, charge 0 * PDG ID 3322";
-        break;
+    break;
 case(25):
 	return "Anti-Xi1317 0 * UrQMD itype -49, 2iso3 -1, charge 0 * PDG ID -3322";
-        break;
+    break;
 case(26):
 	return "Xi1317+ * UrQMD itype -49, 2iso3 1, charge +1 * PDG ID -3312";
-        break;
+    break;
 case(27): 
 	return "Lambda1520 * UrQMD itype 29, 2iso3 0, charge 0 * PDG ID 3124";
-        break;
+    break;
 case(28): 
 	return "Anti-Lambda1520 * UrQMD itype -29, 2iso3 0, charge 0 * PDG ID -3124";
-        break;
+    break;
 case(29):
 	return "Xi1530- * UrQMD itype 50, 2iso3 -1, charge -1 * PDG ID 3314";
-        break;
+    break;
 case(30):
 	return "Xi1530 0 * UrQMD itype 50, 2iso3 1, charge 0 * PDG ID 3324";
-        break;
+    break;
 case(31):
 	return "Anti-Xi1530 0 * UrQMD itype -50, 2iso3 -1, charge 0 * PDG ID -3324";
-        break;
+    break;
 case(32):
 	return "Xi1530+ * UrQMD itype -50, 2iso3 1, charge +1 * PDG ID -3314";
-        break;
+    break;
 case(33):
 	return "Omega1672 * UrQMD itype 55, 2iso3 0, charge -1 * PDG ID 3334";
-        break;
+    break;
 case(34):
 	return "Anti-Omega1672 * UrQMD itype -55, 2iso3 0, charge +1 * PDG ID -3334";
-        break;
+    break;
 default:
         return "All other particles"; 
     }
@@ -573,7 +573,7 @@ int fill(pinfo* plist)
 	int i;
 	wchar_t buf[200];
 	wchar_t tmp[16];
-        FILE* finp;
+    FILE* finp;
 	float float_bb;
 	char par;
 	char pdg_id_stringA[9], pdg_id_stringB[9], pdg_id_stringC[9], pdg_id_stringD[9];

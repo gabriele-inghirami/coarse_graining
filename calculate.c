@@ -508,7 +508,7 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
 	      {
 	         for(r=0;r<4;r++) Jb[r+JBL]+=Jb2[r+JBL];
 	      }
-           }				
+       }				
 	}
 	for(i=0;i<nx;i++)
 	{
@@ -518,7 +518,7 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
 	      {
 	         for(r=0;r<4;r++) Jc[r+JBL]+=Jc2[r+JBL];
 	      }
-           }				
+       }				
 	}
 	for(i=0;i<nx;i++)
 	{
@@ -528,7 +528,7 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
 	      {
 	         for(r=0;r<4;r++) Js[r+JBL]+=Js2[r+JBL];
 	      }
-           }				
+       }				
 	}
     #ifdef INCLUDE_TOTAL_BARYON
 	for(i=0;i<nx;i++)
@@ -539,7 +539,7 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
 	      {
 	         for(r=0;r<4;r++) Jt[r+JBL]+=Jt2[r+JBL];
 	      }
-           }				
+       }				
 	}
     #endif
     #ifdef INCLUDE_RESONANCES
@@ -551,7 +551,7 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
           {
              for(r=0;r<nr;r++)					
 		     {
-                for(l=0;l<4;l++) Jr[l+RNLOC]+=Jr2[r+RNLOC];
+                for(l=0;l<4;l++) Jr[l+RNLOC]+=Jr2[l+RNLOC];
 		     }
 	      }
 	   }				
@@ -594,7 +594,7 @@ int avg(char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *
 	             Pnum[PNLOC]+=Pnum2[PNLOC];
 		 }
 	      }
-           }				
+       }				
 	}
 			
         
@@ -704,7 +704,7 @@ int process_data(double *Tp, double *Jp, double *Jb, double *Jc, double *Js, dou
         #ifdef INCLUDE_RESONANCES
         if (p>=shift_resonance_index) {
            r=p-shift_resonance_index; //we remove the offset
-           p=np-1; //we set the rsonance to the catch-all entry
+           p=np-1; //we set the resonance index to the catch-all entry
         }
         Rnum[RNLOC]+=1;
 	    Tr[T00+RTLOC]+=pdata_entry->en;
@@ -765,8 +765,8 @@ int process_data(double *Tp, double *Jp, double *Jb, double *Jc, double *Js, dou
 	    Jc[J1+JBL]+=(pdata_entry->charge)*(pdata_entry->px)/pdata_entry->en;
 	    Jc[J2+JBL]+=(pdata_entry->charge)*(pdata_entry->py)/pdata_entry->en;
 	    Jc[J3+JBL]+=(pdata_entry->charge)*(pdata_entry->pz)/pdata_entry->en;	    
-            //printf("hadron: %d p: %d strangeness: %d B: %d\n",pdata_entry->itype,p,strangeness, baryon_number);
-            Js[J0+JBL]+=strangeness;
+        //printf("hadron: %d p: %d strangeness: %d B: %d\n",pdata_entry->itype,p,strangeness, baryon_number);
+        Js[J0+JBL]+=strangeness;
 	    Js[J1+JBL]+=strangeness*(pdata_entry->px)/pdata_entry->en;
 	    Js[J2+JBL]+=strangeness*(pdata_entry->py)/pdata_entry->en;
 	    Js[J3+JBL]+=strangeness*(pdata_entry->pz)/pdata_entry->en;	    

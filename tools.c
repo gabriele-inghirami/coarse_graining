@@ -10,9 +10,7 @@
 */
 
 
-extern int nt, np;
 extern const int start_index;
-extern const int nx, ny, nz;
 
 void check_input_files(char **infiles, int narg)
 {
