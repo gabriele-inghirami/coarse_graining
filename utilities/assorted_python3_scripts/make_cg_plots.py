@@ -1,16 +1,3 @@
-# version 2.2.0 - 06/08/2020
-
-# changelog: 2.2.0
-# this version works with store_cg_2.1 and it plots also the entropy density
-# changelog: 2.1.0
-# this version works with store_cg_2.1 and it assumes that the entropy and the total baryon densities are also included in the input files
-# changelog: 1.8.0
-# this version works with store_cg_1.8 and it assumes that anisotropic corrections data are also included in the input files
-# changelog: 1.6.1
-# log plots for T and mu for animations
-# changelog: 1.6.0
-# this version works with store_cg_v1.6 and it assumes that density and energy density are also stored in the input files
-
 import fileinput
 import math
 import numpy as np

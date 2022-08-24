@@ -1,9 +1,3 @@
-# store_cg_new.py - version 2.2.2 - 10/05/2021
-# it reads the energy and number densities and returns the temperatures, with/without the anisotropic correction as in PhysRevC.83.034907
-# we assume that, in addition to tensor_densities_* files, there are corresponding tensor_Tmunu_* files
-# in this version, we save also the number of hadrons in each cell and the total baryon + antibaryon density
-# this version works with cg 2.1.x, which saves also the coordinates of the grid corner
-
 import fileinput
 import math
 import numpy as np
@@ -11,6 +5,10 @@ import sys
 import os
 import pickle
 from scipy import interpolate
+from numpy import linalg as LA
+
+#if use_Eckart is False we use the Landau frame
+use_Eckart=False
 
 #number threshold of particles to accept a cell
 num_thresh=20
@@ -200,13 +198,6 @@ for ff in range(nt):
       yy=np.linspace(ystart+dy/2.,yend,num=ny, endpoint=True)
       zz=np.linspace(zstart+dz/2.,zend,num=nz, endpoint=True)
 
-      print("Array with x axis coordinates:")
-      print(str(xx))
-      print("Array with y axis coordinates:")
-      print(str(yy))
-      print("Array with z axis coordinates:")
-      print(str(zz))
-   
       #arrays to store coarse graining data
       print("Allocating and initializing arrays... ")
       vx=np.zeros((nt,nx,ny,nz),dtype=np.float64)
@@ -252,7 +243,7 @@ for ff in range(nt):
       if((dx_new != dx) or (dy_new != dy) or (dz_new != dz)):
         print("FATAL ERROR: different grid resolution!!! Expected: "+str(dx)+", "+str(dy)+", "+str(dz)+", read now: "+str(dx_new)+", "+str(dy_new)+", "+str(dz_new))
         sys.exit(2)
-      xstart_new,ystart_new,zstart_new=np.fromfile(cdata,dtype=np.float64,count=3) 
+      xstart_new,ystart_new,zstart_new=np.fromfile(cdata,dtype=np.float64,count=3)
       if((xstart_new != xstart) or (ystart_new != ystart) or (zstart_new != zstart)):
         print("FATAL ERROR: different grid resolution!!! Expected: "+str(xstart)+", "+str(ystart)+", "+str(zstart)+", read now: "+str(xstart_new)+", "+str(ystart_new)+", "+str(zstart_new))
         sys.exit(2)
@@ -281,10 +272,10 @@ for ff in range(nt):
     if((dx_T != dx) or (dy_T != dy) or (dz_T != dz)):
       print("FATAL ERROR: different grid resolution between energy-momentum and densities tensors!!! Expected: "+str(dx)+", "+str(dy)+", "+str(dz)+", read now: "+str(dx_T)+", "+str(dy_T)+", "+str(dz_T))
       sys.exit(2)
-    xstart_T,ystart_T,zstart_T=np.fromfile(Tdata,dtype=np.float64,count=3) 
+    xstart_T,ystart_T,zstart_T=np.fromfile(Tdata,dtype=np.float64,count=3)
     if((xstart_T != xstart) or (ystart_T != ystart) or (zstart_T != zstart)):
       print("FATAL ERROR: different grid resolution between energy-momentum and densities tensors!!! Expected: "+str(xstart)+", "+str(ystart)+", "+str(zstart)+", read now: "+str(xstart_T)+", "+str(ystart_T)+", "+str(zstart_T))
-      sys.exit(2)
+      sys.exit(2)  
     Tp=np.fromfile(Tdata,dtype=np.float64,count=nx*ny*nz*num_part*10).reshape([nx,ny,nz,num_part,10])
     Jb=np.fromfile(Tdata,dtype=np.float64,count=nx*ny*nz*4,offset=nx*ny*nz*num_part*4*8).reshape([nx,ny,nz,4])
      #regarding the line above: offset option available only with numpy>=1.17, expressed in bytes (so, with float64, we must multiply by 8)
@@ -293,11 +284,51 @@ for ff in range(nt):
     for i in range(nx):
         for j in range(ny):
             for k in range(nz):
-                glf_arg=Jb[i,j,k,0]*Jb[i,j,k,0]-Jb[i,j,k,1]*Jb[i,j,k,1]-Jb[i,j,k,2]*Jb[i,j,k,2]-Jb[i,j,k,3]*Jb[i,j,k,3]
-                if(glf_arg<=0):
-                  continue
-                glf=np.sqrt(glf_arg)
-                uvel[:]=Jb[i,j,k,:]/glf
+                Tmunu[0,0]=np.sum(Tp[i,j,k,:,0])
+                Tmunu[0,1]=np.sum(Tp[i,j,k,:,1])
+                Tmunu[0,2]=np.sum(Tp[i,j,k,:,2])
+                Tmunu[0,3]=np.sum(Tp[i,j,k,:,3])
+                Tmunu[1,0]=Tmunu[0,1].copy()
+                Tmunu[1,1]=np.sum(Tp[i,j,k,:,4])
+                Tmunu[1,2]=np.sum(Tp[i,j,k,:,5])
+                Tmunu[1,3]=np.sum(Tp[i,j,k,:,6])
+                Tmunu[2,0]=Tmunu[0,2].copy()
+                Tmunu[2,1]=Tmunu[1,2].copy()
+                Tmunu[2,2]=np.sum(Tp[i,j,k,:,7])
+                Tmunu[2,3]=np.sum(Tp[i,j,k,:,8])
+                Tmunu[3,0]=Tmunu[0,3].copy()
+                Tmunu[3,1]=Tmunu[1,3].copy()
+                Tmunu[3,2]=Tmunu[2,3].copy()
+                Tmunu[3,3]=np.sum(Tp[i,j,k,:,9])
+                if use_Eckart:
+                    glf_arg=Jb[i,j,k,0]*Jb[i,j,k,0]-Jb[i,j,k,1]*Jb[i,j,k,1]-Jb[i,j,k,2]*Jb[i,j,k,2]-Jb[i,j,k,3]*Jb[i,j,k,3]
+                    if(glf_arg<=0):
+                      continue
+                    glf=np.sqrt(glf_arg)
+                    uvel[:]=Jb[i,j,k,:]/glf
+                else:
+                    Landau_failed=True
+                    for aa in range(1,4):
+                        Tmunu[aa,:]=-Tmunu[aa,:]
+                    eigvalues, eigvectors = LA.eig(Tmunu)
+                    for item in range(len(eigvalues)):
+                        value=eigvalues[item]
+                        ev=np.real(value)
+                        if (ev<0 or np.imag(value)!=0 or np.iscomplex(np.any(eigvectors[item]))):
+                            continue
+                        if eigvectors[item][0]<0:
+                            eigvectors[item][:]=-eigvectors[item][:]
+                        norm2=eigvectors[item][0]**2-eigvectors[item][1]**2-eigvectors[item][2]**2-eigvectors[item][3]**2
+                        if norm2<=0:
+                            continue
+                        norm=np.sqrt(norm2)
+                        uvel=eigvectors[item]/norm
+                        Landau_failed=False
+                        break
+                    if Landau_failed:
+                        continue
+                    
+                print("Uvel: "+str(uvel[:])) 
                 Lambda[0,0]=uvel[0]
                 Lambda[0,1:]=-uvel[1:]
                 Lambda[1:,0]=-uvel[1:]
@@ -310,79 +341,81 @@ for ff in range(nt):
                 for aa in range(1,4):
                     for bb in range(1,4):
                         LambdaF[aa,bb]=kron(aa,bb)+uvel[aa]*uvel[bb]/(1+uvel[0])
-                Tmunu[0,0]=np.sum(Tp[i,j,k,:,0])
-                for aa in range(1,4):
-                    Tmunu[0,aa]=np.sum(Tp[i,j,k,:,aa])
-                    Tmunu[aa,0]=Tmunu[0,aa]
-                Tmunu[1,1]=np.sum(Tp[i,j,k,:,4])
-                Tmunu[1,2]=np.sum(Tp[i,j,k,:,5])
-                Tmunu[2,1]=Tmunu[1,2]
-                Tmunu[1,3]=np.sum(Tp[i,j,k,:,6])
-                Tmunu[3,1]=Tmunu[1,3]
-                Tmunu[2,2]=np.sum(Tp[i,j,k,:,7])
-                Tmunu[2,3]=np.sum(Tp[i,j,k,:,8])
-                Tmunu[3,2]=Tmunu[2,3]
-                Tmunu[3,3]=np.sum(Tp[i,j,k,:,9])
+                    
                 Tmunu_lrf=np.matmul(Lambda.transpose(),np.matmul(Tmunu,Lambda)) 
-                #Tmunu_F=np.matmul(LambdaF.transpose(),np.matmul(Tmunu_lrf,LambdaF))
-                #print("\n"+str(i)+"  "+str(j)+"  "+str(k))
-                #print("boosted")
-                #print(str(Tmunu_lrf[:,:]))
-                #print("original")
-                #print(str(Tmunu[:,:]))
-                #print("reboosted")
-                #print(str(Tmunu_F[:,:]))
+                    #Tmunu_F=np.matmul(LambdaF.transpose(),np.matmul(Tmunu_lrf,LambdaF))
+                    #print("\n"+str(i)+"  "+str(j)+"  "+str(k))
+                    #print("boosted")
+                    #print(str(Tmunu_lrf[:,:]))
+                    #print("original")
+                    #print(str(Tmunu[:,:]))
+                    #print("reboosted")
+                    #print(str(Tmunu_F[:,:]))
                 pressure_transverse=(Tmunu_lrf[1,1]+Tmunu_lrf[2,2])/2.
-                #if(pressure_transverse<=0):
-                #  print("LOOK HERE")
-                #continue
                 pressure_parallel=Tmunu_lrf[3,3]
                 if((pressure_transverse<=0) or (pressure_parallel<=0)):
-                #  print("Warning, negative or null pressure_transverse in "+str(i)+",  "+str(j)+",  "+str(k)+" : "+str(pressure_transverse))
-                #  print(str(Tmunu[:,:]))
-                #  print(str(Tmunu_lrf[:,:]))
-                #  print(str(uvel[:]))
-                  continue
+                     #  print("Warning, negative or null pressure_transverse in "+str(i)+",  "+str(j)+",  "+str(k)+" : "+str(pressure_transverse))
+                     #  print(str(Tmunu[:,:]))
+                     #  print(str(Tmunu_lrf[:,:]))
+                     #  print(str(uvel[:]))
+                    continue
                 aniso_ratio=pressure_transverse/pressure_parallel
-                #print("aniso_ratio: "+str(aniso_ratio))
-
-
-                rho[ff,i,j,k]=datas[i,j,k,0]
-                vx[ff,i,j,k]=datas[i,j,k,1]
-                vy[ff,i,j,k]=datas[i,j,k,2]
-                vz[ff,i,j,k]=datas[i,j,k,3]
-                rho_bab[ff,i,j,k]=datas[i,j,k,4]
-                edens=0
+                    #print("aniso_ratio: "+str(aniso_ratio))
+                    
+                ptra[ff,i,j,k]=pressure_transverse                   
+                ppar[ff,i,j,k]=pressure_parallel
                 num_hadrons=0
                 for p in range(num_part):
                     num_hadrons=datas[i,j,k,15+3*p]+num_hadrons
-                    dens_hadrons[ff,i,j,k]=datas[i,j,k,16+3*p]+dens_hadrons[ff,i,j,k]
-                    edens=datas[i,j,k,17+3*p]+edens
+                if use_Eckart:
+                    rho[ff,i,j,k]=datas[i,j,k,0]
+                    vx[ff,i,j,k]=datas[i,j,k,1]
+                    vy[ff,i,j,k]=datas[i,j,k,2]
+                    vz[ff,i,j,k]=datas[i,j,k,3]
+                    rho_bab[ff,i,j,k]=datas[i,j,k,4]
+                    edens=0                    
+                    for p in range(num_part):
+                        dens_hadrons[ff,i,j,k]=datas[i,j,k,16+3*p]+dens_hadrons[ff,i,j,k]
+                        edens=datas[i,j,k,17+3*p]+edens
 
-                x_aniso=aniso_ratio**(4./3.)
-                if(x_aniso<1):
-                   r_aniso=1/2.*x_aniso**(-1./3.)*(1.+(x_aniso*np.arctanh(np.sqrt(1.-x_aniso)))/(np.sqrt(1.-x_aniso)))
-                elif(x_aniso>1):
-                   r_aniso=1/2.*x_aniso**(-1./3.)*(1.+(x_aniso*np.arctan(np.sqrt(x_aniso-1.)))/(np.sqrt(x_aniso-1.)))
-                else: #x_aniso==1
-                   r_aniso=1.
-                edens_aniso=edens/r_aniso
+                    x_aniso=aniso_ratio**(4./3.)
+                    if(x_aniso<1):
+                        r_aniso=1/2.*x_aniso**(-1./3.)*(1.+(x_aniso*np.arctanh(np.sqrt(1.-x_aniso)))/(np.sqrt(1.-x_aniso)))
+                    elif(x_aniso>1):
+                        r_aniso=1/2.*x_aniso**(-1./3.)*(1.+(x_aniso*np.arctan(np.sqrt(x_aniso-1.)))/(np.sqrt(x_aniso-1.)))
+                    else: #x_aniso==1
+                        r_aniso=1.
+                    edens_aniso=edens/r_aniso
                   
-                en[ff,i,j,k]=edens
+                    en[ff,i,j,k]=edens
+                else:
+                    en[ff,i,j,k]=Tmunu_lrf[0,0]
+                    rho[ff,i,j,k]=Jb[i,j,k,0]*uvel[0]-Jb[i,j,k,1]*uvel[1]-Jb[i,j,k,2]*uvel[2]-Jb[i,j,k,3]*uvel[3]
+                    vx[ff,i,j,k]=uvel[1]/uvel[0]
+                    vy[ff,i,j,k]=uvel[2]/uvel[0]
+                    vz[ff,i,j,k]=uvel[3]/uvel[0]
 
                 if((en[ff,i,j,k]>0) and (rho[ff,i,j,k]>0) and (num_hadrons>num_thresh)):
-                  mub[ff,i,j,k], temp[ff,i,j,k] , press[ff,i,j,k], s_entr_dens[ff,i,j,k] = get_mub_T(rho[ff,i,j,k],en[ff,i,j,k])
-                  mubA[ff,i,j,k], tempA[ff,i,j,k] , pressA[ff,i,j,k], s_entr_densA[ff,i,j,k] = get_mub_T(rho[ff,i,j,k],edens_aniso)
-                  #print("Eos results: "+str(rho[ff,i,j,k])+", "+str(en[ff,i,j,k])+", "+str(mub[ff,i,j,k])+", "+str(temp[ff,i,j,k]))
+                    mub[ff,i,j,k], temp[ff,i,j,k] , press[ff,i,j,k], s_entr_dens[ff,i,j,k] = get_mub_T(rho[ff,i,j,k],en[ff,i,j,k])
+                    if use_Eckart:
+                        mubA[ff,i,j,k], tempA[ff,i,j,k] , pressA[ff,i,j,k], s_entr_densA[ff,i,j,k] = get_mub_T(rho[ff,i,j,k],edens_aniso)
+                #print("Eos results: "+str(rho[ff,i,j,k])+", "+str(en[ff,i,j,k])+", "+str(mub[ff,i,j,k])+", "+str(temp[ff,i,j,k]))
 
-                ptra[ff,i,j,k]=pressure_transverse                   
-                ppar[ff,i,j,k]=pressure_parallel
+                   
   
 print("Done.")
 
-print("Pickling tt,xx,yy,zz,vx,vy,vz,rho,en,mub,temp,muA,tempA,ptra,ppar,dens_hadrons,press,s_entr_dens,pressA,s_entr_densA,rho_bab")
-with open(outputfile,"wb") as po:
-     pickle.dump((tt[0:nt],xx,yy,zz,vx[0:nt,:,:,:],vy[0:nt,:,:,:],vz[0:nt,:,:,:],rho[0:nt,:,:,:],en[0:nt,:,:,:],mub[0:nt,:,:,:],temp[0:nt,:,:,:],mubA[0:nt,:,:,:],tempA[0:nt,:,:,:],ptra[0:nt,:,:,:],ppar[0:nt,:,:,:],dens_hadrons[0:nt,:,:,:],press[0:nt,:,:,:],s_entr_dens[0:nt,:,:,:],pressA[0:nt,:,:,:],s_entr_densA[0:nt,:,:,:],rho_bab[0:nt,:,:,:]),po)
+if use_Eckart:
+    print("Pickling tt,xx,yy,zz,vx,vy,vz,rho,en,mub,temp,muA,tempA,ptra,ppar,dens_hadrons,press,s_entr_dens,pressA,s_entr_densA,rho_bab")
+    with open(outputfile,"wb") as po:
+        pickle.dump((tt[0:nt],xx,yy,zz,vx[0:nt,:,:,:],vy[0:nt,:,:,:],vz[0:nt,:,:,:],rho[0:nt,:,:,:],en[0:nt,:,:,:],mub[0:nt,:,:,:],\
+        temp[0:nt,:,:,:],mubA[0:nt,:,:,:],tempA[0:nt,:,:,:],ptra[0:nt,:,:,:],ppar[0:nt,:,:,:],dens_hadrons[0:nt,:,:,:],press[0:nt,:,:,:],\
+        s_entr_dens[0:nt,:,:,:],pressA[0:nt,:,:,:],s_entr_densA[0:nt,:,:,:],rho_bab[0:nt,:,:,:]),po)
+else:
+    print("Pickling tt,xx,yy,zz,vx,vy,vz,rho,en,mub,temp,press,s_entr_dens,ptra,ppar")
+    with open(outputfile,"wb") as po:
+        pickle.dump((tt[0:nt],xx,yy,zz,vx[0:nt,:,:,:],vy[0:nt,:,:,:],vz[0:nt,:,:,:],rho[0:nt,:,:,:],en[0:nt,:,:,:],mub[0:nt,:,:,:],\
+        temp[0:nt,:,:,:],press[0:nt,:,:,:],s_entr_dens[0:nt,:,:,:],ptra[0:nt,:,:,:],ppar[0:nt,:,:,:]),po)
 print("All done.")
 
 
