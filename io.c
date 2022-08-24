@@ -481,7 +481,7 @@ void read_data(char *inputfile, double *data_Tp, double *data_Jp, double *data_J
 	  fread(data_Jt,sizeof(double),1,infile);
       #endif
       #ifdef INCLUDE_RESONANCES
-	  fread(nr,sizeof(int),1,infile);
+	  fread(&nr,sizeof(int),1,infile);
 	  fread(data_Jr,sizeof(double),nx*ny*nz*4,infile);
 	  fread(data_Tr,sizeof(double),nx*ny*nz*nr*10,infile);
       #else
