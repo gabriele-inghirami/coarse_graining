@@ -1,9 +1,3 @@
-# store_cg_new.py - version 2.2.0 - 27/03/2021
-# it reads the energy and number densities and returns the temperatures, with/without the anisotropic correction as in PhysRevC.83.034907
-# we assume that, in addition to tensor_densities_* files, there are corresponding tensor_Tmunu_* files
-# in this version, we save also the number of hadrons in each cell and the total baryon + antibaryon density
-# this version works with cg 2.1.x, which saves also the coordinates of the grid corner
-
 import fileinput
 import math
 import numpy as np
