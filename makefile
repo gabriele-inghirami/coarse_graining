@@ -49,8 +49,8 @@ opt=-O3 -march=native
 all: cg.exe to_text.exe to_2D.exe 
 
 cg.exe: main.c calculate.c tools.c io.c particles.c
-	#$(comp) $? -o $@ -L /home/hireaction/inghirami/mylib/lib $(ldflags) $(opt)
 	$(comp) $? -o $@ $(ldflags) $(opt)
+#$(comp) $? -o $@ -L /home/hireaction/inghirami/mylib/lib $(ldflags) $(opt)
 
 to_text.exe: to_text.c
 	$(comp) $? -o $@ $(ldflags) $(opt)
