@@ -22,8 +22,8 @@
 * choice of the transport code to be used: URQMD or SMASH
 *
 */
-//#define URQMD
-#define SMASH
+#define URQMD
+//#define SMASH
 
 //we check that either URQMD or SMASH are defined, if not a compilation error is raised
 #ifdef URQMD
@@ -54,19 +54,19 @@
 * NX_DEF the number of coarse grained cells in the x direction
 *
 */
-#define NX_DEF 1
+#define NX_DEF 7
 
 /**
 * NY_DEF the number of coarse grained cells in the y direction
 *
 */
-#define NY_DEF 1
+#define NY_DEF 7
 
 /**
 * NZ_DEF the number of coarse grained cells in the z direction
 *
 */
-#define NZ_DEF 1
+#define NZ_DEF 7
 
 /**
 * USE_CENTERED_GRID if 0 the grid is centered around 0, otherwise the grid starts at {X,Y,Z}_START
@@ -99,7 +99,7 @@
  *
 */
 
-#define B_SELECTION 1
+#define B_SELECTION 0
 
 /**
 * BMIN the minimum impact parameter b in fm to select an event
@@ -200,21 +200,6 @@ typedef struct pinfo{int pdg_id; wchar_t name[16]; double mass; int spin; int st
  *
 */
 #define MAX_SMASH_HADRON_SPECIES 500
-
-/**
-* plist_unsorted (SMASH)
-* The array containing the characteristics of the particles managed by SMASH. 
-* It has a fixed dimension that should be sufficient even for the upcoming versions of SMASH. 
-* This array is later ordered by growing pdg_id and the results are store in the array plist
-*/
-pinfo plist_unsorted[MAX_SMASH_HADRON_SPECIES];
-
-/**
-* plist (SMASH)
-* This is a pointer the first element of an array containing the characteristics of the particles managed by SMASH
-* This array is ordered by growing pdg_id and dinamically allocated at runtime
-*/
-pinfo* plist;
 
 /**
 * prepare_smash_hadron_list (SMASH)

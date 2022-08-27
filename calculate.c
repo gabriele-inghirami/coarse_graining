@@ -1,6 +1,4 @@
-#ifndef DEFINE
 #include "definitions.h"
-#endif
 
 /** @file calculate.c
 *

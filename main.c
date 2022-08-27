@@ -1,6 +1,5 @@
-#ifndef DEF_MAIN
 #include "definitions.h"
-#endif
+
 /**
 * @file main.c
 *
@@ -55,6 +54,8 @@ const int index_of_output_file=3;//index of the output file in argv
 const int start_index=4;//index of the argument reporting the first input file. 
 
 double *time_int_array; //array with the selected times
+
+extern pinfo *plist;
 
 /** @brief main function
 * It parses the command line arguments, it allocates the most important data arrays (Tp, Jp, Jb, Jc and Js) and it calls the compute or avg functions.

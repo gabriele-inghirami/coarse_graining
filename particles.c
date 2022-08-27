@@ -1,6 +1,4 @@
-#ifndef DEF_MAIN
 #include "definitions.h"
-#endif
 
 /** @file particles.c
 *
@@ -106,7 +104,24 @@ return result;
 }
 
 #elif defined(SMASH)
+
+/**
+* plist_unsorted (SMASH)
+* The array containing the characteristics of the particles managed by SMASH. 
+* It has a fixed dimension that should be sufficient even for the upcoming versions of SMASH. 
+* This array is later ordered by growing pdg_id and the results are store in the array plist
+*/
+pinfo plist_unsorted[MAX_SMASH_HADRON_SPECIES];
+
+/**
+* plist (SMASH)
+* This is a pointer the first element of an array containing the characteristics of the particles managed by SMASH
+* This array is ordered by growing pdg_id and dinamically allocated at runtime
+*/
+pinfo* plist;
+
 int n_hadrons_smash;
+
 //given the SMASH particle pdg_id, it return the particle index
 int get_particle_index(int pdg_id )
 {

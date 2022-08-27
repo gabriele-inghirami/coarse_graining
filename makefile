@@ -23,7 +23,7 @@ gslflags=-lgsl -lblas
 
 #gcc 4.8.5 optimization flag for the CSC GOETHE cluster in Frankfurt am Main, partition general2 (broadwell architecture)
 #opt=-O3 -march=avx2
-opt=-O3 -mavx
+#opt=-O3 -mavx
 
 #icc optimization flag for the CSC GOETHE cluster in Frankfurt am Main, partition general1, or CSC Puhti cluster in Finland (skylake architecture)
 #opt=-O3 -xCORE-AVX512 -ipo
@@ -32,7 +32,7 @@ opt=-O3 -mavx
 #opt=-O3 -xAVX -ipo
 
 #gcc optimization flag that assumes that the computers used to compile and run the program have the same architecture
-#opt=-O3 -march=native
+opt=-O3 -march=native
 
 # debugging flags for GNU gdb (and also ddd, Affinic Debugger, Allinea DDT,...)
 #opt=-g -ggdb -O0
