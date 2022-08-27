@@ -17,6 +17,7 @@ int i,j,k,p,h,l;
 int nx, ny, nz, np;
 double dx, dy, dz;
 double entot;
+size_t ret_it;
 
 if(argc!=3) 
 {
@@ -38,18 +39,78 @@ if(fout==NULL)
 	printf("Sorry, I was unable to create the output file %s\n",argv[2]);
 	exit(2);
 }
-fread(&nevents,sizeof(long int),1,fin);
-fread(&time,sizeof(double),1,fin);
-fread(&np,sizeof(int),1,fin);
-fread(&nx,sizeof(int),1,fin);
-fread(&ny,sizeof(int),1,fin);
-fread(&nz,sizeof(int),1,fin);
-fread(&dx,sizeof(double),1,fin);
-fread(&dy,sizeof(double),1,fin);
-fread(&dz,sizeof(double),1,fin);
-fread(&xmin,sizeof(double),1,fin);
-fread(&ymin,sizeof(double),1,fin);
-fread(&zmin,sizeof(double),1,fin);
+ret_it=fread(&nevents,sizeof(long int),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&time,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&np,sizeof(int),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&nx,sizeof(int),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&ny,sizeof(int),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&nz,sizeof(int),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&dx,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&dy,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&dz,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&xmin,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&ymin,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&zmin,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
 
 
 datap=(double *)malloc(sizeof(double)*ny*nz*(3*np+15));
@@ -74,13 +135,38 @@ for(i=0;i<nx;i++)
 	{
 		for(k=0;k<nz;k++)
                 {
-			fread(&datap[h],sizeof(double),15,fin);//rho,vx,vy,vz,rho_c,rho_s,rho_t,Ic_diff,Is_diff
+			ret_it=fread(&datap[h],sizeof(double),15,fin);//rho,vx,vy,vz,rho_c,rho_s,rho_t,Ic_diff,Is_diff
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
                         h+=15;
 			for(p=0;p<np;p++)
 			{
-				fread(&datap[h+3*p],sizeof(double),1,fin);
-				fread(&datap[h+3*p+1],sizeof(double),1,fin);
-				fread(&datap[h+3*p+2],sizeof(double),1,fin);
+				ret_it=fread(&datap[h+3*p],sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+				ret_it=fread(&datap[h+3*p+1],sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+				ret_it=fread(&datap[h+3*p+2],sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
 			}
                         h+=3*p;
 		}

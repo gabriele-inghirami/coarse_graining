@@ -62,6 +62,8 @@ int look_at_b;
 double bmin_sm=(float_t)bmin;
 double bmax_sm=(float_t)bmax;
 int b_selection_sm=(int)b_selection;
+ssize_t gl_bb; //right now, just to avoid that the compiler complains while not checking the return value of getline
+int fsf_bb; //right now, just to avoid that the compiler complains while not checking the return value of fscanf
 
 fout=files[index_of_output_file];
 nf=ninfiles-start_index-1;//the number of input files with UrQMD data, excluding the last one which contains the informations about timesteps
@@ -89,7 +91,7 @@ for(idx=0;idx<nf;idx++)
 	    if(strncmp(buffer,"UQMD",4)==0)
 		{
 			printf("New event found\n");
-			for(k=0;k<3;k++) getline(&buffer,&buffer_size,infile);
+			for(k=0;k<3;k++) gl_bb=getline(&buffer,&buffer_size,infile);
 			sscanf(buffer,"%s %f",bitbucket,&b);
 			if(((b>=bmin) && (b<=bmax)) || (b_selection==0))
 			{		
@@ -97,12 +99,12 @@ for(idx=0;idx<nf;idx++)
 				take_event=0;
 			}
 			else take_event=-1;		
-			for(k=0;k<14;k++) getline(&buffer,&buffer_size,infile);//we move 14 lines forward
+			for(k=0;k<14;k++) gl_bb=getline(&buffer,&buffer_size,infile);//we move 14 lines forward
 		}
 		sscanf(buffer,"%d",&part_ts);
-		getline(&buffer,&buffer_size,infile);//we skip another line
+		gl_bb=getline(&buffer,&buffer_size,infile);//we skip another line
 		//we read the line and check the timestep
-		getline(&buffer,&buffer_size,infile);
+		gl_bb=getline(&buffer,&buffer_size,infile);
 		sscanf(buffer,"%lf",&test_time);
 		time_index=check_test_time(test_time,time_int_array,nt);
 		if((time_index>-1) && (take_event==0))
@@ -124,7 +126,7 @@ for(idx=0;idx<nf;idx++)
 				pdata_current->next=pdata_new;
 				pdata_current=pdata_new;
 				pdata_current->t_index=time_index;
-				fscanf(infile,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d %d %d %d\n",&bb0, &(pdata_current->x), &(pdata_current->y),
+				fsf_bb=fscanf(infile,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d %d %d %d\n",&bb0, &(pdata_current->x), &(pdata_current->y),
 			   &(pdata_current->z), &(pdata_current->en), &(pdata_current->px), &(pdata_current->py), &(pdata_current->pz), &(pdata_current->m),
 			   &(pdata_current->itype), &(pdata_current->iso3), &(pdata_current->charge), &bb2, &bb3, &bb4);
 			    pdata_current->next=NULL;
@@ -133,7 +135,7 @@ for(idx=0;idx<nf;idx++)
 		}
 		else
 		{
-		      for(k=0;k<part_ts-1;k++) getline(&buffer,&buffer_size,infile);
+		      for(k=0;k<part_ts-1;k++) gl_bb=getline(&buffer,&buffer_size,infile);
 		}
 		numchar=getline(&buffer,&buffer_size,infile);
 	}		

@@ -18,6 +18,7 @@ double nump,var1,var2,edens,xmin,ymin,zmin;
 double *bitbucket;
 int nx, ny, nz, np;
 double dx, dy, dz;
+size_t ret_it;
 
 if(argc!=5) 
 {
@@ -63,18 +64,78 @@ if(fout==NULL)
 chosen_index=atoi(argv[4]);
 
 
-fread(&nevents,sizeof(long int),1,fin);
-fread(&time,sizeof(double),1,fin);
-fread(&np,sizeof(int),1,fin);
-fread(&nx,sizeof(int),1,fin);
-fread(&ny,sizeof(int),1,fin);
-fread(&nz,sizeof(int),1,fin);
-fread(&dx,sizeof(double),1,fin);
-fread(&dy,sizeof(double),1,fin);
-fread(&dz,sizeof(double),1,fin);
-fread(&xmin,sizeof(double),1,fin);
-fread(&ymin,sizeof(double),1,fin);
-fread(&zmin,sizeof(double),1,fin);
+ret_it=fread(&nevents,sizeof(long int),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&time,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&np,sizeof(int),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&nx,sizeof(int),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&ny,sizeof(int),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&nz,sizeof(int),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&dx,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&dy,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&dz,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&xmin,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&ymin,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+ret_it=fread(&zmin,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
 
 bitbucket=(double *)malloc(sizeof(double)*(15+3*np));
 if(bitbucket == NULL) {
@@ -92,15 +153,35 @@ for(i=0;i<nx;i++)
                         {
                           fprintf(fout,"%7.3e  %7.3e  %7.3e  ",xmin+(i+0.5)*dx,ymin+(j+0.5)*dy,zmin+(k+0.5)*dz);
                           for(l=0;l<15;l++) {
-			     fread(&var1,sizeof(double),1,fin);
+			     ret_it=fread(&var1,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
 			     fprintf(fout,"%10.6e  ",var1); 
                           }             
                           edens=0;
 			  for(p=0;p<np;p++)
 			  {
-				fread(&nump,sizeof(double),1,fin);
-				fread(&var1,sizeof(double),1,fin);
-				fread(&var2,sizeof(double),1,fin);
+				ret_it=fread(&nump,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+				ret_it=fread(&var1,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+				ret_it=fread(&var2,sizeof(double),1,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
                                 edens=edens+var2;
 			  }
 			  fprintf(fout,"%10.6e  ",edens); //total energy density
@@ -116,7 +197,12 @@ for(i=0;i<nx;i++)
                         }
                         else
                         {
-			  fread(bitbucket,sizeof(double),15+3*np,fin);
+			  ret_it=fread(bitbucket,sizeof(double),15+3*np,fin);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
                         }
 		}
 	}

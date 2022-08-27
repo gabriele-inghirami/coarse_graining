@@ -17,6 +17,7 @@ extern const char info_dens_label[];
 extern double *time_int_array;
 extern const int T10, T20, T30, T21, T31, T32;
 extern const double cell_volume;
+size_t ret_it;
 
 void write_results(char *outputprefix, double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double *Jt, long int *Pnum, long int nevents)
 {
@@ -35,8 +36,8 @@ void write_results(char *outputprefix, double *Tp, double *Jp, double *Jb, doubl
 	        info_label_len=strlen(infolabel);
 		info_filename=(char *)malloc(sizeof(char)*(prefixlen+info_label_len+1)); //we need to add the \0 character
 		*info_filename='\0';
-		strncat(info_filename,outputprefix,prefixlen);
-		strncat(info_filename,infolabel,info_label_len);
+		strcat(info_filename,outputprefix);
+		strcat(info_filename,infolabel);
 		finfo=fopen(info_filename,"w");
 		fprintf(finfo,"Grid order - row major order (C):\n x_0 y_0 z_0\n x_0 y_0 z_1\n ...\n x_0 y_0 z_n-1\n x_0 y_1 z_0\n ...\n\n");
 		fprintf(finfo,"x axis: %d cells having width %lf and central point coordinates:\n",nx,dx);
@@ -71,8 +72,8 @@ void write_results(char *outputprefix, double *Tp, double *Jp, double *Jb, doubl
 	  strncpy(&time_suffix[3],"_",1);//we replace the dot with an underscore
 	  output_filename_Tp=(char *)malloc(sizeof(char)*(prefixlen+Tmunu_label_len+8+1)); //we need to add the \0 character
 	  *output_filename_Tp='\0';
-	  strncat(output_filename_Tp,outputprefix,prefixlen);
-	  strncat(output_filename_Tp,Tplabel,Tmunu_label_len);
+	  strcat(output_filename_Tp,outputprefix);
+	  strcat(output_filename_Tp,Tplabel);
 	  strncat(output_filename_Tp,time_suffix,8);
 	    
       
@@ -148,9 +149,9 @@ void write_densities(char *outputprefix, double *Tp, double *Jp, double *Jb, dou
 	    info_label_len=strlen(info_dens_label);
 		info_filename=(char *)malloc(sizeof(char)*(prefixlen+info_label_len+1));
 		*info_filename='\0';
-		strncat(info_filename,outputprefix,prefixlen);
-		strncpy(&info_filename[prefixlen],info_dens_label,info_label_len);
-		strncpy(&info_filename[prefixlen+info_label_len],"\0",1);
+		strcat(info_filename,outputprefix);
+		strcpy(&info_filename[prefixlen],info_dens_label);
+		strcpy(&info_filename[prefixlen+info_label_len],"\0");
 		finfo=fopen(info_filename,"w");
                 fprintf(finfo,"Grid order - row major order (C):\n x_0 y_0 z_0\n x_0 y_0 z_1\n ...\n x_0 y_0 z_n-1\n x_0 y_1 z_0\n ...\n\n");
 		fprintf(finfo,"x axis: %d cells having width %lf and central point coordinates:\n",nx,dx);
@@ -317,18 +318,78 @@ void read_data(char *inputfile, double *data_Tp, double *data_Jp, double *data_J
 		  printf("Sorry, I could not open the input file %s, so I am forced to quit.\n",inputfile);
 		  exit(3);
 	  }
-	  fread(nevents,sizeof(long int),1,infile);
-	  fread(data_time,sizeof(double),1,infile);
-	  fread(&np2,sizeof(int),1,infile);
-	  fread(&nx2,sizeof(int),1,infile);
-	  fread(&ny2,sizeof(int),1,infile);
-	  fread(&nz2,sizeof(int),1,infile);
-	  fread(&dx2,sizeof(double),1,infile);
-	  fread(&dy2,sizeof(double),1,infile);
-	  fread(&dz2,sizeof(double),1,infile);
-	  fread(&xmin2,sizeof(double),1,infile);
-	  fread(&ymin2,sizeof(double),1,infile);
-	  fread(&zmin2,sizeof(double),1,infile);
+	  ret_it=fread(nevents,sizeof(long int),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(data_time,sizeof(double),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(&np2,sizeof(int),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(&nx2,sizeof(int),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(&ny2,sizeof(int),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(&nz2,sizeof(int),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(&dx2,sizeof(double),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(&dy2,sizeof(double),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(&dz2,sizeof(double),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(&xmin2,sizeof(double),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(&ymin2,sizeof(double),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(&zmin2,sizeof(double),1,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
           if(np != np2) {
             printf("Error: mismatching between the number of particles!!!\n");
             printf("The hardcoded value is: np=%d\n", np); 
@@ -345,13 +406,48 @@ void read_data(char *inputfile, double *data_Tp, double *data_Jp, double *data_J
             fclose(infile);
             exit(6); 
           }
-	  fread(data_Tp,sizeof(double),nx*ny*nz*np*10,infile);
-	  fread(data_Jp,sizeof(double),nx*ny*nz*np*4,infile);
-	  fread(data_Jb,sizeof(double),nx*ny*nz*4,infile);
-	  fread(data_Jc,sizeof(double),nx*ny*nz*4,infile);
-	  fread(data_Js,sizeof(double),nx*ny*nz*4,infile);
-	  fread(data_Jt,sizeof(double),nx*ny*nz*4,infile);
-	  fread(data_Pnum,sizeof(long int),nx*ny*nz*np,infile);
+	  ret_it=fread(data_Tp,sizeof(double),nx*ny*nz*np*10,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(data_Jp,sizeof(double),nx*ny*nz*np*4,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(data_Jb,sizeof(double),nx*ny*nz*4,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(data_Jc,sizeof(double),nx*ny*nz*4,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(data_Js,sizeof(double),nx*ny*nz*4,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(data_Jt,sizeof(double),nx*ny*nz*4,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
+	  ret_it=fread(data_Pnum,sizeof(long int),nx*ny*nz*np,infile);
+      if (ret_it == 0)
+      {
+          printf("Failure in reading data. Exiting.\n");
+          exit(4);
+      }
 	  printf("%s read.\n",inputfile);
 	  fclose(infile);
 		
