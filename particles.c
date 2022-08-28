@@ -4,8 +4,9 @@
 
 /** @file particles.c
  *
- *   @brief this file contains the functions dealing with the particles to include in the computation:
- * get_particle_index and associate_particle_array_index
+ *   @brief this file contains the functions dealing with the particles to
+ * include in the computation: get_particle_index and
+ * associate_particle_array_index
  */
 
 extern const int shift_resonance_index;
@@ -16,8 +17,9 @@ int
 get_particle_index (int itype, int iso3)
 {
   int result;
-  // Warning: this index has to be manually updated and, every time it is modified, the function
-  // associate_particle_array_index must be modified, too.
+  // Warning: this index has to be manually updated and, every time it is
+  // modified, the function associate_particle_array_index must be modified,
+  // too.
   switch (itype)
     {
     case (101):
@@ -27,7 +29,8 @@ get_particle_index (int itype, int iso3)
         result = 1; // pion +
       else
         result = 2; // pion 0
-      break;        // the break statemets here are not really useful, but not even dangerous.
+      break;        // the break statemets here are not really useful, but not even
+                    // dangerous.
     case (106):
       if (iso3 == -1)
         result = 3; // Kaon 0
@@ -157,15 +160,17 @@ get_particle_index (int itype, int iso3)
 /**
  * plist_unsorted (SMASH)
  * The array containing the characteristics of the particles managed by SMASH.
- * It has a fixed dimension that should be sufficient even for the upcoming versions of SMASH.
- * This array is later ordered by growing pdg_id and the results are store in the array plist
+ * It has a fixed dimension that should be sufficient even for the upcoming
+ * versions of SMASH. This array is later ordered by growing pdg_id and the
+ * results are store in the array plist
  */
 pinfo plist_unsorted[MAX_SMASH_HADRON_SPECIES];
 
 /**
  * plist (SMASH)
- * This is a pointer the first element of an array containing the characteristics of the particles managed by SMASH
- * This array is ordered by growing pdg_id and dinamically allocated at runtime
+ * This is a pointer the first element of an array containing the
+ * characteristics of the particles managed by SMASH This array is ordered by
+ * growing pdg_id and dinamically allocated at runtime
  */
 pinfo *plist;
 
@@ -176,8 +181,9 @@ int
 get_particle_index (int pdg_id)
 {
   int result;
-  // Warning: this index has to be manually updated and, every time it is modified, the function
-  // associate_particle_array_index must be modified, too.
+  // Warning: this index has to be manually updated and, every time it is
+  // modified, the function associate_particle_array_index must be modified,
+  // too.
   switch (pdg_id)
     {
     case (-211):
@@ -370,10 +376,12 @@ associate_particle_array_index (int index)
       return "Lambda1116 * UrQMD itype 27, 2iso3 0, charge 0 * PDG ID 3122";
       break;
     case (16):
-      return "Anti-Lambda1116 * UrQMD itype -27, 2iso3 0, charge 0 * PDG ID -3122";
+      return "Anti-Lambda1116 * UrQMD itype -27, 2iso3 0, charge 0 * PDG ID "
+             "-3122";
       break;
     case (17):
-      return "Sigma1192- * UrQMD itype 40, 2iso3 -2, charge -1, dds * PDG ID 3112";
+      return "Sigma1192- * UrQMD itype 40, 2iso3 -2, charge -1, dds * PDG ID "
+             "3112";
       break;
     case (18):
       return "Sigma1192+ * UrQMD itype 40, 2iso3 2, charge 1, uus * PDG ID 3222";
@@ -382,13 +390,16 @@ associate_particle_array_index (int index)
       return "Sigma1192 * UrQMD itype 40, 2iso3 0, charge 0, uds * PDG ID 3212";
       break;
     case (20):
-      return "Anti-Sigma1192- * UrQMD itype -40, 2iso3 -2, charge -1, u_bar u_bar s_bar * PDG ID -3222";
+      return "Anti-Sigma1192- * UrQMD itype -40, 2iso3 -2, charge -1, u_bar "
+             "u_bar s_bar * PDG ID -3222";
       break;
     case (21):
-      return "Anti-Sigma1192+ * UrQMD itype -40, 2iso3 2, charge +1, d_bar d_bar s_bar * PDG ID -3112";
+      return "Anti-Sigma1192+ * UrQMD itype -40, 2iso3 2, charge +1, d_bar d_bar "
+             "s_bar * PDG ID -3112";
       break;
     case (22):
-      return "Anti-Sigma1192 * UrQMD itype -40, 2iso3 0, charge 0, u_bar d_bar s_bar * PDG ID -3212";
+      return "Anti-Sigma1192 * UrQMD itype -40, 2iso3 0, charge 0, u_bar d_bar "
+             "s_bar * PDG ID -3212";
       break;
     case (23):
       return "Xi1317- * UrQMD itype 49, 2iso3 -1, charge -1 * PDG ID 3312";
@@ -406,7 +417,8 @@ associate_particle_array_index (int index)
       return "Lambda1520 * UrQMD itype 29, 2iso3 0, charge 0 * PDG ID 3124";
       break;
     case (28):
-      return "Anti-Lambda1520 * UrQMD itype -29, 2iso3 0, charge 0 * PDG ID -3124";
+      return "Anti-Lambda1520 * UrQMD itype -29, 2iso3 0, charge 0 * PDG ID "
+             "-3124";
       break;
     case (29):
       return "Xi1530- * UrQMD itype 50, 2iso3 -1, charge -1 * PDG ID 3314";
@@ -424,7 +436,8 @@ associate_particle_array_index (int index)
       return "Omega1672 * UrQMD itype 55, 2iso3 0, charge -1 * PDG ID 3334";
       break;
     case (34):
-      return "Anti-Omega1672 * UrQMD itype -55, 2iso3 0, charge +1 * PDG ID -3334";
+      return "Anti-Omega1672 * UrQMD itype -55, 2iso3 0, charge +1 * PDG ID "
+             "-3334";
       break;
     default:
       return "All other particles";
@@ -608,11 +621,14 @@ get_had_prop (char *id_string, int id_string_len, int *s, int *B, int *Jtot)
           q3 = q3_tmp;
           *B = 1; // 3 quarks: it is a baryon
           if (*Jtot == 9)
-            *Jtot = 10; // this is an expection for N(2200), N(2250) and Lambda(2450) with J=9/2, so that 2J+1=10, but
-                        // in their ID the last number is 9
+            *Jtot = 10; // this is an expection for N(2200), N(2250) and
+                        // Lambda(2450) with J=9/2, so that 2J+1=10, but in their ID
+                        // the last number is 9
           if ((*Jtot % 2) != 0)
-            { // it must be a fermion, 2J+1 must be even and, if divided by 2 there is a reminder, it is odd...
-              printf ("Sorry, but there is something wrong. In particles.txt I have found a baryon with integer "
+            { // it must be a fermion, 2J+1 must be even and, if
+              // divided by 2 there is a reminder, it is odd...
+              printf ("Sorry, but there is something wrong. In particles.txt I have "
+                      "found a baryon with integer "
                       "spin... I quit.\n");
               exit (6);
             }
@@ -623,7 +639,8 @@ get_had_prop (char *id_string, int id_string_len, int *s, int *B, int *Jtot)
           *B = 0; // 2 quarks: it is a meson
           if ((*Jtot % 2) == 0)
             { // it must be a boson, 2J+1 must be odd
-              printf ("Sorry, but there is something wrong. In particles.txt I found a meson with half-integer "
+              printf ("Sorry, but there is something wrong. In particles.txt I found "
+                      "a meson with half-integer "
                       "spin... I quit.\n");
               exit (6);
             }
@@ -660,7 +677,8 @@ fill (pinfo *plist)
   finp = fopen ("particles.txt", "r");
   if (finp == NULL)
     {
-      printf ("Sorry, but it is not possible to open particles.txt, containing the data of the hadron species managed "
+      printf ("Sorry, but it is not possible to open particles.txt, containing "
+              "the data of the hadron species managed "
               "by SMASH... I quit.\n\n");
       exit (5);
     }
@@ -678,8 +696,9 @@ fill (pinfo *plist)
           plist[n].pdg_id = atoi (pdg_id_stringA);
           get_had_prop (pdg_id_stringA, strlen (pdg_id_stringA), &plist[n].strangeness, &plist[n].baryon_num,
                         &plist[n].spin);
-          // printf("%-3d   %-11ls  %12.4lf %10d   B: %1d   s: %2d   2J+1: %2d\n",n, plist[n].name, plist[n].mass,
-          // plist[n].pdg_id, plist[n].baryon_num, plist[n].strangeness, plist[n].spin);
+          // printf("%-3d   %-11ls  %12.4lf %10d   B: %1d   s: %2d   2J+1: %2d\n",n,
+          // plist[n].name, plist[n].mass, plist[n].pdg_id, plist[n].baryon_num,
+          // plist[n].strangeness, plist[n].spin);
           n = n + 1;
 
           if ((pdg_id_stringB[0] == '#') || (pdg_id_stringB[0] == ' ') || (pdg_id_stringB[0] == '\0')
@@ -693,8 +712,9 @@ fill (pinfo *plist)
               plist[n].pdg_id = tmp_pdg_idB;
               get_had_prop (pdg_id_stringB, strlen (pdg_id_stringB), &plist[n].strangeness, &plist[n].baryon_num,
                             &plist[n].spin);
-              // printf("%-3d   %-11ls  %12.4lf %10d   B: %1d   s: %2d   2J+1: %2d\n",n, plist[n].name, plist[n].mass,
-              // plist[n].pdg_id, plist[n].baryon_num, plist[n].strangeness, plist[n].spin);
+              // printf("%-3d   %-11ls  %12.4lf %10d   B: %1d   s: %2d   2J+1:
+              // %2d\n",n, plist[n].name, plist[n].mass, plist[n].pdg_id,
+              // plist[n].baryon_num, plist[n].strangeness, plist[n].spin);
               n = n + 1;
               strncpy (pdg_id_stringB, zero_string, sizeof (pdg_id_stringB));
             }
@@ -710,8 +730,9 @@ fill (pinfo *plist)
               plist[n].pdg_id = tmp_pdg_idC;
               get_had_prop (pdg_id_stringC, strlen (pdg_id_stringC), &plist[n].strangeness, &plist[n].baryon_num,
                             &plist[n].spin);
-              // printf("%-3d   %-11ls  %12.4lf %10d   B: %1d   s: %2d   2J+1: %2d\n",n, plist[n].name, plist[n].mass,
-              // plist[n].pdg_id, plist[n].baryon_num, plist[n].strangeness, plist[n].spin);
+              // printf("%-3d   %-11ls  %12.4lf %10d   B: %1d   s: %2d   2J+1:
+              // %2d\n",n, plist[n].name, plist[n].mass, plist[n].pdg_id,
+              // plist[n].baryon_num, plist[n].strangeness, plist[n].spin);
               n = n + 1;
               strncpy (pdg_id_stringC, zero_string, sizeof (pdg_id_stringC));
             }
@@ -727,8 +748,9 @@ fill (pinfo *plist)
               plist[n].pdg_id = tmp_pdg_idD;
               get_had_prop (pdg_id_stringD, strlen (pdg_id_stringD), &plist[n].strangeness, &plist[n].baryon_num,
                             &plist[n].spin);
-              // printf("%-3d   %-11ls  %12.4lf %10d   B: %1d   s: %2d   2J+1: %2d\n",n, plist[n].name, plist[n].mass,
-              // plist[n].pdg_id, plist[n].baryon_num, plist[n].strangeness, plist[n].spin);
+              // printf("%-3d   %-11ls  %12.4lf %10d   B: %1d   s: %2d   2J+1:
+              // %2d\n",n, plist[n].name, plist[n].mass, plist[n].pdg_id,
+              // plist[n].baryon_num, plist[n].strangeness, plist[n].spin);
               n = n + 1;
               strncpy (pdg_id_stringD, zero_string, sizeof (pdg_id_stringD));
             }
@@ -756,7 +778,8 @@ prepare_smash_hadron_array ()
   plist = (pinfo *)malloc (sizeof (pinfo) * n_hadrons_smash);
   if (plist == NULL)
     {
-      printf ("Unable to allocate array plist in function prepare_smash_hadron_array. I quit.\n");
+      printf ("Unable to allocate array plist in function "
+              "prepare_smash_hadron_array. I quit.\n");
       exit (4);
     }
   for (i = 0; i < n_hadrons_smash; i++)

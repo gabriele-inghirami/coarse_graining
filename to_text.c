@@ -3,16 +3,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const int shift_total_baryon_on = 10; // value added to output_content_info if the total baryons are considered
+const int shift_total_baryon_on = 10; // value added to output_content_info if
+                                      // the total baryons are considered
 const int shift_resonances_on = 100;  // value added to output_content_info if the resonances are considered
-int total_baryon_included = 0;        // flag that will be set to > 0 if total_baryons are included, to < 0 if not
+int total_baryon_included = 0;        // flag that will be set to > 0 if total_baryons
+                                      // are included, to < 0 if not
 int resonances_included = 0;          // flag that will be set to > 0 if resonances are included, to < 0 if not
 size_t ret_it;
 
 void
 help ()
 {
-  printf ("Syntax: ./to_text.exe <inputfile> <outputfile>\nThe informations about the grid and the particles are "
+  printf ("Syntax: ./to_text.exe <inputfile> <outputfile>\nThe informations "
+          "about the grid and the particles are "
           "contained into definitions.h.\n\n");
 }
 
@@ -171,7 +174,8 @@ main (int argc, char *argv[])
 
   if (datap == NULL)
     {
-      printf ("Sorry, but I cannot allocate the datap array to temporary store the input data...\n");
+      printf ("Sorry, but I cannot allocate the datap array to temporary store "
+              "the input data...\n");
       exit (3);
     }
 
@@ -191,8 +195,8 @@ main (int argc, char *argv[])
         {
           for (k = 0; k < nz; k++)
             {
-              ret_it
-                  = fread (&datap[h], sizeof (double), offset, fin); // rho,vx,vy,vz,rho_c,rho_s,rho_t,Ic_diff,Is_diff
+              ret_it = fread (&datap[h], sizeof (double), offset,
+                              fin); // rho,vx,vy,vz,rho_c,rho_s,rho_t,Ic_diff,Is_diff
               if (ret_it == 0)
                 {
                   printf ("Failure in reading data. Exiting.\n");
@@ -267,20 +271,24 @@ main (int argc, char *argv[])
               h += 1;
               fprintf (fout, "strangeness density: %14.9e\n", datap[h]);
               h += 1;
-              fprintf (fout, "electric charge diffusion current components: %14.9e, %14.9e, %14.9e, %14.9e\n",
+              fprintf (fout,
+                       "electric charge diffusion current components: %14.9e, %14.9e, "
+                       "%14.9e, %14.9e\n",
                        datap[h], datap[h + 1], datap[h + 2], datap[h + 3]);
               h += 4;
-              fprintf (fout, "strangeness diffusion current components: %14.9e, %14.9e, %14.9e, %14.9e\n", datap[h],
-                       datap[h + 1], datap[h + 2], datap[h + 3]);
+              fprintf (fout,
+                       "strangeness diffusion current components: %14.9e, %14.9e, "
+                       "%14.9e, %14.9e\n",
+                       datap[h], datap[h + 1], datap[h + 2], datap[h + 3]);
               h += 4;
               entot = 0.;
               for (p = 0; p < np; p++)
                 {
                   entot = entot + datap[3 * p + h + 2];
-                  fprintf (
-                      fout,
-                      "Hadron kind: %4d, total cell number: %14ld, number density: %14.9e, energy density: %14.9e\n",
-                      p, (long int)datap[3 * p + h], datap[3 * p + h + 1], datap[3 * p + h + 2]);
+                  fprintf (fout,
+                           "Hadron kind: %4d, total cell number: %14ld, number density: "
+                           "%14.9e, energy density: %14.9e\n",
+                           p, (long int)datap[3 * p + h], datap[3 * p + h + 1], datap[3 * p + h + 2]);
                 }
               fprintf (fout, "total energy density: %14.9e\n", entot);
               fprintf (fout, "\n");
@@ -290,7 +298,8 @@ main (int argc, char *argv[])
                   for (r = 0; r < nr; r++)
                     {
                       fprintf (fout,
-                               "Resonance kind: %4d, total cell number: %14ld, number density: %14.9e, energy "
+                               "Resonance kind: %4d, total cell number: %14ld, number "
+                               "density: %14.9e, energy "
                                "density: %14.9e\n",
                                r, (long int)datap[3 * r + h], datap[3 * r + h + 1], datap[3 * r + h + 2]);
                     }

@@ -12,7 +12,8 @@
 const int nx2 = 7;
 const int ny2 = 7;
 const int nz2 = 7;
-const int define_grid_corner; // if different from 0 the program uses xmin2, ymin2, zmin2 as grid corner
+const int define_grid_corner; // if different from 0 the program uses xmin2,
+                              // ymin2, zmin2 as grid corner
 const double new_xmin = -1;
 const double new_ymin = -1;
 const double new_zmin = -1;
@@ -105,86 +106,100 @@ main (int argc, char *argv[])
   Tp = (double *)malloc (nx * ny * nz * np * 10 * sizeof (double));
   if (Tp == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Tmunu array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Tmunu array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jp = (double *)malloc (nx * ny * nz * np * 4 * sizeof (double));
   if (Jp == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jp array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jp array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jb = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Jb == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jb array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jb array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jc = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Jc == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jc array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jc array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Js = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Js == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Js array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Js array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jt = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Jt == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jt array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jt array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Pnum = (long int *)malloc (nx * ny * nz * np * sizeof (long int));
   if (Pnum == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Pnum array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Pnum array inside "
+              "main. I am forced to quit.\n");
       exit (4);
     }
 
   Tp2 = (double *)malloc (nx2 * ny2 * nz2 * np * 10 * sizeof (double));
   if (Tp2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Tmunu2 array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Tmunu2 array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jp2 = (double *)malloc (nx2 * ny2 * nz2 * np * 4 * sizeof (double));
   if (Jp2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jp2 array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jp2 array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jb2 = (double *)malloc (nx2 * ny2 * nz2 * 4 * sizeof (double));
   if (Jb2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jb2 array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jb2 array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jc2 = (double *)malloc (nx2 * ny2 * nz2 * 4 * sizeof (double));
   if (Jc2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jc2 array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jc2 array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Js2 = (double *)malloc (nx2 * ny2 * nz2 * 4 * sizeof (double));
   if (Js2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Js2 array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Js2 array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jt2 = (double *)malloc (nx2 * ny2 * nz2 * 4 * sizeof (double));
   if (Jt2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jt2 array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jt2 array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Pnum2 = (long int *)malloc (nx2 * ny2 * nz2 * np * sizeof (long int));
   if (Pnum2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Pnum array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Pnum array inside "
+              "main. I am forced to quit.\n");
       exit (4);
     }
 
@@ -193,7 +208,8 @@ main (int argc, char *argv[])
   fread (Jb, sizeof (double), nx * ny * nz * 4, fin);
   fread (Jc, sizeof (double), nx * ny * nz * 4, fin);
   fread (Js, sizeof (double), nx * ny * nz * 4, fin);
-  fread (Jt, sizeof (double), nx * ny * nz * 4, fin); // currently Jt is read, but not used
+  fread (Jt, sizeof (double), nx * ny * nz * 4,
+         fin); // currently Jt is read, but not used
   fread (Pnum, sizeof (long int), nx * ny * nz * np, fin);
   printf ("%s read.\n", argv[1]);
   fclose (fin);

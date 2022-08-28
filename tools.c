@@ -4,8 +4,9 @@
 
 /** @file tools.c
  *
- *   @brief this file contains the utilities, for example to initialize an array or to check if the files in the list
- * given at the program invocation all exist
+ *   @brief this file contains the utilities, for example to initialize an array
+ * or to check if the files in the list given at the program invocation all
+ * exist
  */
 
 extern const int start_index;
@@ -38,7 +39,8 @@ get_timesteps (char *timefile, int *ntimesteps, double **timesteps_array)
   int i;
   FILE *ftint;
 
-  // we create a temporary array wich almost certainly is large enough to contain all the time intervals to be read
+  // we create a temporary array wich almost certainly is large enough to
+  // contain all the time intervals to be read
   time_intervals_temporary_array = malloc (sizeof (double) * size_of_time_intervals_temporary_array);
   ftint = fopen (timefile, "r");
   printf ("Opening timefile %s\n", timefile);
@@ -63,7 +65,8 @@ get_timesteps (char *timefile, int *ntimesteps, double **timesteps_array)
   free (time_intervals_temporary_array);
 }
 
-// it returns the index in the array of times time_int_array corresponding to the given test_time
+// it returns the index in the array of times time_int_array corresponding to
+// the given test_time
 int
 check_test_time (double test_time, double *time_int_array, int ntimesteps)
 {

@@ -5,8 +5,8 @@
 /**
  * @file main.c
  *
- * @brief this file contains the main function, which controls the highest level of the program execution. It also
- * contains the help function.
+ * @brief this file contains the main function, which controls the highest level
+ * of the program execution. It also contains the help function.
  */
 
 #if USE_CENTERED_GRID == 0
@@ -57,9 +57,11 @@ const int start_index = 4; // index of the argument reporting the first input fi
 
 const int shift_resonance_index = 10000; // index offset to distinguish resonances and stable particles
 
-int output_content_info = 0; // it provides information about which quantities are included in the output
+int output_content_info = 0; // it provides information about which quantities
+                             // are included in the output
 
-const int shift_total_baryon_on = 10; // value added to output_content_info if the total baryons are considered
+const int shift_total_baryon_on = 10; // value added to output_content_info if
+                                      // the total baryons are considered
 
 const int shift_resonances_on = 100; // value added to output_content_info if the resonances are considered
 
@@ -70,20 +72,26 @@ extern pinfo *plist;
 #endif
 
 /** @brief main function
- * It parses the command line arguments, it allocates the most important data arrays (Tp, Jp, Jb, Jc and Js) and it
- *calls the compute or avg functions.
- * @param[in] <comp|avg> comp : it computes the energy momentum tensor for all particles, the baryon and the individual
- *particle four currents;  avg : it averages previously computed datafiles
- * @param[in] <0|1> 0: It does not print separate baryon density current files 1: it does
- * @param[in] <outpufile_prefix> The root of the names of the ouput files (the others part of their names are built
- *automatically)
- * @param[in] <UrQMD_event_file_1|Tmunu_file1> The first UrQMD event file (.f14) if the program is launched with the
- *comp option or the first T_munu output file to be averaged if the program is launched with the avg option
- * @param[in] <UrQMD_event_file_2|Tmunu_file2> The second UrQMD event file (.f14) if the program is launched with the
- *comp option or the second T_munu output file to be averaged if the program is launched with the avg option. The
- *program accepts up to roughly 1000 events files, but the OS might impose a tighter limit.
- * @param[in] <file_with_time_intervals|Tmunu_fileN> Either the file with the chosen time intervals to compute (
- *program launched with comp ) or the final T_munu file to be averaged ( program launched with avg ) \callgraph
+ * It parses the command line arguments, it allocates the most important data
+ *arrays (Tp, Jp, Jb, Jc and Js) and it calls the compute or avg functions.
+ * @param[in] <comp|avg> comp : it computes the energy momentum tensor for all
+ *particles, the baryon and the individual particle four currents;  avg : it
+ *averages previously computed datafiles
+ * @param[in] <0|1> 0: It does not print separate baryon density current files
+ *1: it does
+ * @param[in] <outpufile_prefix> The root of the names of the ouput files (the
+ *others part of their names are built automatically)
+ * @param[in] <UrQMD_event_file_1|Tmunu_file1> The first UrQMD event file (.f14)
+ *if the program is launched with the comp option or the first T_munu output
+ *file to be averaged if the program is launched with the avg option
+ * @param[in] <UrQMD_event_file_2|Tmunu_file2> The second UrQMD event file
+ *(.f14) if the program is launched with the comp option or the second T_munu
+ *output file to be averaged if the program is launched with the avg option. The
+ *program accepts up to roughly 1000 events files, but the OS might impose a
+ *tighter limit.
+ * @param[in] <file_with_time_intervals|Tmunu_fileN> Either the file with the
+ *chosen time intervals to compute ( program launched with comp ) or the final
+ *T_munu file to be averaged ( program launched with avg ) \callgraph
  **/
 
 int
@@ -119,7 +127,7 @@ main (int argc, char *argv[])
                   // dimensions: nt*nx*ny*nz*nr, where nt is the number of timesteps, nx, ny and nz are the cells along
                   // x, y and z respectively, nr is the number of resonances. Each entry tells the total number of
                   // resonances of the species. If INCLUDE_RESONANCES is not defined, it simply points to a 0 double.
-  double *Jr; //< The array containing the four current of resonances. It is a linear array of dimensions:
+  double *Jr;     //< The array containing the four current of resonances. It is a linear array of dimensions:
               // nt*nx*ny*nz*nr*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
               // respectively, nr is the number of resonances and 4 corresponds to the four covariant components for
               // each particle. If INCLUDE_RESONANCES is not defined, it simply points to a 0 double.
@@ -143,15 +151,17 @@ main (int argc, char *argv[])
 
   if (argc > max_args)
     {
-      printf ("Sorry, but opening too many files can cause problems, so there is a limit (%d) on the number of "
-              "accepted arguments...\nIf you wish, you can modify the constant int max_args, recompile the program "
+      printf ("Sorry, but opening too many files can cause problems, so there is "
+              "a limit (%d) on the number of "
+              "accepted arguments...\nIf you wish, you can modify the constant "
+              "int max_args, recompile the program "
               "and run it again.\n",
               max_args);
       return 1;
     }
 
-  if (strlen (argv[3])
-      > 1000) // this check might be looser or removed, but the length should be already sufficient for most purposes
+  if (strlen (argv[3]) > 1000) // this check might be looser or removed, but the length should be
+                               // already sufficient for most purposes
     {
       printf ("The name of the output prefix cannot exceed 1000 characters.\n");
       exit (1);
@@ -164,8 +174,8 @@ main (int argc, char *argv[])
   // formal check of the parameters
   if ((strncmp (argv[1], "comp", 4) == 0) || (strncmp (argv[1], "avg", 3) == 0))
     {
-      check_input_files (argv, argc); // we check that the input files really exist, the final numer tells from which
-                                      // argument index to start
+      check_input_files (argv, argc); // we check that the input files really exist, the final
+                                      // numer tells from which argument index to start
 
       if (strncmp (argv[1], "comp", 4) == 0)
         {
@@ -180,31 +190,36 @@ main (int argc, char *argv[])
       Tp = (double *)calloc (nt * nx * ny * nz * np * 10, sizeof (double));
       if (Tp == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Tp array inside main. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Tp array inside "
+                  "main. I am forced to quit.\n");
           exit (4);
         }
       Jp = (double *)calloc (nt * nx * ny * nz * np * 4, sizeof (double));
       if (Jp == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Jp array inside main. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Jp array inside "
+                  "main. I am forced to quit.\n");
           exit (4);
         }
       Jb = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
       if (Jb == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Jb array inside main. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Jb array inside "
+                  "main. I am forced to quit.\n");
           exit (4);
         }
       Jc = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
       if (Jc == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Jc array inside main. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Jc array inside "
+                  "main. I am forced to quit.\n");
           exit (4);
         }
       Js = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
       if (Js == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Js array inside main. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Js array inside "
+                  "main. I am forced to quit.\n");
           exit (4);
         }
 #ifdef TOTAL_BARYON
@@ -212,16 +227,19 @@ main (int argc, char *argv[])
       Jt = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
       if (Jt == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Jt array inside main. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Jt array inside "
+                  "main. I am forced to quit.\n");
           exit (4);
         }
 #else
-      Jt = (double *)calloc (1, sizeof (double)); // we skip the check, if it fails we are in big troubles anyway
+      Jt = (double *)calloc (1, sizeof (double)); // we skip the check, if it fails
+                                                  // we are in big troubles anyway
 #endif
       Pnum = (long int *)calloc (nt * nx * ny * nz * np, sizeof (long int));
       if (Pnum == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Pnum array inside main. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Pnum array inside "
+                  "main. I am forced to quit.\n");
           exit (4);
         }
 #ifdef INCLUDE_RESONANCES
@@ -229,26 +247,30 @@ main (int argc, char *argv[])
       Jr = (double *)calloc (nt * nx * ny * nz * nr * 4, sizeof (double));
       if (Jr == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Jr array inside main. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Jr array inside "
+                  "main. I am forced to quit.\n");
           exit (4);
         }
       Tr = (double *)calloc (nt * nx * ny * nz * nr * 10, sizeof (double));
       if (Tr == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Tr array inside main. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Tr array inside "
+                  "main. I am forced to quit.\n");
           exit (4);
         }
       Rnum = (long int *)calloc (nt * nx * ny * nz * nr, sizeof (long int));
       if (Rnum == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Rnum array inside main. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Rnum array inside "
+                  "main. I am forced to quit.\n");
           exit (4);
         }
 #else
-      // if the allocation of 3 doubles fails probably the system is unable to go on, so we skip the check
+      // if the allocation of 3 doubles fails probably the system is unable to go
+      // on, so we skip the check
       Jr = (double *)calloc (1, sizeof (double));
       Tr = (double *)calloc (1, sizeof (double));
-      Rnum = (double *)calloc (1, sizeof (double));
+      Rnum = (long int *)calloc (1, sizeof (long int));
 #endif
     }
   else
@@ -271,7 +293,8 @@ main (int argc, char *argv[])
     }
   else // we already checked all main options, so we should never come here
     {
-      printf ("Unknown option %s, strangely not detected by previous checking... Did you make, maybe, a bad code "
+      printf ("Unknown option %s, strangely not detected by previous checking... "
+              "Did you make, maybe, a bad code "
               "modification?\n",
               argv[1]);
       exit (1);
@@ -291,7 +314,8 @@ main (int argc, char *argv[])
       break;
 
     default:
-      printf ("Print option neither 0 nor 1. In the doubt, I don't compute and print the densities.\n");
+      printf ("Print option neither 0 nor 1. In the doubt, I don't compute and "
+              "print the densities.\n");
     }
 
   free (time_int_array);
@@ -318,7 +342,9 @@ main (int argc, char *argv[])
 void
 help ()
 {
-  printf ("Syntax: ./cg <comp|avg> <0 (not print densities) | 1 (print)> <outpufile_prefix> "
-          "<UrQMD_event_file_1|Tmunu_file1> [UrQMD_event_file_2|Tmunu_file2] [UrQMD_event_file_3|Tmunu_file3] ... "
+  printf ("Syntax: ./cg <comp|avg> <0 (not print densities) | 1 (print)> "
+          "<outpufile_prefix> "
+          "<UrQMD_event_file_1|Tmunu_file1> [UrQMD_event_file_2|Tmunu_file2] "
+          "[UrQMD_event_file_3|Tmunu_file3] ... "
           "<file_with_time_intervals|Tmunu_fileN>\n");
 }

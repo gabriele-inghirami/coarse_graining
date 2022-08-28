@@ -45,7 +45,8 @@ const int T32 = T23;
 void
 help ()
 {
-  printf ("Syntax: ./to_landau.exe <Tmumu_inputfile> <density_file> [Tmunu_file]\n\n");
+  printf ("Syntax: ./to_landau.exe <Tmumu_inputfile> <density_file> "
+          "[Tmunu_file]\n\n");
 }
 
 int
@@ -112,28 +113,32 @@ main (int argc, char *argv[])
   Tmunu = gsl_matrix_alloc (4, 4);
   if (Tmunu == NULL)
     {
-      printf ("Unable to allocate the gsl_matrix Tmunu 2D (4,4) array. I am forced to quit.\n");
+      printf ("Unable to allocate the gsl_matrix Tmunu 2D (4,4) array. I am "
+              "forced to quit.\n");
       exit (4);
     }
 
   result = gsl_matrix_complex_alloc (4, 4);
   if (result == NULL)
     {
-      printf ("Unable to allocate the gsl_matrix_complex result 2D (4,4) array. I am forced to quit.\n");
+      printf ("Unable to allocate the gsl_matrix_complex result 2D (4,4) array. I "
+              "am forced to quit.\n");
       exit (4);
     }
 
   ws = gsl_eigen_nonsymmv_alloc (4);
   if (ws == NULL)
     {
-      printf ("Unable to allocate the gsl_eigen_nonsymmv ws array. I am forced to quit.\n");
+      printf ("Unable to allocate the gsl_eigen_nonsymmv ws array. I am forced to "
+              "quit.\n");
       exit (4);
     }
 
   eval = gsl_vector_complex_alloc (4);
   if (eval == NULL)
     {
-      printf ("Unable to allocate the gsl_vector_complex eval array. I am forced to quit.\n");
+      printf ("Unable to allocate the gsl_vector_complex eval array. I am forced "
+              "to quit.\n");
       exit (4);
     }
 
@@ -142,19 +147,22 @@ main (int argc, char *argv[])
       lambda_mat = gsl_matrix_alloc (4, 4);
       if (lambda_mat == NULL)
         {
-          printf ("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I am forced to quit.\n");
+          printf ("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I "
+                  "am forced to quit.\n");
           exit (4);
         }
       Tmunu_Landau = gsl_matrix_alloc (4, 4);
       if (Tmunu_Landau == NULL)
         {
-          printf ("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I am forced to quit.\n");
+          printf ("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I "
+                  "am forced to quit.\n");
           exit (4);
         }
       tmp_mat = gsl_matrix_alloc (4, 4);
       if (tmp_mat == NULL)
         {
-          printf ("Unable to allocate the gsl_matrix tmp_mat 2D (4,4) array. I am forced to quit.\n");
+          printf ("Unable to allocate the gsl_matrix tmp_mat 2D (4,4) array. I am "
+                  "forced to quit.\n");
           exit (4);
         }
     }
@@ -175,49 +183,57 @@ main (int argc, char *argv[])
   Tp = (double *)malloc (nx * ny * nz * np * 10 * sizeof (double));
   if (Tp == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Tmunu array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Tmunu array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jp = (double *)malloc (nx * ny * nz * np * 4 * sizeof (double));
   if (Jp == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jp array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jp array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jb = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Jb == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jb array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jb array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jc = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Jc == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jc array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jc array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Js = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Js == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Js array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Js array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jt = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Jt == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jt array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jt array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Pnum = (long int *)malloc (nx * ny * nz * np * sizeof (long int));
   if (Pnum == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Pnum array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Pnum array inside "
+              "main. I am forced to quit.\n");
       exit (4);
     }
   empty_arr = (double *)calloc ((15 + 3 * np), sizeof (double));
   if (empty_arr == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the empty_arr array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the empty_arr array "
+              "inside main. I am forced to quit.\n");
       exit (4);
     }
   if (argc == 4)
@@ -225,7 +241,8 @@ main (int argc, char *argv[])
       Tp_Landau = (double *)calloc (nx * ny * nz * np * 10, sizeof (double));
       if (Tp_Landau == NULL)
         {
-          printf ("Sorry, but it is not possible to allocate the Tmunu array. I am forced to quit.\n");
+          printf ("Sorry, but it is not possible to allocate the Tmunu array. I am "
+                  "forced to quit.\n");
           exit (4);
         }
     }
@@ -235,7 +252,8 @@ main (int argc, char *argv[])
   fread (Jb, sizeof (double), nx * ny * nz * 4, fin);
   fread (Jc, sizeof (double), nx * ny * nz * 4, fin);
   fread (Js, sizeof (double), nx * ny * nz * 4, fin);
-  fread (Jt, sizeof (double), nx * ny * nz * 4, fin); // currently Jt is read, but not used
+  fread (Jt, sizeof (double), nx * ny * nz * 4,
+         fin); // currently Jt is read, but not used
   fread (Pnum, sizeof (long int), nx * ny * nz * np, fin);
   printf ("%s read.\n", argv[1]);
   fclose (fin);
@@ -368,14 +386,17 @@ main (int argc, char *argv[])
                   for (l = 0; l < 4; l++)
                     {
                       if (fabs (Ib_diffusion[l] - Ib_diffcheck[l] / NF) > 1.e-10)
-                        printf ("Warning, mismatching in baryon diffusion currents at i=%d, j=%d, k=%d!  %14.11e\n", i,
-                                j, k, Ib_diffusion[l] - Ib_diffcheck[l] / NF);
+                        printf ("Warning, mismatching in baryon diffusion currents at "
+                                "i=%d, j=%d, k=%d!  %14.11e\n",
+                                i, j, k, Ib_diffusion[l] - Ib_diffcheck[l] / NF);
                       if (fabs (Ic_diffusion[l] - Ic_diffcheck[l] / NF) > 1.e-10)
-                        printf ("Warning, mismatching in charge diffusion currents at i=%d, j=%d, k=%d!  %14.11e\n", i,
-                                j, k, Ic_diffusion[l] - Ic_diffcheck[l] / NF);
+                        printf ("Warning, mismatching in charge diffusion currents at "
+                                "i=%d, j=%d, k=%d!  %14.11e\n",
+                                i, j, k, Ic_diffusion[l] - Ic_diffcheck[l] / NF);
                       if (fabs (Is_diffusion[l] - Is_diffcheck[l] / NF) > 1.e-10)
-                        printf ("Warning, mismatching in strange diffusion currents at i=%d, j=%d, k=%d! %14.11e\n", i,
-                                j, k, Is_diffusion[l] - Is_diffcheck[l] / NF);
+                        printf ("Warning, mismatching in strange diffusion currents at "
+                                "i=%d, j=%d, k=%d! %14.11e\n",
+                                i, j, k, Is_diffusion[l] - Is_diffcheck[l] / NF);
                     }
                   fwrite (Ib_diffusion, sizeof (double), 4, fde);
                   fwrite (Ic_diffusion, sizeof (double), 4, fde);
@@ -405,8 +426,9 @@ main (int argc, char *argv[])
                 }
               else
                 {
-                  printf ("Warning, undetermined Landau frame fluid four velocity at index: i: %d, j: %d, k: %d\n", i,
-                          j, k);
+                  printf ("Warning, undetermined Landau frame fluid four velocity at "
+                          "index: i: %d, j: %d, k: %d\n",
+                          i, j, k);
                   fwrite (empty_arr, sizeof (double), 15 + np * 3, fde);
                 }
 
@@ -459,8 +481,9 @@ main (int argc, char *argv[])
       // now we write the results in the output file
       fwrite (&nevents, sizeof (long int), 1, ftm);
       fwrite (&time, sizeof (double), 1, ftm);
-      // we save the informations about the number of particles and the grid size because, for a few bytes more of disk
-      // space, we can perform a consistency check when averaging
+      // we save the informations about the number of particles and the grid size
+      // because, for a few bytes more of disk space, we can perform a consistency
+      // check when averaging
       fwrite (&np, sizeof (int), 1, ftm);
       fwrite (&nx, sizeof (int), 1, ftm);
       fwrite (&ny, sizeof (int), 1, ftm);

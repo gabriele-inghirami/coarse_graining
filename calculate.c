@@ -4,7 +4,8 @@
 
 /** @file calculate.c
  *
- *   @brief this file contains the core functions of the program: compute, avg and process_data
+ *   @brief this file contains the core functions of the program: compute, avg
+ * and process_data
  *
  */
 
@@ -31,7 +32,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
   size_t buffer_size = 180;
   ssize_t numchar;
   char bitbucket[180];
-  char *buffer;   // buffer for getline, i.e. to examine line by line the UrQMD .f14 files
+  char *buffer;   // buffer for getline, i.e. to examine line by line the UrQMD
+                  // .f14 files
   float b;        // impact parameter for urqmd
   double b_smash; // impact parameter for smash
   int part_ts;
@@ -47,33 +49,44 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
   double bb0, out_time;
   int time_index;
   char bb_char[4];           // bitbucket array for the magic number in SMASH header
-  char empty_char;           // character at the end of an event block in SMASH output binary
-  uint16_t format_version;   // format version in SMASH header, we will check that it is 4
-  uint16_t format_variant;   // format variant in SMASH header, we will check that it is 0
+  char empty_char;           // character at the end of an event block in SMASH output
+                             // binary
+  uint16_t format_version;   // format version in SMASH header, we will check that
+                             // it is 4
+  uint16_t format_variant;   // format variant in SMASH header, we will check that
+                             // it is 0
   uint32_t smash_vprint_len; // number of characters of the SMASH version
   char smash_ver[100];       // array for the SMASH version
   int continue_flag = 0;
-  // typedef struct smash_record{double t; double  x; double  y; double z; double mass; double p0; double px; double
-  // py; double pz; int32_t pdg; int32_t ID; int32_t charge;} smash_record;
+  // typedef struct smash_record{double t; double  x; double  y; double z;
+  // double mass; double p0; double px; double py; double pz; int32_t pdg;
+  // int32_t ID; int32_t charge;} smash_record;
   const size_t smash_record_size = 9 * sizeof (double) + 3 * sizeof (int32_t);
   void *buffer_smash = NULL;                // buffer to read an output block of SMASH binary output
   void *buffer_smash_tmp = NULL;            // temporary buffer for realloc
   uint32_t elements_of_buffer_smash = 0;    // dimension of the buffer used to read a block of data
   pdata *pdata_smash_at_event_start = NULL; // pointer to the first particle at the beginning of an event
-  char p_char_at_smash_block_start;         // p character before a time block in SMASH binary output
-  uint32_t n_part_lines;                    // lines with particle information in a time block in SMASH binary output
-  fpos_t begin_of_event_file_position; // the position of the beginning of the current event in the opened SMASH binary
-                                       // output file
+  char p_char_at_smash_block_start;         // p character before a time block in SMASH
+                                            // binary output
+  uint32_t n_part_lines;                    // lines with particle information in a time block in
+                                            // SMASH binary output
+  fpos_t begin_of_event_file_position;      // the position of the beginning of the
+                                            // current event in the opened SMASH
+                                            // binary output file
   uint32_t event_number, event_number_check;
   int look_at_b;
   double bmin_sm = (float_t)bmin;
   double bmax_sm = (float_t)bmax;
   int b_selection_sm = (int)b_selection;
   size_t ret_it;
+  ssize_t gl_bb; // right now, just to avoid that the compiler complains while
+                 // not checking the return value of getline
+  int fsf_bb;    // right now, just to avoid that the compiler complains while not
+                 // checking the return value of fscanf
 
   fout = files[index_of_output_file];
-  nf = ninfiles - start_index - 1; // the number of input files with UrQMD data, excluding the last one which contains
-                                   // the informations about timesteps
+  nf = ninfiles - start_index - 1; // the number of input files with UrQMD data, excluding the last one
+                                   // which contains the informations about timesteps
 
   pdata_current = (pdata *)malloc (sizeof (pdata));
   pdata_start = pdata_current;
@@ -90,7 +103,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
   // main loop on input files
   for (idx = 0; idx < nf; idx++)
     {
-      infile = fopen (files[idx + start_index], "r"); // we open the input files with data
+      infile = fopen (files[idx + start_index],
+                      "r"); // we open the input files with data
       printf ("Working on file %s\n", files[idx + start_index]);
       numchar = getline (&buffer, &buffer_size, infile);
       while (numchar > 0)
@@ -99,7 +113,7 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
             {
               printf ("New event found\n");
               for (k = 0; k < 3; k++)
-                getline (&buffer, &buffer_size, infile);
+                gl_bb = getline (&buffer, &buffer_size, infile);
               sscanf (buffer, "%s %f", bitbucket, &b);
               if (((b >= bmin) && (b <= bmax)) || (b_selection == 0))
                 {
@@ -109,12 +123,13 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
               else
                 take_event = -1;
               for (k = 0; k < 14; k++)
-                getline (&buffer, &buffer_size, infile); // we move 14 lines forward
+                gl_bb = getline (&buffer, &buffer_size,
+                                 infile); // we move 14 lines forward
             }
           sscanf (buffer, "%d", &part_ts);
-          getline (&buffer, &buffer_size, infile); // we skip another line
+          gl_bb = getline (&buffer, &buffer_size, infile); // we skip another line
           // we read the line and check the timestep
-          getline (&buffer, &buffer_size, infile);
+          gl_bb = getline (&buffer, &buffer_size, infile);
           sscanf (buffer, "%lf", &test_time);
           time_index = check_test_time (test_time, time_int_array, nt);
           if ((time_index > -1) && (take_event == 0))
@@ -137,10 +152,11 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
                   pdata_current->next = pdata_new;
                   pdata_current = pdata_new;
                   pdata_current->t_index = time_index;
-                  fscanf (infile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d %d %d %d\n", &bb0, &(pdata_current->x),
-                          &(pdata_current->y), &(pdata_current->z), &(pdata_current->en), &(pdata_current->px),
-                          &(pdata_current->py), &(pdata_current->pz), &(pdata_current->m), &(pdata_current->itype),
-                          &(pdata_current->iso3), &(pdata_current->charge), &bb2, &bb3, &bb4);
+                  fsf_bb = fscanf (infile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d %d %d %d\n", &bb0,
+                                   &(pdata_current->x), &(pdata_current->y), &(pdata_current->z), &(pdata_current->en),
+                                   &(pdata_current->px), &(pdata_current->py), &(pdata_current->pz),
+                                   &(pdata_current->m), &(pdata_current->itype), &(pdata_current->iso3),
+                                   &(pdata_current->charge), &bb2, &bb3, &bb4);
                   pdata_current->next = NULL;
                 }
               printf ("Data of timestep read (%d items)\n", part_ts);
@@ -148,15 +164,16 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
           else
             {
               for (k = 0; k < part_ts - 1; k++)
-                getline (&buffer, &buffer_size, infile);
+                gl_bb = getline (&buffer, &buffer_size, infile);
             }
           numchar = getline (&buffer, &buffer_size, infile);
         }
       fclose (infile);
       printf ("File %s read.\n", files[idx + start_index]);
       process_data (Tp, Jp, Jb, Jc, Js, Jt, Jt, Tr, Pnum, Rnum, *nevents, pdata_start);
-      // process_data, hopefully, should deallocate all the memory for pdata structures in the linked list,
-      // so we reset the memory counter and we repeat the initial allocation step
+      // process_data, hopefully, should deallocate all the memory for pdata
+      // structures in the linked list, so we reset the memory counter and we
+      // repeat the initial allocation step
       pdata_totmem = 0;
       pdata_current = (pdata *)malloc (sizeof (pdata));
       pdata_start = pdata_current;
@@ -167,8 +184,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
 #elif defined(SMASH)
 
   fout = files[index_of_output_file];
-  nf = ninfiles - start_index - 1; // the number of input files with UrQMD data, excluding the last one which contains
-                                   // the informations about timesteps
+  nf = ninfiles - start_index - 1; // the number of input files with UrQMD data, excluding the last one
+                                   // which contains the informations about timesteps
 
   pdata_current = (pdata *)malloc (sizeof (pdata));
   pdata_start = pdata_current;
@@ -176,7 +193,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
   // main loop on input files
   for (idx = 0; idx < nf; idx++)
     {
-      infile = fopen (files[idx + start_index], "rb"); // we open the input files with data
+      infile = fopen (files[idx + start_index],
+                      "rb"); // we open the input files with data
       printf ("Working on file %s\n", files[idx + start_index]);
       ret_it = ret_it = fread (bb_char, sizeof (char), 4, infile);
       if (ret_it == 0)
@@ -198,8 +216,9 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
       /*
       if((int)format_version!=4)
       {
-              printf("Error! This program is designed to read SHASH binary output version 4, but you provided a file
-      written according to version %u\n.",format_version); exit(7);
+              printf("Error! This program is designed to read SHASH binary output
+      version 4, but you provided a file written according to version
+      %u\n.",format_version); exit(7);
       }*/
       ret_it = fread (&format_variant, sizeof (uint16_t), 1, infile);
       if (ret_it == 0)
@@ -209,8 +228,9 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
         }
       /*if(format_variant!=0)
       {
-              printf("Error! This program is designed to read SHASH format variant 0 (normal), but you provided a file
-      written according to variant %u\n.",format_variant); exit(7);
+              printf("Error! This program is designed to read SHASH format variant
+      0 (normal), but you provided a file written according to variant
+      %u\n.",format_variant); exit(7);
       }*/
       ret_it = fread (&smash_vprint_len, sizeof (uint32_t), 1, infile);
       if (ret_it == 0)
@@ -244,7 +264,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
             }
           if (!((p_char_at_smash_block_start == 'p') || (p_char_at_smash_block_start == 'f')))
             {
-              printf ("Error in reading file %s. I did not find the p character at the beginning of a block header, "
+              printf ("Error in reading file %s. I did not find the p character at "
+                      "the beginning of a block header, "
                       "but %c. I quit.\n",
                       files[idx + start_index], p_char_at_smash_block_start);
               exit (8);
@@ -259,7 +280,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
                 }
               if ((b_selection_sm != 0) && (look_at_b == 1))
                 {
-                  // we skip the lines, we want to go a the end of the file and read the value of the impact parameter
+                  // we skip the lines, we want to go a the end of the file and read the
+                  // value of the impact parameter
                   fseek (infile, n_part_lines * smash_record_size, SEEK_CUR);
                 }
               else
@@ -279,15 +301,17 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
                     }
                   else
                     {
-                      // we read a block of particles at time, we check if the impact parameter is within the desired
-                      // range and, if so, we analize the data but first, we check if we have allocated enough room
+                      // we read a block of particles at time, we check if the impact
+                      // parameter is within the desired range and, if so, we analize the
+                      // data but first, we check if we have allocated enough room
                       if (buffer_smash == NULL)
                         {
                           buffer_smash = malloc (smash_record_size * n_part_lines);
                           elements_of_buffer_smash = n_part_lines;
                           if (buffer_smash == NULL)
                             {
-                              printf ("Unable to allocate buffer_smash for output block of file %s. I quit.\n",
+                              printf ("Unable to allocate buffer_smash for output block of "
+                                      "file %s. I quit.\n",
                                       files[idx + start_index]);
                               exit (8);
                             }
@@ -297,7 +321,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
                           buffer_smash_tmp = realloc ((void *)buffer_smash, smash_record_size * n_part_lines);
                           if (buffer_smash == NULL)
                             {
-                              printf ("Unable to reallocate buffer_smash for output block of file %s. I quit.\n",
+                              printf ("Unable to reallocate buffer_smash for output block of "
+                                      "file %s. I quit.\n",
                                       files[idx + start_index]);
                               exit (8);
                             }
@@ -311,7 +336,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
                           printf ("Data reading failure. Exiting.\n");
                           exit (4);
                         }
-                      // we have read the data, now we store them into the pdata_smash linked list
+                      // we have read the data, now we store them into the pdata_smash
+                      // linked list
                       for (k = 0; k < n_part_lines; k++)
                         {
                           pdata_new = (pdata *)malloc (sizeof (pdata));
@@ -338,8 +364,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
                           memcpy (&(pdata_current->pz), buffer_smash, sizeof (double));
                           buffer_smash += sizeof (double); // we move forward 1 double
                           memcpy ((int *)&(pdata_current->pdg_id), buffer_smash, sizeof (uint32_t));
-                          buffer_smash += 2 * sizeof (uint32_t); // we move fwd 2 unsigned int, because we skip the
-                                                                 // particle internal ID info
+                          buffer_smash += 2 * sizeof (uint32_t); // we move fwd 2 unsigned int, because
+                                                                 // we skip the particle internal ID info
                           memcpy ((int *)&(pdata_current->charge), buffer_smash, sizeof (uint32_t));
                           buffer_smash += sizeof (uint32_t); // we move fwd 1 unsigned int
 
@@ -362,7 +388,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
                 }
               if (event_number != event_number_check)
                 {
-                  printf ("There is a discrepancy between the number of events according to the file %s (%u) and what "
+                  printf ("There is a discrepancy between the number of events "
+                          "according to the file %s (%u) and what "
                           "we counted so far (%u)... Please, check!\n",
                           files[idx + start_index], event_number, event_number_check);
                   exit (8);
@@ -408,8 +435,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
                 }
               else
                 {
-                  event_number_check
-                      = event_number_check + 1; // we discard the event, but we update the event_number_check variable
+                  event_number_check = event_number_check + 1; // we discard the event, but we update the
+                                                               // event_number_check variable
                   fgetpos (infile, &begin_of_event_file_position);
                 }
             }
@@ -417,8 +444,9 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
       fclose (infile);
       printf ("File %s read, with events %u.\n", files[idx + start_index], event_number + 1);
       process_data (Tp, Jp, Jb, Jc, Js, Jt, Jr, Tr, Pnum, Rnum, *nevents, pdata_start);
-      // process_data, hopefully, should deallocate all the memory for pdata structures in the linked list,
-      // so we reset the memory counter and we repeat the initial allocation step
+      // process_data, hopefully, should deallocate all the memory for pdata
+      // structures in the linked list, so we reset the memory counter and we
+      // repeat the initial allocation step
       pdata_totmem = 0;
       pdata_current = (pdata *)malloc (sizeof (pdata));
       pdata_start = pdata_current;
@@ -459,38 +487,44 @@ avg (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *Jc,
   Tp2 = (double *)malloc (sizeof (double) * nx * ny * nz * np * 10);
   if (Tp2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Tp2 array inside avg. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Tp2 array inside "
+              "avg. I am forced to quit.\n");
       exit (4);
     }
   Jp2 = (double *)malloc (sizeof (double) * nx * ny * nz * np * 4);
   if (Jp2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jp2 array inside avg. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jp2 array inside "
+              "avg. I am forced to quit.\n");
       exit (4);
     }
   Jb2 = (double *)malloc (sizeof (double) * nx * ny * nz * 4);
   if (Jb2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jb2 array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jb2 array inside "
+              "main. I am forced to quit.\n");
       exit (4);
     }
   Jc2 = (double *)malloc (sizeof (double) * nx * ny * nz * 4);
   if (Jc2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jc2 array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jc2 array inside "
+              "main. I am forced to quit.\n");
       exit (4);
     }
   Js2 = (double *)malloc (sizeof (double) * nx * ny * nz * 4);
   if (Js2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Js2 array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Js2 array inside "
+              "main. I am forced to quit.\n");
       exit (4);
     }
 #ifdef INCLUDE_TOTAL_BARYON
   Jt2 = (double *)malloc (sizeof (double) * nx * ny * nz * 4);
   if (Jt2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jt2 array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jt2 array inside "
+              "main. I am forced to quit.\n");
       exit (4);
     }
 #else
@@ -500,13 +534,15 @@ avg (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *Jc,
   Jr2 = (double *)malloc (sizeof (double) * nx * ny * nz * nr * 4);
   if (Jr2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jr2 array inside avg. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jr2 array inside "
+              "avg. I am forced to quit.\n");
       exit (4);
     }
   Tr2 = (double *)malloc (sizeof (double) * nx * ny * nz * nr * 10);
   if (Tr2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Tr2 array inside avg. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Tr2 array inside "
+              "avg. I am forced to quit.\n");
       exit (4);
     }
 #else
@@ -516,21 +552,24 @@ avg (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *Jc,
   Pnum2 = (long int *)malloc (sizeof (long int) * nx * ny * nz * np);
   if (Pnum2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Pnum2 array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Pnum2 array inside "
+              "main. I am forced to quit.\n");
       exit (4);
     }
 #ifdef INCLUDE_RESONANCES
   Rnum2 = (long int *)malloc (sizeof (long int) * nx * ny * nz * nr);
   if (Rnum2 == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Rnum2 array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Rnum2 array inside "
+              "main. I am forced to quit.\n");
       exit (4);
     }
 #else
   Rnum2 = (long int *)malloc (sizeof (long int));
 #endif
-  // we already checked that the allocated memory was less than the maximum allocatable in the first part of the main
-  // function, so we do not do it again here
+  // we already checked that the allocated memory was less than the maximum
+  // allocatable in the first part of the main function, so we do not do it
+  // again here
   nf = ninfiles - start_index; // the number of input files with Tmunu data
 
   for (f = 0; f < nf; f++)
@@ -547,7 +586,8 @@ avg (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double *Jc,
         {
           if (time_check != timeref)
             {
-              printf ("Mismatching between the time in file %s (%lf) and corresponding entry %d in time array "
+              printf ("Mismatching between the time in file %s (%lf) and "
+                      "corresponding entry %d in time array "
                       "obtained from file %s.\n",
                       input_filename_Tp, time_check, h, files[ninfiles - 1]);
               printf ("I quit.\n");
@@ -708,10 +748,8 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
   int continue_flag;
   int strangeness, baryon_number;
 
-  /* for debugging purposes, tot1 total number of hadrons, tot2 hadrons within the coarse grained grid
-  int tot1, tot2;
-  tot1=0;
-  tot2=0;
+  /* for debugging purposes, tot1 total number of hadrons, tot2 hadrons within
+  the coarse grained grid int tot1, tot2; tot1=0; tot2=0;
   */
 
   pdata *pdata_entry, *pdata_next;
@@ -723,7 +761,8 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
     }
   else
     {
-      printf ("I just start computing the energy-momentum tensor, but I have no particle data. Something went "
+      printf ("I just start computing the energy-momentum tensor, but I have no "
+              "particle data. Something went "
               "wrong... I quit.\n");
       exit (2);
     }
@@ -794,22 +833,22 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
         {
           r = p - shift_resonance_index; // we remove the offset
           p = np - 1;                    // we set the resonance index to the catch-all entry
+          Rnum[RNLOC] += 1;
+          Tr[T00 + RTLOC] += pdata_entry->en;
+          Tr[T01 + RTLOC] += pdata_entry->px;
+          Tr[T02 + RTLOC] += pdata_entry->py;
+          Tr[T03 + RTLOC] += pdata_entry->pz;
+          Tr[T11 + RTLOC] += (pdata_entry->px * pdata_entry->px) / (pdata_entry->en);
+          Tr[T12 + RTLOC] += (pdata_entry->px * pdata_entry->py) / (pdata_entry->en);
+          Tr[T13 + RTLOC] += (pdata_entry->px * pdata_entry->pz) / (pdata_entry->en);
+          Tr[T22 + RTLOC] += (pdata_entry->py * pdata_entry->py) / (pdata_entry->en);
+          Tr[T23 + RTLOC] += (pdata_entry->py * pdata_entry->pz) / (pdata_entry->en);
+          Tr[T33 + RTLOC] += (pdata_entry->pz * pdata_entry->pz) / (pdata_entry->en);
+          Jr[J0 + RNLOC] += 1;
+          Jr[J1 + RNLOC] += (pdata_entry->px) / pdata_entry->en;
+          Jr[J2 + RNLOC] += (pdata_entry->py) / pdata_entry->en;
+          Jr[J3 + RNLOC] += (pdata_entry->pz) / pdata_entry->en;
         }
-      Rnum[RNLOC] += 1;
-      Tr[T00 + RTLOC] += pdata_entry->en;
-      Tr[T01 + RTLOC] += pdata_entry->px;
-      Tr[T02 + RTLOC] += pdata_entry->py;
-      Tr[T03 + RTLOC] += pdata_entry->pz;
-      Tr[T11 + RTLOC] += (pdata_entry->px * pdata_entry->px) / (pdata_entry->en);
-      Tr[T12 + RTLOC] += (pdata_entry->px * pdata_entry->py) / (pdata_entry->en);
-      Tr[T13 + RTLOC] += (pdata_entry->px * pdata_entry->pz) / (pdata_entry->en);
-      Tr[T22 + RTLOC] += (pdata_entry->py * pdata_entry->py) / (pdata_entry->en);
-      Tr[T23 + RTLOC] += (pdata_entry->py * pdata_entry->pz) / (pdata_entry->en);
-      Tr[T33 + RTLOC] += (pdata_entry->pz * pdata_entry->pz) / (pdata_entry->en);
-      Jr[J0 + RNLOC] += 1;
-      Jr[J1 + RNLOC] += (pdata_entry->px) / pdata_entry->en;
-      Jr[J2 + RNLOC] += (pdata_entry->py) / pdata_entry->en;
-      Jr[J3 + RNLOC] += (pdata_entry->pz) / pdata_entry->en;
 #endif
       // tot2=tot2+1;
       Pnum[PNLOC] += 1;
@@ -841,7 +880,8 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
             }
 #elif defined(SMASH)
       get_hadron_info (pdata_entry->pdg_id, &strangeness, &baryon_number);
-      // printf("hadron: %d p: %d strangeness: %d B: %d\n",pdata_entry->pdg_id,p,strangeness, baryon_number);
+      // printf("hadron: %d p: %d strangeness: %d B:
+      // %d\n",pdata_entry->pdg_id,p,strangeness, baryon_number);
       if (baryon_number != 0)
         {
           jsign = baryon_number;
@@ -859,7 +899,8 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
       Jc[J1 + JBL] += (pdata_entry->charge) * (pdata_entry->px) / pdata_entry->en;
       Jc[J2 + JBL] += (pdata_entry->charge) * (pdata_entry->py) / pdata_entry->en;
       Jc[J3 + JBL] += (pdata_entry->charge) * (pdata_entry->pz) / pdata_entry->en;
-      // printf("hadron: %d p: %d strangeness: %d B: %d\n",pdata_entry->itype,p,strangeness, baryon_number);
+      // printf("hadron: %d p: %d strangeness: %d B:
+      // %d\n",pdata_entry->itype,p,strangeness, baryon_number);
       Js[J0 + JBL] += strangeness;
       Js[J1 + JBL] += strangeness * (pdata_entry->px) / pdata_entry->en;
       Js[J2 + JBL] += strangeness * (pdata_entry->py) / pdata_entry->en;

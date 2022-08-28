@@ -4,7 +4,8 @@
 
 /** @file io.c
  *
- *   @brief this file contains the functions which write from/to disk: write_results, write_densities and read_data
+ *   @brief this file contains the functions which write from/to disk:
+ * write_results, write_densities and read_data
  */
 
 extern int nt, np, nr;
@@ -45,7 +46,8 @@ write_results (char *outputprefix, double *Tp, double *Jp, double *Jb, double *J
       strcat (info_filename, outputprefix);
       strcat (info_filename, infolabel);
       finfo = fopen (info_filename, "w");
-      fprintf (finfo, "Grid order - row major order (C):\n x_0 y_0 z_0\n x_0 y_0 z_1\n ...\n x_0 y_0 z_n-1\n x_0 y_1 "
+      fprintf (finfo, "Grid order - row major order (C):\n x_0 y_0 z_0\n x_0 y_0 "
+                      "z_1\n ...\n x_0 y_0 z_n-1\n x_0 y_1 "
                       "z_0\n ...\n\n");
       fprintf (finfo, "Index:   X coordinate:\n");
       for (i = 0; i < nx; i++)
@@ -59,7 +61,10 @@ write_results (char *outputprefix, double *Tp, double *Jp, double *Jb, double *J
       for (k = 0; k < nz; k++)
         fprintf (finfo, " %4d       %9.4lf\n", k, zmin + (k + 0.5) * dz);
       fprintf (finfo, "\n");
-      fprintf (finfo, "Volume factor (all saved quantities should be divided by this number): %lf\n\n", dx * dy * dz);
+      fprintf (finfo,
+               "Volume factor (all saved quantities should be divided by this "
+               "number): %lf\n\n",
+               dx * dy * dz);
       fprintf (finfo, "Indexes for Tmunu of hadrons (%d entries):\n", np);
       for (i = 0; i < np - 1; i++)
         {
@@ -101,7 +106,8 @@ write_results (char *outputprefix, double *Tp, double *Jp, double *Jb, double *J
 #ifdef INCLUDE_RESONANCES
       fprintf (finfo, "Number of resonance species nr (int):    %d\n", nr);
       fprintf (finfo, "Jr, resonance four current, type double, size nx*ny*nz*np*4\n");
-      fprintf (finfo, "Tr, resonance enery momentum tensor, type double, size nx*ny*nz*nr*10\n");
+      fprintf (finfo, "Tr, resonance enery momentum tensor, type double, size "
+                      "nx*ny*nz*nr*10\n");
 #else
       fprintf (finfo, "Jr placeholder, type double, size 1\n");
       fprintf (finfo, "Tr placeholder, type double, size 1\n");
@@ -133,7 +139,9 @@ write_results (char *outputprefix, double *Tp, double *Jp, double *Jb, double *J
       fTp = fopen (output_filename_Tp, "wb");
       if (fTp == NULL)
         {
-          printf ("Sorry, I could not open the output file %s, so I am forced to quit.\n", output_filename_Tp);
+          printf ("Sorry, I could not open the output file %s, so I am forced to "
+                  "quit.\n",
+                  output_filename_Tp);
           exit (3);
         }
       fwrite (&nevents, sizeof (long int), 1, fTp);
@@ -196,7 +204,8 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
   double *empty_array; // array filled with zeroes
   /*
     the decomposition is: J^\mu (CF) = rho u^\mu (CF) + I_diff^\mu,
-    where I_diff^\mu = Delta^\mu_nu J^\nu = ( Kron_delta^\mu_\nu - u^\mu u_\nu ) J^\nu
+    where I_diff^\mu = Delta^\mu_nu J^\nu = ( Kron_delta^\mu_\nu - u^\mu u_\nu )
+    J^\nu
   */
   double rho_c, rho_s, rho_t;
   double vel_B[3], vel_c[3], vel_s[3];
@@ -217,7 +226,8 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
       strcpy (&info_filename[prefixlen], info_dens_label);
       strcpy (&info_filename[prefixlen + info_label_len], "\0");
       finfo = fopen (info_filename, "w");
-      fprintf (finfo, "Grid order - row major order (C):\n x_0 y_0 z_0\n x_0 y_0 z_1\n ...\n x_0 y_0 z_n-1\n x_0 y_1 "
+      fprintf (finfo, "Grid order - row major order (C):\n x_0 y_0 z_0\n x_0 y_0 "
+                      "z_1\n ...\n x_0 y_0 z_n-1\n x_0 y_1 "
                       "z_0\n ...\n\n");
       fprintf (finfo, "Index:   X coordinate:\n");
       for (i = 0; i < nx; i++)
@@ -249,7 +259,10 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
       fprintf (finfo, "ymin, i.e. low border of the 1st y cell (double):    %lf\n", ymin);
       fprintf (finfo, "zmin, i.e. low border of the 1st z cell (double):    %lf\n", zmin);
       fprintf (finfo, "output_content_info (int), optional output flag:    %d\n", output_content_info);
-      fprintf (finfo, "Volume factor dxdydz (divide by this number to get a density): %lf\n\n", dx * dy * dz);
+      fprintf (finfo,
+               "Volume factor dxdydz (divide by this number to get a density): "
+               "%lf\n\n",
+               dx * dy * dz);
       fprintf (finfo, "Indexes for Tmunu (%d entries):\n", np);
       for (i = 0; i < np - 1; i++)
         {
@@ -280,7 +293,8 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
   empty_array = (double *)calloc (offset, sizeof (double));
   if (empty_array == NULL)
     {
-      printf ("Unable to create the empty_array in function write_densities in io.c. This is a weird situation and I "
+      printf ("Unable to create the empty_array in function write_densities in "
+              "io.c. This is a weird situation and I "
               "prefer to quit.\n");
       exit (4);
     }
@@ -300,7 +314,9 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
       fTp = fopen (output_filename_Tp, "wb");
       if (fTp == NULL)
         {
-          printf ("Sorry, I could not open the output file %s, so I am forced to quit.\n", output_filename_Tp);
+          printf ("Sorry, I could not open the output file %s, so I am forced to "
+                  "quit.\n",
+                  output_filename_Tp);
           exit (3);
         }
 
@@ -337,13 +353,14 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                       u4[2] = Jb[J2 + JBL] / jf;
                       u4[3] = Jb[J3 + JBL] / jf;
                       // printf("*** Point with coordinates: %d  %d  %d  %e  %e
-                      // %e\n",i,j,k,xmin+(i+0.5)*dx,ymin+(j+0.5)*dy,zmin+(k+0.5)*dz); printf("*** Point with
-                      // coordinates: %e  %e  %e\n",xmin+(i+0.5)*dx,ymin+(j+0.5)*dy,zmin+(k+0.5)*dz); printf("u
+                      // %e\n",i,j,k,xmin+(i+0.5)*dx,ymin+(j+0.5)*dy,zmin+(k+0.5)*dz);
+                      // printf("*** Point with coordinates: %e  %e
+                      // %e\n",xmin+(i+0.5)*dx,ymin+(j+0.5)*dy,zmin+(k+0.5)*dz); printf("u
                       // components: %e  %e  %e  %e\n",u4[0], u4[1], u4[2], u4[3]);
                       rho = (Jb[J0 + JBL] * u4[0] - Jb[J1 + JBL] * u4[1] - Jb[J2 + JBL] * u4[2] - Jb[J3 + JBL] * u4[3])
                             / (cell_volume * nevents);
-                      // printf("Jb components and rho: %e  %e  %e  %e  %e\n",Jb[J0+JBL], Jb[J1+JBL], Jb[J2+JBL],
-                      // Jb[J3+JBL], rho);
+                      // printf("Jb components and rho: %e  %e  %e  %e  %e\n",Jb[J0+JBL],
+                      // Jb[J1+JBL], Jb[J2+JBL], Jb[J3+JBL], rho);
                       fwrite (&rho, sizeof (double), 1, fTp);
                       for (l = 1; l < 4; l++)
                         vel_B[l - 1] = u4[l] / u4[0];
@@ -363,10 +380,12 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                             / (cell_volume * nevents);
                       fwrite (&rho_c, sizeof (double), 1, fTp);
                       fwrite (&rho_s, sizeof (double), 1, fTp);
-                      // printf("Jt components and rho_t: %e  %e  %e  %e  %e\n",Jt[J0+JBL], Jt[J1+JBL], Jt[J2+JBL],
-                      // Jt[J3+JBL], rho_t); printf("Jc components and rho_c: %e  %e  %e  %e  %e\n",Jc[J0+JBL],
-                      // Jc[J1+JBL], Jc[J2+JBL], Jc[J3+JBL], rho_c); printf("Js components and rho_s: %e  %e  %e  %e
-                      // %e\n",Js[J0+JBL], Js[J1+JBL], Js[J2+JBL], Js[J3+JBL], rho_s);
+                      // printf("Jt components and rho_t: %e  %e  %e  %e %e\n",Jt[J0+JBL],
+                      // Jt[J1+JBL], Jt[J2+JBL], Jt[J3+JBL], rho_t); printf("Jc components
+                      // and rho_c: %e  %e  %e  %e  %e\n",Jc[J0+JBL], Jc[J1+JBL],
+                      // Jc[J2+JBL], Jc[J3+JBL], rho_c); printf("Js components and rho_s:
+                      // %e  %e  %e  %e %e\n",Js[J0+JBL], Js[J1+JBL], Js[J2+JBL],
+                      // Js[J3+JBL], rho_s);
                       Ic_diffcheck[0] = (1 - u4[0] * u4[0]) * Jc[J0 + JBL] + u4[0] * u4[1] * Jc[J1 + JBL]
                                         + u4[0] * u4[2] * Jc[J2 + JBL] + u4[0] * u4[3] * Jc[J3 + JBL];
                       Ic_diffcheck[1] = -u4[0] * u4[1] * Jc[J0 + JBL] + (1 + u4[1] * u4[1]) * Jc[J1 + JBL]
@@ -390,19 +409,20 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                       for (l = 0; l < 4; l++)
                         {
                           if (fabs (Ic_diffusion[l] - Ic_diffcheck[l] / (cell_volume * nevents)) > 1.e-10)
-                            printf (
-                                "Warning, mismatching in charge diffusion currents at i=%d, j=%d, k=%d! %lf vs %lf\n",
-                                i, j, k, Ic_diffusion[l], Ic_diffcheck[l]);
+                            printf ("Warning, mismatching in charge diffusion currents at "
+                                    "i=%d, j=%d, k=%d! %lf vs %lf\n",
+                                    i, j, k, Ic_diffusion[l], Ic_diffcheck[l]);
                           if (fabs (Is_diffusion[l] - Is_diffcheck[l] / (cell_volume * nevents)) > 1.e-10)
-                            printf (
-                                "Warning, mismatching in strange diffusion currents at i=%d, j=%d, k=%d! %lf vs %lf\n",
-                                i, j, k, Is_diffusion[l], Is_diffcheck[l]);
+                            printf ("Warning, mismatching in strange diffusion currents at "
+                                    "i=%d, j=%d, k=%d! %lf vs %lf\n",
+                                    i, j, k, Is_diffusion[l], Is_diffcheck[l]);
                         }
                       fwrite (Ic_diffusion, sizeof (double), 4, fTp);
                       fwrite (Is_diffusion, sizeof (double), 4, fTp);
                       // printf("Ic diffusion components: %e  %e  %e
-                      // %e\n",Ic_diffusion[0],Ic_diffusion[1],Ic_diffusion[2], Ic_diffusion[3]); printf("Is diffusion
-                      // components: %e  %e  %e  %e\n",Is_diffusion[0],Is_diffusion[1],Is_diffusion[2],
+                      // %e\n",Ic_diffusion[0],Ic_diffusion[1],Ic_diffusion[2],
+                      // Ic_diffusion[3]); printf("Is diffusion components: %e  %e  %e
+                      // %e\n",Is_diffusion[0],Is_diffusion[1],Is_diffusion[2],
                       // Is_diffusion[3]); printf("\n\n");
                       for (p = 0; p < np; p++)
                         {
@@ -462,8 +482,8 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                                   Jb[J2 + JBL], Jb[J3 + JBL]);
                         }
                       fwrite (empty_array, sizeof (double), offset,
-                              fTp); // it includes rho,velB,rho_t,rho_c, rho_s, Ic_diffusion,Is_diffusion, rho and eps
-                                    // for all hadrons
+                              fTp); // it includes rho,velB,rho_t,rho_c, rho_s,
+                                    // Ic_diffusion,Is_diffusion, rho and eps for all hadrons
                     }
                 }
             }
@@ -573,8 +593,8 @@ read_data (char *inputfile, double *data_Tp, double *data_Jp, double *data_Jb, d
       printf ("Failure in reading data. Exiting.\n");
       exit (4);
     }
-  // at some point these checks should be changed and the comparison should be only with the values in the first file,
-  // not with those hardcoded
+  // at some point these checks should be changed and the comparison should be
+  // only with the values in the first file, not with those hardcoded
   if (output_content_info != output_content_info2)
     {
       printf ("Error: mismatching between the output_content_info flags!!!\n");
@@ -596,11 +616,14 @@ read_data (char *inputfile, double *data_Tp, double *data_Jp, double *data_Jb, d
   if ((nx != nx2) || (ny != ny2) || (nz != nz2) || (dx != dx2) || (dy != dy2) || (dz != dz2) || (xmin != xmin2)
       || (ymin != ymin2) || (zmin != zmin2))
     {
-      printf ("Error: mismatching between the dimension and/or resolution of the old and the new grid!!!\n");
-      printf ("The old values are: nx=%d, ny=%d, nz=%d, dx=%6.4lf, dy=%6.4lf, dz=%6.4lf, xmin=%6.4lf, ymin=%6.4lf, "
+      printf ("Error: mismatching between the dimension and/or resolution of the "
+              "old and the new grid!!!\n");
+      printf ("The old values are: nx=%d, ny=%d, nz=%d, dx=%6.4lf, dy=%6.4lf, "
+              "dz=%6.4lf, xmin=%6.4lf, ymin=%6.4lf, "
               "zmin=%6.4lf\n",
               nx, ny, nz, dx, dy, dz, xmin, ymin, zmin);
-      printf ("The new values in %s are: nx2=%d, ny2=%d, nz2=%d, dx2=%6.4lf, dy2=%6.4lf, dz2=%6.4lf, xmin2=%6.4lf, "
+      printf ("The new values in %s are: nx2=%d, ny2=%d, nz2=%d, dx2=%6.4lf, "
+              "dy2=%6.4lf, dz2=%6.4lf, xmin2=%6.4lf, "
               "ymin2=%6.4lf, zmin2=%6.4lf\n",
               inputfile, nx2, ny2, nz2, dx2, dy2, dz2, xmin2, ymin2, zmin2);
       printf ("Sorry, but I have to quit..\n");

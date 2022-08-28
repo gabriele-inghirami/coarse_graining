@@ -3,7 +3,8 @@
 /**
  * @file definitions.h
  *
- * @brief here we define the dimension of the grid, the data structures and we declare functions
+ * @brief here we define the dimension of the grid, the data structures and we
+ * declare functions
  *
  */
 
@@ -23,10 +24,11 @@
  * choice of the transport code to be used: URQMD or SMASH
  *
  */
-//#define URQMD
-#define SMASH
+#define URQMD
+//#define SMASH
 
-// we check that either URQMD or SMASH are defined, if not a compilation error is raised
+// we check that either URQMD or SMASH are defined, if not a compilation error
+// is raised
 #ifdef URQMD
 #elif defined(SMASH)
 #else
@@ -70,7 +72,8 @@
 #define NZ_DEF 1
 
 /**
- * USE_CENTERED_GRID if 0 the grid is centered around 0, otherwise the grid starts at {X,Y,Z}_START
+ * USE_CENTERED_GRID if 0 the grid is centered around 0, otherwise the grid
+ * starts at {X,Y,Z}_START
  *
  */
 #define USE_CENTERED_GRID 0
@@ -94,8 +97,8 @@
 #define Z_START -0.5
 
 /**
- * B_SELECTION if not zero (e.g. 1) it selects only events with impact parameter between BMIN and BMAX, chosen below.
- * If 0 all events are accepted.
+ * B_SELECTION if not zero (e.g. 1) it selects only events with impact parameter
+ * between BMIN and BMAX, chosen below. If 0 all events are accepted.
  *
  */
 
@@ -113,8 +116,9 @@
  */
 #define BMAX 3.5
 
-// in a previous version we used long int for all variable to avoid type casting, we should check if there is a
-// significant difference in the speed of execution
+// in a previous version we used long int for all variable to avoid type
+// casting, we should check if there is a significant difference in the speed of
+// execution
 #define TLOC 10 * (p + np * (k + nz * (j + ny * (i + (long)h * nx))))
 #define JPL 4 * (p + np * (k + nz * (j + ny * (i + (long)h * nx))))
 #define JBL 4 * (k + nz * (j + ny * (i + (long)h * nx)))
@@ -123,8 +127,9 @@
 #define RNLOC (r + nr * (k + nz * (j + ny * (i + (long)h * nx))))
 
 /**
- * NP the number of particles: from 0 to all "stable" (lifetime > 10 fm) particles (maximum 35)
- * set NP=0, leaving just the "catchall" entry, if not interested in computing the individual hadron currents
+ * NP the number of particles: from 0 to all "stable" (lifetime > 10 fm)
+ * particles (maximum 35) set NP=0, leaving just the "catchall" entry, if not
+ * interested in computing the individual hadron currents
  *
  */
 #define NP 35
@@ -133,27 +138,30 @@
 #endif
 
 /**
- * INCLUDE_RESONANCES if defined we compute also the energy momentum tensor and the four current of rho0 mesons and
- * Delta++ baryons comment the next line to disable it
+ * INCLUDE_RESONANCES if defined we compute also the energy momentum tensor and
+ * the four current of rho0 mesons and Delta++ baryons comment the next line to
+ * disable it
  */
-#define INCLUDE_RESONANCES
+//#define INCLUDE_RESONANCES
 
 /**
- * INCLUDE_TOTAL_BARYON if defined we compute also the four current of the total baryons
- * comment the next line to disable it
+ * INCLUDE_TOTAL_BARYON if defined we compute also the four current of the total
+ * baryons comment the next line to disable it
  */
 #define INCLUDE_TOTAL_BARYON
 
 /**
- * NR the number of resonance, it is hardcoded. Right now we have just rho0 mesons and Delta++ baryons.
+ * NR the number of resonance, it is hardcoded. Right now we have just rho0
+ * mesons and Delta++ baryons.
  */
 #define NR 2
 
 #ifdef URQMD
 /**
  * \struct pdata (UrQMD)
- * It contains most of the information provided by UrQMD about a particle. However, please, note that the first member
- * is the time index instead of the actual time. The pdata components are:
+ * It contains most of the information provided by UrQMD about a particle.
+ * However, please, note that the first member is the time index instead of the
+ * actual time. The pdata components are:
  *  - t_intex : time index
  *  - x       : the x coordinate
  *  - y       : the y coordinate
@@ -189,8 +197,9 @@ typedef struct pdata
 #elif defined(SMASH)
 /**
  * \struct pdata (SMASH)
- * It contains most of the information provided by SMASH about a particle. However, please, note that the first member
- * is the time index instead of the actual time. The pdata components are:
+ * It contains most of the information provided by SMASH about a particle.
+ * However, please, note that the first member is the time index instead of the
+ * actual time. The pdata components are:
  *  - t_intex : time index
  *  - x       : the x coordinate
  *  - y       : the y coordinate
@@ -247,19 +256,22 @@ typedef struct pinfo
 /**
  * MAX_SMASH_HADRON_SPECIES
  *
- * the maximum number of hadrons species that is expected to find in SMASH's particles.txt
+ * the maximum number of hadrons species that is expected to find in SMASH's
+ * particles.txt
  *
  */
 #define MAX_SMASH_HADRON_SPECIES 500
 
 /**
  * prepare_smash_hadron_list (SMASH)
- * It reads the file particles.txt, that comes with SMASH, and it prepares a sorted array (ordered by growind pdg_id)
- * with the properties of the hadrons managed by SMASH
+ * It reads the file particles.txt, that comes with SMASH, and it prepares a
+ * sorted array (ordered by growind pdg_id) with the properties of the hadrons
+ * managed by SMASH
  */
 void prepare_smash_hadron_array ();
 
-/** @brief (SMASH) it returns the strangeness and the baryon number of a hadron, given the pdg_id
+/** @brief (SMASH) it returns the strangeness and the baryon number of a hadron,
+ * given the pdg_id
  *
  * @param[in] the pdg_id
  *
@@ -298,7 +310,8 @@ enum
  *
  *   @param[in] an integer with the number of the files to be processed
  *
- *   @param[in] *Tp a pointer to the energy momentum tensor of the particle species
+ *   @param[in] *Tp a pointer to the energy momentum tensor of the particle
+ * species
  *
  *   @param[in] *Jp a pointer to the particle species four currents
  *
@@ -312,7 +325,8 @@ enum
  *
  *   @param[in] *Jr a pointer to the resonance species four currents
  *
- *   @param[in] *Tr a pointer to the energy momentum tensor of the resonance species
+ *   @param[in] *Tr a pointer to the energy momentum tensor of the resonance
+ * species
  *
  *   @param[in] *Pnum a pointer to the number of hadrons for each species
  *
@@ -323,13 +337,15 @@ enum
 int compute (char **, int, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *,
              double_t *, long int *, long int *, long int *);
 
-/** @brief It averages the results of previously computed energy momentum tensors and four currents
+/** @brief It averages the results of previously computed energy momentum
+ * tensors and four currents
  *
  *   @param[in] an array with the names of the files to be processed
  *
  *   @param[in] an integer with the number of the files to be processed
  *
- *   @param[in] *Tp a pointer to the energy momentum tensor of the particle species
+ *   @param[in] *Tp a pointer to the energy momentum tensor of the particle
+ * species
  *
  *   @param[in] *Jp a pointer to the particle species four current
  *
@@ -343,7 +359,8 @@ int compute (char **, int, double_t *, double_t *, double_t *, double_t *, doubl
  *
  *   @param[in] *Jr a pointer to the resonance species four currents
  *
- *   @param[in] *Tr a pointer to the energy momentum tensor of the resonance species
+ *   @param[in] *Tr a pointer to the energy momentum tensor of the resonance
+ * species
  *
  *   @param[in] *Pnum a pointer to the number of hadrons for each species
  *
@@ -361,12 +378,14 @@ int avg (char **, int, double_t *, double_t *, double_t *, double_t *, double_t 
 int process_data (double_t *, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *,
                   long int *, long int *, long int, pdata *);
 
-/** @brief It returns the index of the particle in Tmunu or the number of Tmunu entries if 0,0 (UrQMD) or 0 (SMASH) are
- * given as arguments The version for UrQMD takes itype and iso3, the version for SMASH takes pdg_id Unkown particles
- * go in the last Tmunu index.
+/** @brief It returns the index of the particle in Tmunu or the number of Tmunu
+ * entries if 0,0 (UrQMD) or 0 (SMASH) are given as arguments The version for
+ * UrQMD takes itype and iso3, the version for SMASH takes pdg_id Unkown
+ * particles go in the last Tmunu index.
  */
 #ifdef URQMD
-int get_particle_index (int, int); // The third argument tells if it is a particle (+1) or an antiparticle (-1)
+int get_particle_index (int, int); // The third argument tells if it is a
+                                   // particle (+1) or an antiparticle (-1)
 #elif defined(SMASH)
 int get_particle_index (int);
 #endif
@@ -375,15 +394,18 @@ int get_particle_index (int);
  * *
  * *   @ param[in] the itype of the particle
  * *
- * *   @ param[out] the strangeness (-(number_of_strange_quarks - number_of_anti_strange_quarks)) of the hadron
+ * *   @ param[out] the strangeness (-(number_of_strange_quarks -
+ * number_of_anti_strange_quarks)) of the hadron
  * */
 int get_strangeness (int);
 
-/** @brief it reads the data from an UrQMD output file or a SMASH binary output file
+/** @brief it reads the data from an UrQMD output file or a SMASH binary output
+ * file
  *
  *   @param[in] a char pointer to the name of the file
  *
- *   @param[in] *Tp a pointer to the energy momentum tensor of the particle species
+ *   @param[in] *Tp a pointer to the energy momentum tensor of the particle
+ * species
  *
  *   @param[in] *Jp a pointer to the particle species four current
  *
@@ -397,7 +419,8 @@ int get_strangeness (int);
  *
  *   @param[in] *Jr a pointer to the resonance species four currents
  *
- *   @param[in] *Tr a pointer to the energy momentum tensor of the resonance species
+ *   @param[in] *Tr a pointer to the energy momentum tensor of the resonance
+ * species
  *
  *   @param[in] *Pnum a pointer to the number of hadrons for each species
  *
@@ -405,7 +428,8 @@ int get_strangeness (int);
  *
  *   @param[out] nevents the number of events (long int)
  *
- *   @param[in/out] *data_time a pointer to the system evolution time at which to perform the computation
+ *   @param[in/out] *data_time a pointer to the system evolution time at which
+ * to perform the computation
  *
  *   \callgraph
  */
@@ -413,22 +437,27 @@ int get_strangeness (int);
 void read_data (char *, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *,
                 long int *, long int *, long int *, double_t *);
 
-/** @brief it takes the timesteps to analize from a text files and it stores them into an array
+/** @brief it takes the timesteps to analize from a text files and it stores
+ * them into an array
  *
- *   @param[in] timefile the name of the text file containing the times to analize
+ *   @param[in] timefile the name of the text file containing the times to
+ * analize
  *
  *   @param[out] ntimesteps the number of timesteps
  *
- *   @param[out] timesteps_array a pointer to an array with the timesteps to analize
+ *   @param[out] timesteps_array a pointer to an array with the timesteps to
+ * analize
  *
  */
 void get_timesteps (char *, int *, double **);
 
-/** @brief it write the densities into an output file. This function is enabled/disabled when the program is invoked.
+/** @brief it write the densities into an output file. This function is
+ * enabled/disabled when the program is invoked.
  *
  *   @param[in] outputprefix the prefix of the output files
  *
- *   @param[in] *Tp a pointer to the energy momentum tensor of the particle species
+ *   @param[in] *Tp a pointer to the energy momentum tensor of the particle
+ * species
  *
  *   @param[in] *Jp a pointer to the particle species four current
  *
@@ -442,7 +471,8 @@ void get_timesteps (char *, int *, double **);
  *
  *   @param[in] *Jr a pointer to the resonance species four currents
  *
- *   @param[in] *Tr a pointer to the energy momentum tensor of the resonance species
+ *   @param[in] *Tr a pointer to the energy momentum tensor of the resonance
+ * species
  *
  *   @param[in] *Pnum a pointer to the number of hadrons for each species
  *
@@ -454,12 +484,13 @@ void get_timesteps (char *, int *, double **);
 void write_densities (char *, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *,
                       double_t *, long int *, long int *, long int);
 
-/** @brief it write the results into an output file. These output files contain all the necessary informations for
- * further averaging.
+/** @brief it write the results into an output file. These output files contain
+ * all the necessary informations for further averaging.
  *
  *   @param[in] outputprefix the prefix of the output files
  *
- *   @param[in] *Tp a pointer to the energy momentum tensor of the particle species
+ *   @param[in] *Tp a pointer to the energy momentum tensor of the particle
+ * species
  *
  *   @param[in] *Jp a pointer to the particle species four current
  *
@@ -473,7 +504,8 @@ void write_densities (char *, double_t *, double_t *, double_t *, double_t *, do
  *
  *   @param[in] *Jr a pointer to the resonance species four currents
  *
- *   @param[in] *Tr a pointer to the energy momentum tensor of the resonance species
+ *   @param[in] *Tr a pointer to the energy momentum tensor of the resonance
+ * species
  *
  *   @param[in] *Pnum a pointer to the number of hadrons for each species
  *
@@ -485,8 +517,8 @@ void write_densities (char *, double_t *, double_t *, double_t *, double_t *, do
 void write_results (char *, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *, double_t *,
                     double_t *, long int *, long int *, long int);
 
-/** @brief it checks all input files exist. If not, it stops the program execution.
- *   \callgraph
+/** @brief it checks all input files exist. If not, it stops the program
+ * execution. \callgraph
  */
 void check_input_files (char **, int);
 
@@ -498,7 +530,8 @@ const char *associate_particle_array_index (int);
  */
 const char *associate_resonance_array_index (int);
 
-/** @brief it associates to a hadron it baryon number, strangeness, total spin and electric charge from its PDG id
+/** @brief it associates to a hadron it baryon number, strangeness, total spin
+ * and electric charge from its PDG id
  *
  * @param[in] the PDG id string
  *
@@ -513,7 +546,8 @@ const char *associate_resonance_array_index (int);
  */
 void get_had_prop (char *, int, int *, int *, int *);
 
-/** @brief it fills the array of hadron properties from file particles.txt (SMASH)
+/** @brief it fills the array of hadron properties from file particles.txt
+ * (SMASH)
  *
  *  @param[in] the array of pinfo to be filled (plist)
  *
@@ -523,7 +557,8 @@ void get_had_prop (char *, int, int *, int *, int *);
  */
 int fill (pinfo *);
 
-/** @brief it returns the index in the array of times time_int_array corresponding to the given test_time
+/** @brief it returns the index in the array of times time_int_array
+ * corresponding to the given test_time
  */
 int check_test_time (double, double *, int);
 

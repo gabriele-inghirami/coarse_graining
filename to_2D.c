@@ -7,8 +7,10 @@
 void
 help ()
 {
-  printf ("Syntax: ./to_2D.exe <inputfile> <outputfile> <i,j or k> <index>\nIt prints a 2D slice, suitable to be "
-          "plotted with gnuplot, at fixed i, j or k equal to index.\nThe informations about the grid and the "
+  printf ("Syntax: ./to_2D.exe <inputfile> <outputfile> <i,j or k> <index>\nIt "
+          "prints a 2D slice, suitable to be "
+          "plotted with gnuplot, at fixed i, j or k equal to index.\nThe "
+          "informations about the grid and the "
           "particles are contained into definitions.h.\n\n");
 }
 
@@ -195,8 +197,9 @@ main (int argc, char *argv[])
                   fprintf (fout, "%10.6e  ", edens); // total energy density
                   fprintf (fout, "\n");
                   inner_counter = inner_counter + 1;
-                  // this counter tells when to add an additional new line at the end of a block
-                  // please, note that for slices along i and j it is nz, while it is ny for slices along k
+                  // this counter tells when to add an additional new line at the end of
+                  // a block please, note that for slices along i and j it is nz, while
+                  // it is ny for slices along k
                   if (((chosen_dir == 0) && (inner_counter == nz)) || ((chosen_dir == 1) && (inner_counter == nz))
                       || ((chosen_dir == 2) && (inner_counter == ny)))
                     {

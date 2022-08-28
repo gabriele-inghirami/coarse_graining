@@ -31,10 +31,10 @@ gslflags=-lgsl -lblas
 #opt=-O3 -xAVX -ipo
 
 #gcc optimization flag that assumes that the computers used to compile and run the program have the same architecture
-opt=-O3 -march=native
+ùopt=-O3 -march=native
 
 # debugging flags for GNU gdb (and also ddd, Affinic Debugger, Allinea DDT,...)
-#opt=-g -ggdb -O0
+opt=-g -ggdb -O0
 
 # debugging flag for Absoft FX3 debugger
 # opt=-g -gdwarf-3 -O0

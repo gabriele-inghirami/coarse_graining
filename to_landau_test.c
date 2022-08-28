@@ -33,28 +33,32 @@ main (int argc, char *argv[])
   Tmunu = gsl_matrix_alloc (4, 4);
   if (Tmunu == NULL)
     {
-      printf ("Unable to allocate the gsl_matrix Tmunu 2D (4,4) array. I am forced to quit.\n");
+      printf ("Unable to allocate the gsl_matrix Tmunu 2D (4,4) array. I am "
+              "forced to quit.\n");
       exit (4);
     }
 
   result = gsl_matrix_complex_alloc (4, 4);
   if (result == NULL)
     {
-      printf ("Unable to allocate the gsl_matrix_complex result 2D (4,4) array. I am forced to quit.\n");
+      printf ("Unable to allocate the gsl_matrix_complex result 2D (4,4) array. I "
+              "am forced to quit.\n");
       exit (4);
     }
 
   ws = gsl_eigen_nonsymmv_alloc (4);
   if (ws == NULL)
     {
-      printf ("Unable to allocate the gsl_eigen_nonsymmv ws array. I am forced to quit.\n");
+      printf ("Unable to allocate the gsl_eigen_nonsymmv ws array. I am forced to "
+              "quit.\n");
       exit (4);
     }
 
   eval = gsl_vector_complex_alloc (4);
   if (eval == NULL)
     {
-      printf ("Unable to allocate the gsl_vector_complex eval array. I am forced to quit.\n");
+      printf ("Unable to allocate the gsl_vector_complex eval array. I am forced "
+              "to quit.\n");
       exit (4);
     }
 
@@ -63,19 +67,22 @@ main (int argc, char *argv[])
       lambda_mat = gsl_matrix_alloc (4, 4);
       if (lambda_mat == NULL)
         {
-          printf ("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I am forced to quit.\n");
+          printf ("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I "
+                  "am forced to quit.\n");
           exit (4);
         }
       Tmunu_Landau = gsl_matrix_alloc (4, 4);
       if (Tmunu_Landau == NULL)
         {
-          printf ("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I am forced to quit.\n");
+          printf ("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I "
+                  "am forced to quit.\n");
           exit (4);
         }
       tmp_mat = gsl_matrix_alloc (4, 4);
       if (tmp_mat == NULL)
         {
-          printf ("Unable to allocate the gsl_matrix tmp_mat 2D (4,4) array. I am forced to quit.\n");
+          printf ("Unable to allocate the gsl_matrix tmp_mat 2D (4,4) array. I am "
+                  "forced to quit.\n");
           exit (4);
         }
     }
@@ -96,49 +103,57 @@ main (int argc, char *argv[])
   Tp = (double *)malloc (nx * ny * nz * np * 10 * sizeof (double));
   if (Tp == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Tmunu array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Tmunu array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jp = (double *)malloc (nx * ny * nz * np * 4 * sizeof (double));
   if (Jp == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jp array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jp array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jb = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Jb == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jb array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jb array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jc = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Jc == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jc array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jc array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Js = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Js == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Js array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Js array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Jt = (double *)malloc (nx * ny * nz * 4 * sizeof (double));
   if (Jt == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Jt array. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Jt array. I am "
+              "forced to quit.\n");
       exit (4);
     }
   Pnum = (long int *)malloc (nx * ny * nz * np * sizeof (long int));
   if (Pnum == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the Pnum array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the Pnum array inside "
+              "main. I am forced to quit.\n");
       exit (4);
     }
   empty_arr = (double *)calloc ((15 + 3 * np), sizeof (double));
   if (empty_arr == NULL)
     {
-      printf ("Sorry, but it is not possible to allocate the empty_arr array inside main. I am forced to quit.\n");
+      printf ("Sorry, but it is not possible to allocate the empty_arr array "
+              "inside main. I am forced to quit.\n");
       exit (4);
     }
 
