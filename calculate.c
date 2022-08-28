@@ -9,7 +9,7 @@
  *
  */
 
-extern size_t pdata_totmem;
+extern size_t pdata_totmem, max_memory_allocatable_data, big_arrays_allocated_mem;
 extern int nt, np, nr;
 extern const int nx, ny, nz;
 extern const double dx, dy, dz;
@@ -170,13 +170,17 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
         }
       fclose (infile);
       printf ("File %s read.\n", files[idx + start_index]);
-      process_data (Tp, Jp, Jb, Jc, Js, Jt, Jt, Tr, Pnum, Rnum, *nevents, pdata_start);
-      // process_data, hopefully, should deallocate all the memory for pdata
-      // structures in the linked list, so we reset the memory counter and we
-      // repeat the initial allocation step
-      pdata_totmem = 0;
-      pdata_current = (pdata *)malloc (sizeof (pdata));
-      pdata_start = pdata_current;
+      if (((pdata_totmem + big_arrays_allocated_mem) > max_memory_allocatable_data)
+          && (idx < nf - 1)) // if we are working on the last file, we will process the data anyway
+        {
+          process_data (Tp, Jp, Jb, Jc, Js, Jt, Jt, Tr, Pnum, Rnum, *nevents, pdata_start);
+          // process_data, hopefully, should deallocate all the memory for pdata
+          // structures in the linked list, so we reset the memory counter and we
+          // repeat the initial allocation step
+          pdata_totmem = 0;
+          pdata_current = (pdata *)malloc (sizeof (pdata));
+          pdata_start = pdata_current;
+        }
     }
 
   // we free the allocated arrays
@@ -443,13 +447,17 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
         }
       fclose (infile);
       printf ("File %s read, with events %u.\n", files[idx + start_index], event_number + 1);
-      process_data (Tp, Jp, Jb, Jc, Js, Jt, Jr, Tr, Pnum, Rnum, *nevents, pdata_start);
-      // process_data, hopefully, should deallocate all the memory for pdata
-      // structures in the linked list, so we reset the memory counter and we
-      // repeat the initial allocation step
-      pdata_totmem = 0;
-      pdata_current = (pdata *)malloc (sizeof (pdata));
-      pdata_start = pdata_current;
+      if (((pdata_totmem + big_arrays_allocated_mem) > max_memory_allocatable_data)
+          && (idx < nf - 1)) // if we are working on the last file, we will process the data anyway
+        {
+          process_data (Tp, Jp, Jb, Jc, Js, Jt, Jr, Tr, Pnum, Rnum, *nevents, pdata_start);
+          // process_data, hopefully, should deallocate all the memory for pdata
+          // structures in the linked list, so we reset the memory counter and we
+          // repeat the initial allocation step
+          pdata_totmem = 0;
+          pdata_current = (pdata *)malloc (sizeof (pdata));
+          pdata_start = pdata_current;
+        }
     }
 
   free (buffer_smash);
@@ -458,7 +466,6 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
 #else
 #error "Error when compiling calculate.c: either URQMD or SMASH must be defined. Compilation failed."
 #endif
-
   process_data (Tp, Jp, Jb, Jc, Js, Jt, Jr, Tr, Pnum, Rnum, *nevents, pdata_start);
 
   printf ("Number of events: %ld\n", *nevents);
@@ -890,10 +897,12 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
           Jb[J1 + JBL] += jsign * (pdata_entry->px) / pdata_entry->en;
           Jb[J2 + JBL] += jsign * (pdata_entry->py) / pdata_entry->en;
           Jb[J3 + JBL] += jsign * (pdata_entry->pz) / pdata_entry->en;
+#ifdef INCLUDE_TOTAL_BARYON
           Jt[J0 + JBL] += 1;
           Jt[J1 + JBL] += (pdata_entry->px) / pdata_entry->en;
           Jt[J2 + JBL] += (pdata_entry->py) / pdata_entry->en;
           Jt[J3 + JBL] += (pdata_entry->pz) / pdata_entry->en;
+#endif
         }
       Jc[J0 + JBL] += (pdata_entry->charge);
       Jc[J1 + JBL] += (pdata_entry->charge) * (pdata_entry->px) / pdata_entry->en;

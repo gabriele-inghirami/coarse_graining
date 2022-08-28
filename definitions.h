@@ -116,6 +116,17 @@
  */
 #define BMAX 3.5
 
+/**
+ * MAX_GB_PER_PROC the maximum amount of memory (in GB) that a process can allocate
+ * before staring to elaborate data. It is the sum of the memory for the
+ * arrays with the results (T^munu, J^mu...), which is fixed, and the memory
+ * for the list of particles, which grows with number of files that are read.
+ * When this limit is reached, the program analyses the data stored so far,
+ * reset the particle lists and then continues.
+ */
+
+#define MAX_GB_PER_PROC 6
+
 // in a previous version we used long int for all variable to avoid type
 // casting, we should check if there is a significant difference in the speed of
 // execution
@@ -142,7 +153,7 @@
  * the four current of rho0 mesons and Delta++ baryons comment the next line to
  * disable it
  */
-//#define INCLUDE_RESONANCES
+#define INCLUDE_RESONANCES
 
 /**
  * INCLUDE_TOTAL_BARYON if defined we compute also the four current of the total

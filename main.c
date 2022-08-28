@@ -35,6 +35,10 @@ const char info_dens_label[] = "_densities_info.dat";
 
 int nt;
 size_t pdata_totmem = 0;
+size_t big_arrays_allocated_mem = 0;
+// maximum memory that a processor should allocate on the heap for arrays and list of particles
+const size_t max_memory_allocatable_data = MAX_GB_PER_PROC;
+const double oneGBsize = 1024 * 1024 * 1024;
 
 const int T10 = T01;
 const int T20 = T02;
@@ -194,6 +198,7 @@ main (int argc, char *argv[])
                   "main. I am forced to quit.\n");
           exit (4);
         }
+      big_arrays_allocated_mem += nt * nx * ny * nz * np * 10 * sizeof (double);
       Jp = (double *)calloc (nt * nx * ny * nz * np * 4, sizeof (double));
       if (Jp == NULL)
         {
@@ -201,6 +206,7 @@ main (int argc, char *argv[])
                   "main. I am forced to quit.\n");
           exit (4);
         }
+      big_arrays_allocated_mem += nt * nx * ny * nz * np * 4 * sizeof (double);
       Jb = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
       if (Jb == NULL)
         {
@@ -208,6 +214,7 @@ main (int argc, char *argv[])
                   "main. I am forced to quit.\n");
           exit (4);
         }
+      big_arrays_allocated_mem += nt * nx * ny * nz * 4 * sizeof (double);
       Jc = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
       if (Jc == NULL)
         {
@@ -215,6 +222,7 @@ main (int argc, char *argv[])
                   "main. I am forced to quit.\n");
           exit (4);
         }
+      big_arrays_allocated_mem += nt * nx * ny * nz * 4 * sizeof (double);
       Js = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
       if (Js == NULL)
         {
@@ -222,7 +230,8 @@ main (int argc, char *argv[])
                   "main. I am forced to quit.\n");
           exit (4);
         }
-#ifdef TOTAL_BARYON
+      big_arrays_allocated_mem += nt * nx * ny * nz * 4 * sizeof (double);
+#ifdef INCLUDE_TOTAL_BARYON
       output_content_info += shift_total_baryon_on;
       Jt = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
       if (Jt == NULL)
@@ -231,6 +240,7 @@ main (int argc, char *argv[])
                   "main. I am forced to quit.\n");
           exit (4);
         }
+      big_arrays_allocated_mem += nt * nx * ny * nz * 4 * sizeof (double);
 #else
       Jt = (double *)calloc (1, sizeof (double)); // we skip the check, if it fails
                                                   // we are in big troubles anyway
@@ -242,6 +252,7 @@ main (int argc, char *argv[])
                   "main. I am forced to quit.\n");
           exit (4);
         }
+      big_arrays_allocated_mem += nt * nx * ny * nz * np * sizeof (long int);
 #ifdef INCLUDE_RESONANCES
       output_content_info += shift_resonances_on;
       Jr = (double *)calloc (nt * nx * ny * nz * nr * 4, sizeof (double));
@@ -251,6 +262,7 @@ main (int argc, char *argv[])
                   "main. I am forced to quit.\n");
           exit (4);
         }
+      big_arrays_allocated_mem += nt * nx * ny * nz * nr * 4 * sizeof (double);
       Tr = (double *)calloc (nt * nx * ny * nz * nr * 10, sizeof (double));
       if (Tr == NULL)
         {
@@ -258,6 +270,7 @@ main (int argc, char *argv[])
                   "main. I am forced to quit.\n");
           exit (4);
         }
+      big_arrays_allocated_mem += nt * nx * ny * nz * nr * 10 * sizeof (double);
       Rnum = (long int *)calloc (nt * nx * ny * nz * nr, sizeof (long int));
       if (Rnum == NULL)
         {
@@ -265,6 +278,7 @@ main (int argc, char *argv[])
                   "main. I am forced to quit.\n");
           exit (4);
         }
+      big_arrays_allocated_mem += nt * nx * ny * nz * nr * sizeof (long int);
 #else
       // if the allocation of 3 doubles fails probably the system is unable to go
       // on, so we skip the check
@@ -272,6 +286,16 @@ main (int argc, char *argv[])
       Tr = (double *)calloc (1, sizeof (double));
       Rnum = (long int *)calloc (1, sizeof (long int));
 #endif
+      if ((big_arrays_allocated_mem / oneGBsize) > max_memory_allocatable_data)
+        {
+          printf ("The memory required for the allocation of the main arrays is %6.2f GB.\n",
+                  big_arrays_allocated_mem / oneGBsize);
+          printf ("The maximum memory per process defined in MAX_GB_PER_PROC is %d GB.\n", MAX_GB_PER_PROC);
+          printf ("If you have enough memory, please, increase the value of this parameter,\
+                recompile and try again. Otherwise, please, reduce your space-time grid size.\n\
+                For now, I quit.\n");
+          exit (4);
+        }
     }
   else
     {
@@ -301,7 +325,6 @@ main (int argc, char *argv[])
     }
   printf ("Writing the energy momentum tensor and the four currents.\n");
   write_results (outputfile, Tp, Jp, Jb, Jc, Js, Jt, Jr, Tr, Pnum, Rnum, nevents);
-
   print_dens = atoi (argv[2]);
   switch (print_dens)
     {
