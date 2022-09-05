@@ -71,9 +71,13 @@ const int shift_resonances_on = 100; // value added to output_content_info if th
 
 double *time_int_array; // array with the selected times
 
-#ifdef SMASH
-extern pinfo *plist;
-#endif
+extern pinfo *plist; // used onyl with SMASH
+
+const int use_urqmd = URQMD_OR_SMASH;
+
+const int include_resonances = INCLUDE_RESONANCES;
+
+const int include_total_baryon = INCLUDE_TOTAL_BARYON;
 
 /** @brief main function
  * It parses the command line arguments, it allocates the most important data
@@ -145,7 +149,6 @@ main (int argc, char *argv[])
   int print_dens; //< The flag to decide whether to print or not the four current components into additional separate
                   // files ( the four currents are always saved with the energy momentum tensors, but these additional
                   // files make easier to extract their values in text format )
-
   // in the worst case, the number of arguments must be at least 5
   if (argc < 5)
     {
@@ -231,20 +234,23 @@ main (int argc, char *argv[])
           exit (4);
         }
       big_arrays_allocated_mem += nt * nx * ny * nz * 4 * sizeof (double);
-#ifdef INCLUDE_TOTAL_BARYON
-      output_content_info += shift_total_baryon_on;
-      Jt = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
-      if (Jt == NULL)
+      if (include_total_baryon)
         {
-          printf ("Sorry, but it is not possible to allocate the Jt array inside "
-                  "main. I am forced to quit.\n");
-          exit (4);
+          output_content_info += shift_total_baryon_on;
+          Jt = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
+          if (Jt == NULL)
+            {
+              printf ("Sorry, but it is not possible to allocate the Jt array inside "
+                      "main. I am forced to quit.\n");
+              exit (4);
+            }
+          big_arrays_allocated_mem += nt * nx * ny * nz * 4 * sizeof (double);
         }
-      big_arrays_allocated_mem += nt * nx * ny * nz * 4 * sizeof (double);
-#else
-      Jt = (double *)calloc (1, sizeof (double)); // we skip the check, if it fails
-                                                  // we are in big troubles anyway
-#endif
+      else
+        {
+          Jt = (double *)calloc (1, sizeof (double));
+          // we skip the check, if it fails the situation is already desperate
+        }
       Pnum = (long int *)calloc (nt * nx * ny * nz * np, sizeof (long int));
       if (Pnum == NULL)
         {
@@ -253,39 +259,42 @@ main (int argc, char *argv[])
           exit (4);
         }
       big_arrays_allocated_mem += nt * nx * ny * nz * np * sizeof (long int);
-#ifdef INCLUDE_RESONANCES
-      output_content_info += shift_resonances_on;
-      Jr = (double *)calloc (nt * nx * ny * nz * nr * 4, sizeof (double));
-      if (Jr == NULL)
+      if (include_resonances)
         {
-          printf ("Sorry, but it is not possible to allocate the Jr array inside "
-                  "main. I am forced to quit.\n");
-          exit (4);
+          output_content_info += shift_resonances_on;
+          Jr = (double *)calloc (nt * nx * ny * nz * nr * 4, sizeof (double));
+          if (Jr == NULL)
+            {
+              printf ("Sorry, but it is not possible to allocate the Jr array inside "
+                      "main. I am forced to quit.\n");
+              exit (4);
+            }
+          big_arrays_allocated_mem += nt * nx * ny * nz * nr * 4 * sizeof (double);
+          Tr = (double *)calloc (nt * nx * ny * nz * nr * 10, sizeof (double));
+          if (Tr == NULL)
+            {
+              printf ("Sorry, but it is not possible to allocate the Tr array inside "
+                      "main. I am forced to quit.\n");
+              exit (4);
+            }
+          big_arrays_allocated_mem += nt * nx * ny * nz * nr * 10 * sizeof (double);
+          Rnum = (long int *)calloc (nt * nx * ny * nz * nr, sizeof (long int));
+          if (Rnum == NULL)
+            {
+              printf ("Sorry, but it is not possible to allocate the Rnum array inside "
+                      "main. I am forced to quit.\n");
+              exit (4);
+            }
+          big_arrays_allocated_mem += nt * nx * ny * nz * nr * sizeof (long int);
         }
-      big_arrays_allocated_mem += nt * nx * ny * nz * nr * 4 * sizeof (double);
-      Tr = (double *)calloc (nt * nx * ny * nz * nr * 10, sizeof (double));
-      if (Tr == NULL)
+      else
         {
-          printf ("Sorry, but it is not possible to allocate the Tr array inside "
-                  "main. I am forced to quit.\n");
-          exit (4);
+          // if the allocation of 3 doubles fails probably the system is unable to go
+          // on, so we skip the checks afterwards
+          Jr = (double *)calloc (1, sizeof (double));
+          Tr = (double *)calloc (1, sizeof (double));
+          Rnum = (long int *)calloc (1, sizeof (long int));
         }
-      big_arrays_allocated_mem += nt * nx * ny * nz * nr * 10 * sizeof (double);
-      Rnum = (long int *)calloc (nt * nx * ny * nz * nr, sizeof (long int));
-      if (Rnum == NULL)
-        {
-          printf ("Sorry, but it is not possible to allocate the Rnum array inside "
-                  "main. I am forced to quit.\n");
-          exit (4);
-        }
-      big_arrays_allocated_mem += nt * nx * ny * nz * nr * sizeof (long int);
-#else
-      // if the allocation of 3 doubles fails probably the system is unable to go
-      // on, so we skip the check
-      Jr = (double *)calloc (1, sizeof (double));
-      Tr = (double *)calloc (1, sizeof (double));
-      Rnum = (long int *)calloc (1, sizeof (long int));
-#endif
       if ((big_arrays_allocated_mem / oneGBsize) > max_memory_allocatable_data)
         {
           printf ("The memory required for the allocation of the main arrays is %6.2f GB.\n",
@@ -306,9 +315,10 @@ main (int argc, char *argv[])
 
   if ((strncmp (argv[1], "comp", 4) == 0))
     {
-#ifdef SMASH
-      prepare_smash_hadron_array ();
-#endif
+      if (use_urqmd == 0)
+        {
+          prepare_smash_hadron_array ();
+        }
       compute (argv, argc, Tp, Jp, Jb, Jc, Js, Jt, Jr, Tr, Pnum, Rnum, &nevents);
     }
   else if (strncmp (argv[1], "avg", 3) == 0)
@@ -342,19 +352,31 @@ main (int argc, char *argv[])
     }
 
   free (time_int_array);
+  // dbg printf("tarr freed\n");
   free (Tp);
+  // dbg printf("tp freed\n");
   free (Jp);
+  // dbg printf("jp freed\n");
   free (Jb);
+  // dbg printf("jb freed\n");
   free (Jc);
+  // dbg printf("jc freed\n");
   free (Js);
+  // dbg printf("js freed\n");
   free (Jt);
+  // dbg printf("jt freed\n");
   free (Pnum);
+  // dbg printf("pnum freed\n");
   free (Rnum);
+  // dbg printf("Rnum freed\n");
   free (Tr);
+  // dbg printf("Tr freed\n");
   free (Jr);
-#ifdef SMASH
-  free (plist);
-#endif
+  // dbg printf("Jr freed\n");
+  if (use_urqmd == 0)
+    {
+      free (plist);
+    }
   return 0;
 }
 

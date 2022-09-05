@@ -21,19 +21,10 @@
 #include <wchar.h>
 
 /**
- * choice of the transport code to be used: URQMD or SMASH
+ * choice of the transport code to be used: URQMD (!=0) or SMASH (0)
  *
  */
-#define URQMD
-//#define SMASH
-
-// we check that either URQMD or SMASH are defined, if not a compilation error
-// is raised
-#ifdef URQMD
-#elif defined(SMASH)
-#else
-#error "You must define either SMASH or URQMD in definitions.h - compilation failed."
-#endif
+#define URQMD_OR_SMASH 1
 
 /**
  * DX_DEF the lenght (in fm) of the side x of the coarse grained cell
@@ -136,6 +127,7 @@
 #define PNLOC (p + np * (k + nz * (j + ny * (i + (long)h * nx))))
 #define RTLOC 10 * (r + nr * (k + nz * (j + ny * (i + (long)h * nx))))
 #define RNLOC (r + nr * (k + nz * (j + ny * (i + (long)h * nx))))
+#define JRL 4 * (r + nr * (k + nz * (j + ny * (i + (long)h * nx))))
 
 /**
  * NP the number of particles: from 0 to all "stable" (lifetime > 10 fm)
@@ -149,17 +141,16 @@
 #endif
 
 /**
- * INCLUDE_RESONANCES if defined we compute also the energy momentum tensor and
- * the four current of rho0 mesons and Delta++ baryons comment the next line to
- * disable it
+ * INCLUDE_RESONANCES if != 0 we compute also the energy momentum tensor and
+ * the four current of rho0 mesons and Delta++ baryons
  */
-#define INCLUDE_RESONANCES
+#define INCLUDE_RESONANCES 1
 
 /**
- * INCLUDE_TOTAL_BARYON if defined we compute also the four current of the total
+ * INCLUDE_TOTAL_BARYON if !=0 we compute also the four current of the total
  * baryons comment the next line to disable it
  */
-#define INCLUDE_TOTAL_BARYON
+#define INCLUDE_TOTAL_BARYON 1
 
 /**
  * NR the number of resonance, it is hardcoded. Right now we have just rho0
@@ -167,25 +158,24 @@
  */
 #define NR 2
 
-#ifdef URQMD
 /**
- * \struct pdata (UrQMD)
- * It contains most of the information provided by UrQMD about a particle.
+ * \struct pdata_urqmd
+ * It contains most of the information provided by UrQMD or SMASH about a particle.
  * However, please, note that the first member is the time index instead of the
  * actual time. The pdata components are:
- *  - t_intex : time index
- *  - x       : the x coordinate
- *  - y       : the y coordinate
- *  - z       : the z coordinate
- *  - en      : the energy
- *  - px      : the x component of the four momentum
- *  - py      : the y component of the four momentum
- *  - pz      : the z component of the four momentum
- *  - m       : the mass
- *  - itype   : the UrQMD's itype
- *  - iso3    : isospin
- *  - charge  : the electric charge
- *  - *next   : a pointer to the memory location of the next pdata structure
+ *  - t_intex           : time index
+ *  - x                 : the x coordinate
+ *  - y                 : the y coordinate
+ *  - z                 : the z coordinate
+ *  - en                : the energy
+ *  - px                : the x component of the four momentum
+ *  - py                : the y component of the four momentum
+ *  - pz                : the z component of the four momentum
+ *  - m                 : the mass
+ *  - itype_or_pdg_id   : the UrQMD's itype or, with SMASH, the PDG ID
+ *  - iso3              : isospin (with UrQMD, unused with SMASH)
+ *  - charge            : the electric charge
+ *  - *next             : a pointer to the memory location of the next pdata structure
  */
 
 typedef struct pdata
@@ -199,49 +189,11 @@ typedef struct pdata
   double py;
   double pz;
   double m;
-  int itype;
+  int itype_or_pdg_id;
   int iso3;
   int charge;
   struct pdata *next;
 } pdata;
-
-#elif defined(SMASH)
-/**
- * \struct pdata (SMASH)
- * It contains most of the information provided by SMASH about a particle.
- * However, please, note that the first member is the time index instead of the
- * actual time. The pdata components are:
- *  - t_intex : time index
- *  - x       : the x coordinate
- *  - y       : the y coordinate
- *  - z       : the z coordinate
- *  - en      : the energy
- *  - px      : the x component of the four momentum
- *  - py      : the y component of the four momentum
- *  - pz      : the z component of the four momentum
- *  - m       : the mass
- *  - pdg_id  : the PDG id
- *  - charge  : the electric charge
- *  - *next   : a pointer to the memory location of the next pdata structure
- */
-typedef struct pdata
-{
-  int t_index;
-  double x;
-  double y;
-  double z;
-  double en;
-  double px;
-  double py;
-  double pz;
-  double m;
-  int pdg_id;
-  int charge;
-  struct pdata *next;
-} pdata;
-#else
-#error "You must define either SMASH or URQMD in definitions.h - compilation failed."
-#endif
 
 /**
  * \struct pinfo (SMASH)
@@ -390,16 +342,11 @@ int process_data (double_t *, double_t *, double_t *, double_t *, double_t *, do
                   long int *, long int *, long int, pdata *);
 
 /** @brief It returns the index of the particle in Tmunu or the number of Tmunu
- * entries if 0,0 (UrQMD) or 0 (SMASH) are given as arguments The version for
- * UrQMD takes itype and iso3, the version for SMASH takes pdg_id Unkown
- * particles go in the last Tmunu index.
+ * entries if 0,0 are given as arguments. The version for
+ * UrQMD takes itype and iso3, the version for SMASH takes pdg_id as first argument
+ * and any number as second argument, which is ignored. Unkown particles go in the last Tmunu index.
  */
-#ifdef URQMD
-int get_particle_index (int, int); // The third argument tells if it is a
-                                   // particle (+1) or an antiparticle (-1)
-#elif defined(SMASH)
-int get_particle_index (int);
-#endif
+int get_particle_index (int, int);
 
 /** @brief It returns the strangeness of an hadron
  * *

@@ -29,7 +29,7 @@ interpret_output_content (int num)
   else
     {
       resonances_included = 1;
-      num -= resonances_included;
+      num -= shift_resonances_on;
     }
   if (num < shift_total_baryon_on)
     {
@@ -79,26 +79,26 @@ main (int argc, char *argv[])
   ret_it = fread (&nevents, sizeof (long int), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading nevents. Exiting.\n");
       exit (4);
     }
   ret_it = fread (&time, sizeof (double), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading time. Exiting.\n");
       exit (4);
     }
   ret_it = fread (&output_content, sizeof (int), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading output_content. Exiting.\n");
       exit (4);
     }
   interpret_output_content (output_content);
   ret_it = fread (&np, sizeof (int), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading np. Exiting.\n");
       exit (4);
     }
   if (resonances_included > 0)
@@ -106,62 +106,62 @@ main (int argc, char *argv[])
       ret_it = fread (&nr, sizeof (int), 1, fin);
       if (ret_it == 0)
         {
-          printf ("Failure in reading data. Exiting.\n");
+          printf ("Failure in reading nr. Exiting.\n");
           exit (4);
         }
     }
   ret_it = fread (&nx, sizeof (int), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading nx. Exiting.\n");
       exit (4);
     }
   ret_it = fread (&ny, sizeof (int), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading ny. Exiting.\n");
       exit (4);
     }
   ret_it = fread (&nz, sizeof (int), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading nz. Exiting.\n");
       exit (4);
     }
   ret_it = fread (&dx, sizeof (double), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading dx. Exiting.\n");
       exit (4);
     }
   ret_it = fread (&dy, sizeof (double), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading dy. Exiting.\n");
       exit (4);
     }
   ret_it = fread (&dz, sizeof (double), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading dz. Exiting.\n");
       exit (4);
     }
   ret_it = fread (&xmin, sizeof (double), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading xmin. Exiting.\n");
       exit (4);
     }
   ret_it = fread (&ymin, sizeof (double), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading ymin. Exiting.\n");
       exit (4);
     }
   ret_it = fread (&zmin, sizeof (double), 1, fin);
   if (ret_it == 0)
     {
-      printf ("Failure in reading data. Exiting.\n");
+      printf ("Failure in reading zmin. Exiting.\n");
       exit (4);
     }
 
@@ -186,7 +186,7 @@ main (int argc, char *argv[])
     fprintf (fout, "Number of resonances: %12d  \n", nr);
   fprintf (fout, "nx: %6d, ny: %6d, nz: %6d\n", nx, ny, nz);
   fprintf (fout, "dx: %7.3e, dy: %7.3e, dz: %7.3e\n", dx, dy, dz);
-  fprintf (fout, "xmin: %7.3e, ymin: %7.3e, zmin: %7.3e\n", dx, dy, dz);
+  fprintf (fout, "xmin: %7.3e, ymin: %7.3e, zmin: %7.3e\n", xmin, ymin, zmin);
 
   for (i = 0; i < nx; i++)
     {
@@ -199,7 +199,7 @@ main (int argc, char *argv[])
                               fin); // rho,vx,vy,vz,rho_c,rho_s,rho_t,Ic_diff,Is_diff
               if (ret_it == 0)
                 {
-                  printf ("Failure in reading data. Exiting.\n");
+                  printf ("Failure in reading rhos, velocities and diff. currents. Exiting.\n");
                   exit (4);
                 }
               h += offset;
@@ -208,19 +208,19 @@ main (int argc, char *argv[])
                   ret_it = fread (&datap[h + 3 * p], sizeof (double), 1, fin);
                   if (ret_it == 0)
                     {
-                      printf ("Failure in reading data. Exiting.\n");
+                      printf ("Failure in reading n for hadron %d. Exiting.\n", p);
                       exit (4);
                     }
                   ret_it = fread (&datap[h + 3 * p + 1], sizeof (double), 1, fin);
                   if (ret_it == 0)
                     {
-                      printf ("Failure in reading data. Exiting.\n");
+                      printf ("Failure in reading density for hadron %d. Exiting.\n", p);
                       exit (4);
                     }
                   ret_it = fread (&datap[h + 3 * p + 2], sizeof (double), 1, fin);
                   if (ret_it == 0)
                     {
-                      printf ("Failure in reading data. Exiting.\n");
+                      printf ("Failure in reading en. dens. for hadron %d. Exiting.\n", p);
                       exit (4);
                     }
                 }
@@ -232,19 +232,19 @@ main (int argc, char *argv[])
                       ret_it = fread (&datap[h + 3 * r], sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
-                          printf ("Failure in reading data. Exiting.\n");
+                          printf ("Failure in reading n for resonance %d. Exiting.\n", p);
                           exit (4);
                         }
                       ret_it = fread (&datap[h + 3 * r + 1], sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
-                          printf ("Failure in reading data. Exiting.\n");
+                          printf ("Failure in reading density for resonance %d. Exiting.\n", p);
                           exit (4);
                         }
                       ret_it = fread (&datap[h + 3 * r + 2], sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
-                          printf ("Failure in reading data. Exiting.\n");
+                          printf ("Failure in reading en. dens for resonance %d. Exiting.\n", p);
                           exit (4);
                         }
                     }

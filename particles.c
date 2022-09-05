@@ -10,160 +10,19 @@
  */
 
 extern const int shift_resonance_index;
-
-#ifdef URQMD
-// given the UrQMD particle itpye and iso3, it return the particle index
-int
-get_particle_index (int itype, int iso3)
-{
-  int result;
-  // Warning: this index has to be manually updated and, every time it is
-  // modified, the function associate_particle_array_index must be modified,
-  // too.
-  switch (itype)
-    {
-    case (101):
-      if (iso3 == -2)
-        result = 0; // pion -
-      else if (iso3 == 2)
-        result = 1; // pion +
-      else
-        result = 2; // pion 0
-      break;        // the break statemets here are not really useful, but not even
-                    // dangerous.
-    case (106):
-      if (iso3 == -1)
-        result = 3; // Kaon 0
-      else
-        result = 4; // Kaon +
-      break;
-    case (-106):
-      if (iso3 == -1)
-        result = 5; // Kaon -
-      else
-        result = 6; // Kaon 0 bar
-      break;
-    case (1):
-      if (iso3 == -1)
-        result = 7; // Neutron
-      else
-        result = 8; // Proton
-      break;
-    case (-1):
-      if (iso3 == -1)
-        result = 9; // Anti-proton
-      else
-        result = 10; // Anti-neutron
-      break;
-    case (102):
-      result = 11; // eta
-      break;
-    case (103):
-      result = 12; // omega meson
-      break;
-    case (107):
-      result = 13; // eta'
-      break;
-    case (109):
-      result = 14; // phi
-      break;
-    case (27):
-      result = 15; // Lambda1116
-      break;
-    case (-27):
-      result = 16; // Anti-Lambda1116
-      break;
-    case (40):
-      // Sigma1192
-      if (iso3 == -2)
-        result = 17; // Sigma -
-      else if (iso3 == 2)
-        result = 18; // Sigma +
-      else
-        result = 19; // Sigma 0
-      break;
-    case (-40):
-      // Anti-Sigma1192
-      if (iso3 == -2)
-        result = 20; // Anti-Sigma (charge -)
-      else if (iso3 == 2)
-        result = 21; // Anti-Sigma (charge +)
-      else
-        result = 22; // Anti-Sigma 0
-      break;
-    case (49):
-      // Xi1317
-      if (iso3 == -1)
-        result = 23; // Xi -
-      else
-        result = 24; // Xi 0
-      break;
-    case (-49):
-      // Anti-Xi1317
-      if (iso3 == -1)
-        result = 25; // Anti-Xi 0
-      else
-        result = 26; // Xi +
-      break;
-    case (29):
-      result = 27; // Lambda1520
-      break;
-    case (-29):
-      result = 28; // Anti-Lambda1520
-      break;
-    case (50):
-      // Xi1530
-      if (iso3 == -1)
-        result = 29; // Xi -
-      else
-        result = 30; // Xi 0
-      break;         // Xi1530
-    case (-50):
-      // Anti-Xi1530
-      if (iso3 == -1)
-        result = 31; // Anti-Xi 0
-      else
-        result = 32; // Xi +
-      break;
-    case (55):
-      result = 33; // Omega1672
-      break;
-    case (-55):
-      result = 34; // Anti-Omega1672
-      break;
-#ifdef INCLUDE_RESONANCES
-    case (104):
-      if (iso3 == 0)
-        result = 0 + shift_resonance_index; // rho0 meson
-      break;
-    case (17):
-      if (iso3 == 3)
-        result = 1 + shift_resonance_index; // Delta++
-      break;
-#endif
-    // index for other particles
-    default:
-      result = NP; // all other particles
-    }
-#ifdef INCLUDE_RESONANCES
-  if ((result > NP) && (result < shift_resonance_index))
-    result = NP;
-#else
-  if (result > NP)
-    result = NP;
-#endif
-  return result;
-}
-
-#elif defined(SMASH)
+extern const int include_total_baryon;
+extern const int include_resonances;
+extern const int use_urqmd;
 
 /**
  * plist_unsorted (SMASH)
  * The array containing the characteristics of the particles managed by SMASH.
  * It has a fixed dimension that should be sufficient even for the upcoming
  * versions of SMASH. This array is later ordered by growing pdg_id and the
- * results are store in the array plist
+ * results are store in the array plist.
  */
+// since the array is not so big, for simplicity we always allocate it in the stack,
+// even when using UrQMD data
 pinfo plist_unsorted[MAX_SMASH_HADRON_SPECIES];
 
 /**
@@ -176,150 +35,305 @@ pinfo *plist;
 
 int n_hadrons_smash;
 
-// given the SMASH particle pdg_id, it return the particle index
+// given the UrQMD particle itpye and iso3 or thd PDG ID when using SMASH,
+// it return the particle index
 int
-get_particle_index (int pdg_id)
+get_particle_index (int arg1, int arg2)
 {
   int result;
-  // Warning: this index has to be manually updated and, every time it is
-  // modified, the function associate_particle_array_index must be modified,
-  // too.
-  switch (pdg_id)
+  if (use_urqmd)
     {
-    case (-211):
-      result = 0; // pion -
-      break;
-    case (211):
-      result = 1; // pion +
-      break;
-    case (111):
-      result = 2; // pion 0
-      break;
-    case (311):
-      result = 3; // Kaon 0
-      break;
-    case (321):
-      result = 4; // Kaon +
-      break;
-    case (-321):
-      result = 5; // Kaon -
-      break;
-    case (-311):
-      result = 6; // Kaon 0 bar
-      break;
-    case (2112):
-      result = 7; // Neutron
-      break;
-    case (2212):
-      result = 8; // Proton
-      break;
-    case (-2212):
-      result = 9; // Anti-proton
-      break;
-    case (-2112):
-      result = 10; // Anti-neutron
-      break;
-    case (221):
-      result = 11; // eta
-      break;
-    case (223):
-      result = 12; // omega meson
-      break;
-    case (331):
-      result = 13; // eta'
-      break;
-    case (333):
-      result = 14; // phi
-      break;
-    case (3122):
-      result = 15; // Lambda1116
-      break;
-    case (-3122):
-      result = 16; // Anti-Lambda1116
-      break;
-    case (3112):
-      // Sigma1192
-      result = 17; // Sigma -
-      break;
-    case (3222):
-      result = 18; // Sigma +
-      break;
-    case (3212):
-      result = 19; // Sigma 0
-      break;
-    case (-3222):
-      // Anti-Sigma1192
-      result = 20; // Anti-Sigma (charge -)
-      break;
-    case (-3112):
-      result = 21; // Anti-Sigma (charge +)
-      break;
-    case (-3212):
-      result = 22; // Anti-Sigma 0
-      break;
-    case (3312):
-      // Xi1317
-      result = 23; // Xi -
-      break;
-    case (3322):
-      result = 24; // Xi 0
-      break;
-    case (-3322):
-      // Anti-Xi1317
-      result = 25; // Anti-Xi 0
-      break;
-    case (-3312):
-      result = 26; // Xi +
-      break;
-    case (3124):
-      result = 27; // Lambda1520
-      break;
-    case (-3124):
-      result = 28; // Anti-Lambda1520
-      break;
-    case (3314):
-      // Xi1530
-      result = 29; // Xi -
-      break;
-    case (3324):
-      result = 30; // Xi 0
-      break;       // Xi1530
-    case (-3324):
-      // Anti-Xi1530
-      result = 31; // Anti-Xi 0
-      break;
-    case (-3314):
-      result = 32; // Xi +
-      break;
-    case (3334):
-      result = 33; // Omega1672
-      break;
-    case (-3334):
-      result = 34; // Anti-Omega1672
-      break;
-#ifdef INCLUDE_RESONANCES
-    case (113):
-      result = 0 + shift_resonance_index; // rho0 meson
-      break;
-    case (2224):
-      result = 1 + shift_resonance_index; // Delta++
-      break;
-#endif
-    // index for other particles
-    default:
-      result = NP; // all other particles
+      int itype = arg1;
+      int iso3 = arg2;
+      // Warning: this index has to be manually updated and, every time it is
+      // modified, the function associate_particle_array_index must be modified,
+      // too.
+      switch (itype)
+        {
+        case (101):
+          if (iso3 == -2)
+            result = 0; // pion -
+          else if (iso3 == 2)
+            result = 1; // pion +
+          else
+            result = 2; // pion 0
+          break;        // the break statemets here are not really useful, but not even
+                        // dangerous.
+        case (106):
+          if (iso3 == -1)
+            result = 3; // Kaon 0
+          else
+            result = 4; // Kaon +
+          break;
+        case (-106):
+          if (iso3 == -1)
+            result = 5; // Kaon -
+          else
+            result = 6; // Kaon 0 bar
+          break;
+        case (1):
+          if (iso3 == -1)
+            result = 7; // Neutron
+          else
+            result = 8; // Proton
+          break;
+        case (-1):
+          if (iso3 == -1)
+            result = 9; // Anti-proton
+          else
+            result = 10; // Anti-neutron
+          break;
+        case (102):
+          result = 11; // eta
+          break;
+        case (103):
+          result = 12; // omega meson
+          break;
+        case (107):
+          result = 13; // eta'
+          break;
+        case (109):
+          result = 14; // phi
+          break;
+        case (27):
+          result = 15; // Lambda1116
+          break;
+        case (-27):
+          result = 16; // Anti-Lambda1116
+          break;
+        case (40):
+          // Sigma1192
+          if (iso3 == -2)
+            result = 17; // Sigma -
+          else if (iso3 == 2)
+            result = 18; // Sigma +
+          else
+            result = 19; // Sigma 0
+          break;
+        case (-40):
+          // Anti-Sigma1192
+          if (iso3 == -2)
+            result = 20; // Anti-Sigma (charge -)
+          else if (iso3 == 2)
+            result = 21; // Anti-Sigma (charge +)
+          else
+            result = 22; // Anti-Sigma 0
+          break;
+        case (49):
+          // Xi1317
+          if (iso3 == -1)
+            result = 23; // Xi -
+          else
+            result = 24; // Xi 0
+          break;
+        case (-49):
+          // Anti-Xi1317
+          if (iso3 == -1)
+            result = 25; // Anti-Xi 0
+          else
+            result = 26; // Xi +
+          break;
+        case (29):
+          result = 27; // Lambda1520
+          break;
+        case (-29):
+          result = 28; // Anti-Lambda1520
+          break;
+        case (50):
+          // Xi1530
+          if (iso3 == -1)
+            result = 29; // Xi -
+          else
+            result = 30; // Xi 0
+          break;         // Xi1530
+        case (-50):
+          // Anti-Xi1530
+          if (iso3 == -1)
+            result = 31; // Anti-Xi 0
+          else
+            result = 32; // Xi +
+          break;
+        case (55):
+          result = 33; // Omega1672
+          break;
+        case (-55):
+          result = 34; // Anti-Omega1672
+          break;
+          if (include_resonances)
+            {
+            case (104):
+              if (iso3 == 0)
+                {
+                  result = 0 + shift_resonance_index; // rho0 meson
+                }
+              else
+                {
+                  result = NP;
+                }
+              break;
+            case (17):
+              if (iso3 == 3)
+                {
+                  result = 1 + shift_resonance_index; // Delta++
+                }
+              else
+                {
+                  result = NP;
+                }
+              break;
+            }
+        // index for other particles
+        default:
+          result = NP; // all other particles
+        }
     }
-#ifdef INCLUDE_RESONANCES
-  if ((result > NP) && (result < shift_resonance_index))
-    result = NP;
-#else
-  if (result > NP)
-    result = NP;
-#endif
+
+  else
+    {
+      // SMASH data case
+      int pdg_id = arg1;
+      // Warning: this index has to be manually updated and, every time it is
+      // modified, the function associate_particle_array_index must be modified,
+      // too.
+      switch (pdg_id)
+        {
+        case (-211):
+          result = 0; // pion -
+          break;
+        case (211):
+          result = 1; // pion +
+          break;
+        case (111):
+          result = 2; // pion 0
+          break;
+        case (311):
+          result = 3; // Kaon 0
+          break;
+        case (321):
+          result = 4; // Kaon +
+          break;
+        case (-321):
+          result = 5; // Kaon -
+          break;
+        case (-311):
+          result = 6; // Kaon 0 bar
+          break;
+        case (2112):
+          result = 7; // Neutron
+          break;
+        case (2212):
+          result = 8; // Proton
+          break;
+        case (-2212):
+          result = 9; // Anti-proton
+          break;
+        case (-2112):
+          result = 10; // Anti-neutron
+          break;
+        case (221):
+          result = 11; // eta
+          break;
+        case (223):
+          result = 12; // omega meson
+          break;
+        case (331):
+          result = 13; // eta'
+          break;
+        case (333):
+          result = 14; // phi
+          break;
+        case (3122):
+          result = 15; // Lambda1116
+          break;
+        case (-3122):
+          result = 16; // Anti-Lambda1116
+          break;
+        case (3112):
+          // Sigma1192
+          result = 17; // Sigma -
+          break;
+        case (3222):
+          result = 18; // Sigma +
+          break;
+        case (3212):
+          result = 19; // Sigma 0
+          break;
+        case (-3222):
+          // Anti-Sigma1192
+          result = 20; // Anti-Sigma (charge -)
+          break;
+        case (-3112):
+          result = 21; // Anti-Sigma (charge +)
+          break;
+        case (-3212):
+          result = 22; // Anti-Sigma 0
+          break;
+        case (3312):
+          // Xi1317
+          result = 23; // Xi -
+          break;
+        case (3322):
+          result = 24; // Xi 0
+          break;
+        case (-3322):
+          // Anti-Xi1317
+          result = 25; // Anti-Xi 0
+          break;
+        case (-3312):
+          result = 26; // Xi +
+          break;
+        case (3124):
+          result = 27; // Lambda1520
+          break;
+        case (-3124):
+          result = 28; // Anti-Lambda1520
+          break;
+        case (3314):
+          // Xi1530
+          result = 29; // Xi -
+          break;
+        case (3324):
+          result = 30; // Xi 0
+          break;       // Xi1530
+        case (-3324):
+          // Anti-Xi1530
+          result = 31; // Anti-Xi 0
+          break;
+        case (-3314):
+          result = 32; // Xi +
+          break;
+        case (3334):
+          result = 33; // Omega1672
+          break;
+        case (-3334):
+          result = 34; // Anti-Omega1672
+          break;
+          if (include_resonances)
+            {
+            case (113):
+              result = 0 + shift_resonance_index; // rho0 meson
+              break;
+            case (2224):
+              result = 1 + shift_resonance_index; // Delta++
+              break;
+            }
+        // index for other particles
+        default:
+          result = NP; // all other particles
+        }
+    }
+  if (include_resonances)
+    {
+      if ((result > NP) && (result < shift_resonance_index))
+        result = NP;
+    }
+  else
+    {
+      if (result > NP)
+        result = NP;
+    }
   return result;
 }
-
-#endif
 
 // it returns the name of the particle given its array index
 const char *
@@ -462,7 +476,6 @@ associate_resonance_array_index (int index)
     }
 }
 
-#ifdef URQMD
 // it returns the strangeness given the itype
 int
 get_strangeness (int itype)
@@ -591,7 +604,6 @@ get_strangeness (int itype)
     }
 }
 
-#elif defined(SMASH)
 void
 get_had_prop (char *id_string, int id_string_len, int *s, int *B, int *Jtot)
 {
@@ -806,4 +818,3 @@ get_hadron_info (const int pdg_id, int *s, int *B)
   *s = sign * result->strangeness;
   *B = sign * result->baryon_num;
 }
-#endif

@@ -1,12 +1,11 @@
+outdir=res_77
+mkdir -p $outdir
 export LC_NUMERIC="en_US.UTF-8"
-for k in $(seq 500 500 2500)
+for k in $(seq 25 25 3000)
 do
     b=$(echo "$k/100" | bc -l)
     c=$(printf "%07.3f" $b)
     d=${c/./_}
-    for k in $(seq 1 18)
-    do
-      ./cg.exe avg 1 res_smash/piece_$k\_tensor rest/test_d$k\f*_Tmunu_$d
-    done
+    ./cg.exe avg 1 $outdir/tensor results_Au_*/tensor_Tmunu_$d
 done
 
