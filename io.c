@@ -179,7 +179,7 @@ write_results (char *outputprefix, double *Tp, double *Jp, double *Jb, double *J
       if (include_resonances)
         {
           fwrite (&nr, sizeof (int), 1, fTp);
-          fwrite (&Jr[h * nx * ny * nz * 4], sizeof (double), nx * ny * nz * 4, fTp);
+          fwrite (&Jr[h * nx * ny * nz * nr * 4], sizeof (double), nx * ny * nz * nr * 4, fTp);
           fwrite (&Tr[h * nx * ny * nz * nr * 10], sizeof (double), nx * ny * nz * nr * 10, fTp);
         }
       fwrite (&Pnum[h * nx * ny * nz * np], sizeof (long int), nx * ny * nz * np, fTp);
@@ -619,7 +619,7 @@ read_data (char *inputfile, double *data_Tp, double *data_Jp, double *data_Jb, d
            long int *nevents, double *data_time)
 {
   FILE *infile;
-  int np2, nx2, ny2, nz2;
+  int np2, nr2, nx2, ny2, nz2;
   int output_content_info2;
   double dx2, dy2, dz2;
   double xmin2, ymin2, zmin2;
@@ -786,13 +786,25 @@ read_data (char *inputfile, double *data_Tp, double *data_Jp, double *data_Jb, d
     }
   if (include_resonances)
     {
-      ret_it = fread (&nr, sizeof (int), 1, infile);
+      ret_it = fread (&nr2, sizeof (int), 1, infile);
       if (ret_it == 0)
         {
           printf ("Failure in reading data. Exiting.\n");
           exit (4);
         }
-      ret_it = fread (data_Jr, sizeof (double), nx * ny * nz * 4, infile);
+      else
+        {
+          if (nr != nr2)
+            {
+              printf ("Error: mismatching between the number of resonances!!!\n");
+              printf ("The hardcoded value is: nr=%d\n", nr);
+              printf ("The new value in %s is: nr2=%d\n", inputfile, nr2);
+              printf ("Sorry, but I have to quit..\n");
+              fclose (infile);
+              exit (6);
+            }
+        }
+      ret_it = fread (data_Jr, sizeof (double), nx * ny * nz * nr * 4, infile);
       if (ret_it == 0)
         {
           printf ("Failure in reading data. Exiting.\n");
