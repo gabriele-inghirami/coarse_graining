@@ -116,7 +116,7 @@
  * reset the particle lists and then continues.
  */
 
-#define MAX_GB_PER_PROC 6
+#define MAX_GB_PER_PROC 0.05
 
 // in a previous version we used long int for all variable to avoid type
 // casting, we should check if there is a significant difference in the speed of

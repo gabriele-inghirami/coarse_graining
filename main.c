@@ -34,11 +34,11 @@ const char dens_label[] = "_densities_";
 const char info_dens_label[] = "_densities_info.dat";
 
 int nt;
-size_t pdata_totmem = 0;
-size_t big_arrays_allocated_mem = 0;
+float pdata_totmem = 0;
+float big_arrays_allocated_mem = 0;
 // maximum memory that a processor should allocate on the heap for arrays and list of particles
-const size_t max_memory_allocatable_data = MAX_GB_PER_PROC;
-const double oneGBsize = 1024 * 1024 * 1024;
+const float max_memory_allocatable_data = MAX_GB_PER_PROC;
+const float oneGBsize = 1024 * 1024 * 1024;
 
 const int T10 = T01;
 const int T20 = T02;
@@ -195,6 +195,7 @@ main (int argc, char *argv[])
         }
 
       Tp = (double *)calloc (nt * nx * ny * nz * np * 10, sizeof (double));
+      //dbg printf("Tp at begin is %p\n",Tp);
       if (Tp == NULL)
         {
           printf ("Sorry, but it is not possible to allocate the Tp array inside "
@@ -203,6 +204,7 @@ main (int argc, char *argv[])
         }
       big_arrays_allocated_mem += nt * nx * ny * nz * np * 10 * sizeof (double);
       Jp = (double *)calloc (nt * nx * ny * nz * np * 4, sizeof (double));
+      //dbg printf("Jp at begin is %p\n",Jp);
       if (Jp == NULL)
         {
           printf ("Sorry, but it is not possible to allocate the Jp array inside "
@@ -211,6 +213,7 @@ main (int argc, char *argv[])
         }
       big_arrays_allocated_mem += nt * nx * ny * nz * np * 4 * sizeof (double);
       Jb = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
+      //dbg printf("Jb at begin is %p\n",Jb);
       if (Jb == NULL)
         {
           printf ("Sorry, but it is not possible to allocate the Jb array inside "
@@ -219,6 +222,7 @@ main (int argc, char *argv[])
         }
       big_arrays_allocated_mem += nt * nx * ny * nz * 4 * sizeof (double);
       Jc = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
+      //dbg printf("Jc at begin is %p\n",Jc);
       if (Jc == NULL)
         {
           printf ("Sorry, but it is not possible to allocate the Jc array inside "
@@ -227,6 +231,7 @@ main (int argc, char *argv[])
         }
       big_arrays_allocated_mem += nt * nx * ny * nz * 4 * sizeof (double);
       Js = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
+      //dbg printf("Js at begin is %p\n",Js);
       if (Js == NULL)
         {
           printf ("Sorry, but it is not possible to allocate the Js array inside "
@@ -238,6 +243,7 @@ main (int argc, char *argv[])
         {
           output_content_info += shift_total_baryon_on;
           Jt = (double *)calloc (nt * nx * ny * nz * 4, sizeof (double));
+          //dbg printf("Jt at begin is %p\n",Jt);
           if (Jt == NULL)
             {
               printf ("Sorry, but it is not possible to allocate the Jt array inside "
@@ -252,6 +258,7 @@ main (int argc, char *argv[])
           // we skip the check, if it fails the situation is already desperate
         }
       Pnum = (long int *)calloc (nt * nx * ny * nz * np, sizeof (long int));
+      //dbg printf("Pnum at begin is %p\n",Pnum);
       if (Pnum == NULL)
         {
           printf ("Sorry, but it is not possible to allocate the Pnum array inside "
@@ -263,6 +270,7 @@ main (int argc, char *argv[])
         {
           output_content_info += shift_resonances_on;
           Jr = (double *)calloc (nt * nx * ny * nz * nr * 4, sizeof (double));
+          //dbg printf("Jr at begin is %p\n",Jr);
           if (Jr == NULL)
             {
               printf ("Sorry, but it is not possible to allocate the Jr array inside "
@@ -271,6 +279,7 @@ main (int argc, char *argv[])
             }
           big_arrays_allocated_mem += nt * nx * ny * nz * nr * 4 * sizeof (double);
           Tr = (double *)calloc (nt * nx * ny * nz * nr * 10, sizeof (double));
+          //dbg printf("Tr at begin is %p\n",Tr);
           if (Tr == NULL)
             {
               printf ("Sorry, but it is not possible to allocate the Tr array inside "
@@ -279,6 +288,7 @@ main (int argc, char *argv[])
             }
           big_arrays_allocated_mem += nt * nx * ny * nz * nr * 10 * sizeof (double);
           Rnum = (long int *)calloc (nt * nx * ny * nz * nr, sizeof (long int));
+          //dbg printf("Rnum at begin is %p\n",Rnum);
           if (Rnum == NULL)
             {
               printf ("Sorry, but it is not possible to allocate the Rnum array inside "
@@ -299,7 +309,7 @@ main (int argc, char *argv[])
         {
           printf ("The memory required for the allocation of the main arrays is %6.2f GB.\n",
                   big_arrays_allocated_mem / oneGBsize);
-          printf ("The maximum memory per process defined in MAX_GB_PER_PROC is %d GB.\n", MAX_GB_PER_PROC);
+          printf ("The maximum memory per process defined in MAX_GB_PER_PROC is %6.2f GB.\n", MAX_GB_PER_PROC);
           printf ("If you have enough memory, please, increase the value of this parameter,\
                 recompile and try again. Otherwise, please, reduce your space-time grid size.\n\
                 For now, I quit.\n");
@@ -365,14 +375,14 @@ main (int argc, char *argv[])
   // dbg printf("js freed\n");
   free (Jt);
   // dbg printf("jt freed\n");
-  free (Pnum);
-  // dbg printf("pnum freed\n");
   free (Rnum);
   // dbg printf("Rnum freed\n");
   free (Tr);
   // dbg printf("Tr freed\n");
   free (Jr);
   // dbg printf("Jr freed\n");
+  free (Pnum);
+  // dbg printf("pnum freed\n");
   if (use_urqmd == 0)
     {
       free (plist);
