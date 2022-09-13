@@ -214,11 +214,13 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
     J^\nu
   */
   double rho_c, rho_s, rho_t;
-  double vel_B[3], vel_c[3], vel_s[3];
+  double vel_B[3], vel_c[3], vel_s[3], vel_h[3];
+  const double vel_null[3] = {0,0,0};
+  const double null_2[2] = {0,0};
   double u4[4];
   double Ic_diffusion[4], Is_diffusion[4];
   double Ic_diffcheck[4], Is_diffcheck[4];
-  double jf, jf_arg, rho, eps;
+  double jf, jf_arg, jh_arg, rho, eps;
   int offset = 14;
 
   // uncomment the following line to print some debugging messages when printing densities
@@ -296,11 +298,6 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
   if (include_total_baryon)
     {
       offset += 1;
-    }
-
-  if (include_resonances)
-    {
-      offset += nr * 3;
     }
 
   empty_array = (double *)calloc (offset, sizeof (double));
@@ -514,14 +511,29 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                       // Ic_diffusion[3]); printf("Is diffusion components: %e  %e  %e
                       // %e\n",Is_diffusion[0],Is_diffusion[1],Is_diffusion[2],
                       // Is_diffusion[3]); printf("\n\n");
-                      for (p = 0; p < np; p++)
+                    }
+                  else
+                    {
+                      if (jf_arg < 0)
+                        {
+                          printf ("Problem with Jb at index h: %d, i: %d, j: %d, k: %d\n", h, i, j, k);
+                          printf ("Jb components: %9.5e    %9.5e    %9.5e    %9.5e\n", Jb[J0 + JBL], Jb[J1 + JBL],
+                                  Jb[J2 + JBL], Jb[J3 + JBL]);
+                        }
+                      fwrite (empty_array, sizeof (double), offset,
+                              fTp); // it includes rho,velB,rho_t,rho_c, rho_s,
+                                    // Ic_diffusion,Is_diffusion, rho and eps for all hadrons
+                    }
+                  for (p = 0; p < np; p++)
+                    {
+                      if (jf_arg > 0)
                         {
                           rho = (Jp[J0 + JPL] * u4[0] - Jp[J1 + JPL] * u4[1] - Jp[J2 + JPL] * u4[2]
-                                 - Jp[J3 + JPL] * u4[3])
-                                / (cell_volume * nevents);
+                                - Jp[J3 + JPL] * u4[3])
+                               / (cell_volume * nevents);
                           eps = ((u4[0] * Tp[T00 + TLOC] - u4[1] * Tp[T10 + TLOC] - u4[2] * Tp[T20 + TLOC]
                                   - u4[3] * Tp[T30 + TLOC])
-                                     * u4[0]
+                                 * u4[0]
                                  - (u4[0] * Tp[T01 + TLOC] - u4[1] * Tp[T11 + TLOC] - u4[2] * Tp[T21 + TLOC]
                                     - u4[3] * Tp[T31 + TLOC])
                                        * u4[1]
@@ -532,12 +544,27 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                                     - u4[3] * Tp[T33 + TLOC])
                                        * u4[3])
                                 / (cell_volume * nevents);
-                          tmp_value = (double)Pnum[PNLOC];
-                          fwrite (&tmp_value, sizeof (double), 1, fTp);
+                        }
+                      jh_arg = (Jp[J0 + JPL] * Jp[J0 + JPL] - Jp[J1 + JPL] * Jp[J1 + JPL] - Jp[J2 + JPL] * Jp[J2 + JPL]
+                        - Jp[J3 + JPL] * Jp[J3 + JPL]);
+                      if (jh_arg > 0)
+                        {
+                          jf = sqrt (jh_arg);
+                          u4[0] = Jp[J0 + JPL] / jf;
+                          u4[1] = Jp[J1 + JPL] / jf;
+                          u4[2] = Jp[J2 + JPL] / jf;
+                          u4[3] = Jp[J3 + JPL] / jf;
+                          for (l = 1; l < 4; l++)
+                              vel_h[l - 1] = u4[l] / u4[0];
+                        }
+                      tmp_value = (double)Pnum[PNLOC];
+                      fwrite (&tmp_value, sizeof (double), 1, fTp);
 #ifdef DBG_DENS
-                          printf ("w, i, j, k, p, n p: %d  %d  %d  %d  %d  %lf\n", w, i, j, k, p, tmp_value);
-                          w++;
+                      printf ("w, i, j, k, p, n p: %d  %d  %d  %d  %d  %lf\n", w, i, j, k, p, tmp_value);
+                      w++;
 #endif
+                      if (jf_arg > 0)
+                        {
                           fwrite (&rho, sizeof (double), 1, fTp);
 #ifdef DBG_DENS
                           printf ("w, i, j, k, p, rho p: %d  %d  %d  %d  %d  %lf\n", w, i, j, k, p, rho);
@@ -549,9 +576,33 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                           w++;
 #endif
                         }
-                      if (include_resonances)
+                      else
                         {
-                          for (r = 0; r < nr; r++)
+                          fwrite (&null_2, sizeof (double), 2, fTp);
+#ifdef DBG_DENS
+                          w += 2;
+#endif
+                        }
+                      if (jh_arg > 0)
+                        {
+                          fwrite (vel_h, sizeof (double), 3, fTp);
+#ifdef DBG_DENS
+                          printf ("w, i, j, k, p, vel p: %d  %d  %d  %d  %d  %lf  %lf  %lf\n", w, i, j, k, p, vel_h[0], vel_h[1], vel_h[2]);
+#endif
+                        }
+                      else
+                        {
+                          fwrite (vel_null, sizeof (double), 3, fTp);
+                        }
+#ifdef DBG_DENS
+                        w+=3;
+#endif
+                    } //end cycle over p
+                  if (include_resonances)
+                    {
+                      for (r = 0; r < nr; r++)
+                        {
+                          if (jf_arg > 0)
                             {
                               rho = (Jr[J0 + JRL] * u4[0] - Jr[J1 + JRL] * u4[1] - Jr[J2 + JRL] * u4[2]
                                      - Jr[J3 + JRL] * u4[3])
@@ -569,12 +620,27 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                                         - u4[3] * Tr[T33 + RTLOC])
                                            * u4[3])
                                     / (cell_volume * nevents);
-                              tmp_value = (double)Rnum[RNLOC];
-                              fwrite (&tmp_value, sizeof (double), 1, fTp);
+                            }
+                          jh_arg = (Jr[J0 + JRL] * Jr[J0 + JRL] - Jr[J1 + JRL] * Jr[J1 + JRL] - Jr[J2 + JRL] * Jr[J2 + JRL]
+                            - Jr[J3 + JRL] * Jr[J3 + JRL]);
+                          if (jh_arg > 0)
+                            {
+                              jf = sqrt (jh_arg);
+                              u4[0] = Jr[J0 + JRL] / jf;
+                              u4[1] = Jr[J1 + JRL] / jf;
+                              u4[2] = Jr[J2 + JRL] / jf;
+                              u4[3] = Jr[J3 + JRL] / jf;
+                              for (l = 1; l < 4; l++)
+                                  vel_h[l - 1] = u4[l] / u4[0];
+                            }
+                          tmp_value = (double)Rnum[RNLOC];
+                          fwrite (&tmp_value, sizeof (double), 1, fTp);
 #ifdef DBG_DENS
-                              printf ("w, i, j, k, r, n p: %d  %d  %d  %d  %d  %lf\n", w, i, j, k, r, tmp_value);
-                              w++;
+                          printf ("w, i, j, k, r, n p: %d  %d  %d  %d  %d  %lf\n", w, i, j, k, r, tmp_value);
+                          w++;
 #endif
+                          if (jf_arg > 0)
+                            {
                               fwrite (&rho, sizeof (double), 1, fTp);
 #ifdef DBG_DENS
                               printf ("w, i, j, k, r, rho r: %d  %d  %d  %d  %d  %lf\n", w, i, j, k, r, rho);
@@ -586,19 +652,28 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                               w++;
 #endif
                             }
+                          else
+                            {
+                              fwrite (&null_2, sizeof (double), 2, fTp);
+#ifdef DBG_DENS
+                              w+=2;
+#endif
+                            }
+                          if (jh_arg > 0)
+                            {
+                              fwrite (vel_h, sizeof (double), 3, fTp);
+#ifdef DBG_DENS
+                              printf ("w, i, j, k, p, vel r: %d  %d  %d  %d  %d  %lf  %lf  %lf\n", w, i, j, k, r, vel_h[0], vel_h[1], vel_h[2]);
+#endif
+                            }
+                          else
+                            {
+                              fwrite (vel_null, sizeof (double), 3, fTp);
+                            }
+#ifdef DBG_DENS
+                          w+=3;
+#endif
                         }
-                    }
-                  else
-                    {
-                      if (jf_arg < 0)
-                        {
-                          printf ("Problem with Jb at index h: %d, i: %d, j: %d, k: %d\n", h, i, j, k);
-                          printf ("Jb components: %9.5e    %9.5e    %9.5e    %9.5e\n", Jb[J0 + JBL], Jb[J1 + JBL],
-                                  Jb[J2 + JBL], Jb[J3 + JBL]);
-                        }
-                      fwrite (empty_array, sizeof (double), offset,
-                              fTp); // it includes rho,velB,rho_t,rho_c, rho_s,
-                                    // Ic_diffusion,Is_diffusion, rho and eps for all hadrons
                     }
                 }
             }
