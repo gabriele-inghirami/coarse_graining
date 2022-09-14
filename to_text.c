@@ -168,9 +168,9 @@ main (int argc, char *argv[])
   if (total_baryon_included > 0)
     offset += 1;
   if (resonances_included > 0)
-    offset_res += 3 * nr;
+    offset_res += 6 * nr;
 
-  datap = (double *)malloc (sizeof (double) * ny * nz * (3 * np + offset + offset_res));
+  datap = (double *)malloc (sizeof (double) * ny * nz * (6 * np + offset + offset_res));
 
   if (datap == NULL)
     {
@@ -223,6 +223,24 @@ main (int argc, char *argv[])
                       printf ("Failure in reading en. dens. for hadron %d. Exiting.\n", p);
                       exit (4);
                     }
+                  ret_it = fread (&datap[h + 3 * p + 3], sizeof (double), 1, fin);
+                  if (ret_it == 0)
+                    {
+                      printf ("Failure in reading Vx for hadron %d. Exiting.\n", p);
+                      exit (4);
+                    }
+                  ret_it = fread (&datap[h + 3 * p + 4], sizeof (double), 1, fin);
+                  if (ret_it == 0)
+                    {
+                      printf ("Failure in reading Vy for hadron %d. Exiting.\n", p);
+                      exit (4);
+                    }
+                  ret_it = fread (&datap[h + 3 * p + 5], sizeof (double), 1, fin);
+                  if (ret_it == 0)
+                    {
+                      printf ("Failure in reading Vz for hadron %d. Exiting.\n", p);
+                      exit (4);
+                    }
                 }
               h += 3 * p;
               if (resonances_included > 0)
@@ -245,6 +263,24 @@ main (int argc, char *argv[])
                       if (ret_it == 0)
                         {
                           printf ("Failure in reading en. dens for resonance %d. Exiting.\n", p);
+                          exit (4);
+                        }
+                      ret_it = fread (&datap[h + 3 * r + 3], sizeof (double), 1, fin);
+                      if (ret_it == 0)
+                        {
+                          printf ("Failure in reading Vx for hadron %d. Exiting.\n", p);
+                          exit (4);
+                        }
+                      ret_it = fread (&datap[h + 3 * r + 4], sizeof (double), 1, fin);
+                      if (ret_it == 0)
+                        {
+                          printf ("Failure in reading Vy for hadron %d. Exiting.\n", p);
+                          exit (4);
+                        }
+                      ret_it = fread (&datap[h + 3 * r + 5], sizeof (double), 1, fin);
+                      if (ret_it == 0)
+                        {
+                          printf ("Failure in reading Vz for hadron %d. Exiting.\n", p);
                           exit (4);
                         }
                     }
@@ -287,12 +323,12 @@ main (int argc, char *argv[])
                   entot = entot + datap[3 * p + h + 2];
                   fprintf (fout,
                            "Hadron kind: %4d, total cell number: %14ld, number density: "
-                           "%14.9e, energy density: %14.9e\n",
-                           p, (long int)datap[3 * p + h], datap[3 * p + h + 1], datap[3 * p + h + 2]);
+                           "%14.9e, energy density: %14.9e, vx: %14.9e, vy: %14.9e, vz: %14.9e\n",
+                           p, (long int)datap[3 * p + h], datap[3 * p + h + 1], datap[3 * p + h + 2],  datap[3 * p + h + 3],  datap[3 * p + h + 4],  datap[3 * p + h + 5]);
                 }
               fprintf (fout, "total energy density: %14.9e\n", entot);
               fprintf (fout, "\n");
-              h += 3 * p;
+              h += 6 * p;
               if (resonances_included > 0)
                 {
                   for (r = 0; r < nr; r++)
@@ -300,11 +336,11 @@ main (int argc, char *argv[])
                       fprintf (fout,
                                "Resonance kind: %4d, total cell number: %14ld, number "
                                "density: %14.9e, energy "
-                               "density: %14.9e\n",
-                               r, (long int)datap[3 * r + h], datap[3 * r + h + 1], datap[3 * r + h + 2]);
+                               "density: %14.9e, vx: %14.9e, vy: %14.9e, vz: %14.9e\n",
+                               r, (long int)datap[3 * r + h], datap[3 * r + h + 1], datap[3 * r + h + 2], datap[3 * r + h + 3], datap[3 * r + h + 4], datap[3 * r + h + 5]);
                     }
                   fprintf (fout, "\n");
-                  h += 3 * r;
+                  h += 6 * r;
                 }
             }
         }
