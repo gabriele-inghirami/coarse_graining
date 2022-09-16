@@ -224,7 +224,7 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
   int offset = 14;
 
   // uncomment the following line to print some debugging messages when printing densities
-  //#define DBG_DENS
+  #define DBG_DENS
 
   if (first_time == 0) // we print the grid informations
     {
