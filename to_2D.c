@@ -1,4 +1,4 @@
-/* Author: Gabriele Inghirami g.inghirami@gsi.de (2019-2022) - License: GPLv3 */
+/* Author: Gabriele Inghirami g.inghirami@gsi.de (2019-2023) - License: GPLv3 */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +11,8 @@ help ()
           "prints a 2D slice, suitable to be "
           "plotted with gnuplot, at fixed i, j or k equal to index.\nThe "
           "informations about the grid and the "
-          "particles are contained into definitions.h.\n\n");
+          "particles are contained into definitions.h.\n"
+          "WARNING: currently it does not work if resonances are enabled!!!\n\n");
 }
 
 int
@@ -23,10 +24,13 @@ main (int argc, char *argv[])
   double time;
   int i, j, k, p, l, chosen_index, chosen_dir, inner_counter;
   double nump, var1, var2, edens, xmin, ymin, zmin;
+  double bb3[3];
   double *bitbucket;
   int nx, ny, nz, np;
   double dx, dy, dz;
   size_t ret_it;
+  // number of data entries for hadrons, currently number, density, energy, vx, vy, vz
+  const int entries = 6;
 
   if (argc != 5)
     {
@@ -143,7 +147,7 @@ main (int argc, char *argv[])
       exit (4);
     }
 
-  bitbucket = (double *)malloc (sizeof (double) * (15 + 3 * np));
+  bitbucket = (double *)malloc (sizeof (double) * (15 + entries * np));
   if (bitbucket == NULL)
     {
       printf ("Allocation of bitbucket array failed. I quit.\n");
@@ -192,6 +196,12 @@ main (int argc, char *argv[])
                           printf ("Failure in reading data. Exiting.\n");
                           exit (4);
                         }
+                      ret_it = fread (bb3, sizeof (double), 3, fin);
+                      if (ret_it == 0)
+                        {
+                          printf ("Failure in reading data. Exiting.\n");
+                          exit (4);
+                        }
                       edens = edens + var2;
                     }
                   fprintf (fout, "%10.6e  ", edens); // total energy density
@@ -209,7 +219,7 @@ main (int argc, char *argv[])
                 }
               else
                 {
-                  ret_it = fread (bitbucket, sizeof (double), 15 + 3 * np, fin);
+                  ret_it = fread (bitbucket, sizeof (double), 15 + entries * np, fin);
                   if (ret_it == 0)
                     {
                       printf ("Failure in reading data. Exiting.\n");
