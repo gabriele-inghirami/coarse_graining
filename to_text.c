@@ -324,7 +324,8 @@ main (int argc, char *argv[])
                   fprintf (fout,
                            "Hadron kind: %4d, total cell number: %14ld, number density: "
                            "%14.9e, energy density: %14.9e, vx: %14.9e, vy: %14.9e, vz: %14.9e\n",
-                           p, (long int)datap[3 * p + h], datap[3 * p + h + 1], datap[3 * p + h + 2],  datap[3 * p + h + 3],  datap[3 * p + h + 4],  datap[3 * p + h + 5]);
+                           p, (long int)datap[3 * p + h], datap[3 * p + h + 1], datap[3 * p + h + 2],
+                           datap[3 * p + h + 3], datap[3 * p + h + 4], datap[3 * p + h + 5]);
                 }
               fprintf (fout, "total energy density: %14.9e\n", entot);
               fprintf (fout, "\n");
@@ -337,7 +338,8 @@ main (int argc, char *argv[])
                                "Resonance kind: %4d, total cell number: %14ld, number "
                                "density: %14.9e, energy "
                                "density: %14.9e, vx: %14.9e, vy: %14.9e, vz: %14.9e\n",
-                               r, (long int)datap[3 * r + h], datap[3 * r + h + 1], datap[3 * r + h + 2], datap[3 * r + h + 3], datap[3 * r + h + 4], datap[3 * r + h + 5]);
+                               r, (long int)datap[3 * r + h], datap[3 * r + h + 1], datap[3 * r + h + 2],
+                               datap[3 * r + h + 3], datap[3 * r + h + 4], datap[3 * r + h + 5]);
                     }
                   fprintf (fout, "\n");
                   h += 6 * r;
