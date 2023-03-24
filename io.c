@@ -135,11 +135,12 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
     where I_diff^\mu = Delta^\mu_nu J^\nu = ( Kron_delta^\mu_\nu - u^\mu u_\nu ) J^\nu
   */
   double rho_c, rho_s, rho_t;
-  double vel_B[3], vel_c[3], vel_s[3];
+  double vel_B[3], vel_c[3], vel_s[3], vel_h[3];
+  const double five_blank_doubles[5] = { 0, 0, 0, 0, 0 };
   double u4[4];
   double Ic_diffusion[4], Is_diffusion[4];
   double Ic_diffcheck[4], Is_diffcheck[4];
-  double jf, jf_arg, rho, eps;
+  double jf, jf_arg, jh_arg, rho, eps;
 
   empty_array = (double *)calloc ((15 + np * 3), sizeof (double));
   if (empty_array == NULL)
@@ -323,10 +324,31 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                                     - u4[3] * Tp[T33 + TLOC])
                                        * u4[3])
                                 / (cell_volume * nevents);
+                          jh_arg = (Jp[J0 + JPL] * Jp[J0 + JPL] - Jp[J1 + JPL] * Jp[J1 + JPL]
+                                    - Jp[J2 + JPL] * Jp[J2 + JPL] - Jp[J3 + JPL] * Jp[J3 + JPL]);
+                          if (jh_arg > 0)
+                            {
+                              jf = sqrt (jh_arg);
+                              u4[0] = Jp[J0 + JPL] / jf;
+                              u4[1] = Jp[J1 + JPL] / jf;
+                              u4[2] = Jp[J2 + JPL] / jf;
+                              u4[3] = Jp[J3 + JPL] / jf;
+                              for (l = 1; l < 4; l++)
+                                vel_h[l - 1] = u4[l] / u4[0];
+                            }
+
                           tmp_value = (double)Pnum[PNLOC];
                           fwrite (&tmp_value, sizeof (double), 1, fTp);
-                          fwrite (&rho, sizeof (double), 1, fTp);
-                          fwrite (&eps, sizeof (double), 1, fTp);
+                          if (jh_arg > 0)
+                            {
+                              fwrite (&rho, sizeof (double), 1, fTp);
+                              fwrite (&eps, sizeof (double), 1, fTp);
+                              fwrite (&vel_h, sizeof (double), 3, fTp);
+                            }
+                          else
+                            {
+                              fwrite (&five_blank_doubles, sizeof (double), 5, fTp);
+                            }
                         }
                     }
                   else
@@ -337,7 +359,7 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                           printf ("Jb components: %9.5e    %9.5e    %9.5e    %9.5e\n", Jb[J0 + JBL], Jb[J1 + JBL],
                                   Jb[J2 + JBL], Jb[J3 + JBL]);
                         }
-                      fwrite (empty_array, sizeof (double), 15 + np * 3,
+                      fwrite (empty_array, sizeof (double), 15 + np * 6,
                               fTp); // it includes rho,velB,rho_t,rho_c, rho_s, Ic_diffusion,Is_diffusion, rho and eps
                                     // for all hadrons
                     }

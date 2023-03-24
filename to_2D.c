@@ -5,9 +5,10 @@
 void
 help ()
 {
-  printf ("Syntax: ./to_2D.exe <inputfile> <outputfile> <i,j or k> <index>\nIt prints a 2D slice, suitable to be "
-          "plotted with gnuplot, at fixed i, j or k equal to index.\nThe informations about the grid and the "
-          "particles are contained into definitions.h.\n\n");
+  printf (
+      "Syntax: ./to_2D.exe <inputfile> <outputfile> <i,j or k> <index>\nIt prints a 2D slice of the energy density,"
+      " suitable to be plotted with gnuplot, at fixed i, j or k equal to index.\nThe informations about the grid"
+      " and the particles are contained into definitions.h.\n\n");
 }
 
 int
@@ -18,11 +19,13 @@ main (int argc, char *argv[])
   long int nevents;
   double time;
   int i, j, k, p, l, chosen_index, chosen_dir, inner_counter;
-  double nump, var1, var2, edens, xmin, ymin, zmin;
+  double nump, bb, had_edens, edens, xmin, ymin, zmin, density;
+  double bb3[3];
   double *bitbucket;
   int nx, ny, nz, np;
   double dx, dy, dz;
   size_t ret_it;
+  const int entries = 6;
 
   if (argc != 5)
     {
@@ -139,7 +142,7 @@ main (int argc, char *argv[])
       exit (4);
     }
 
-  bitbucket = (double *)malloc (sizeof (double) * (15 + 3 * np));
+  bitbucket = (double *)malloc (sizeof (double) * (15 + entries * np));
   if (bitbucket == NULL)
     {
       printf ("Allocation of bitbucket array failed. I quit.\n");
@@ -159,13 +162,13 @@ main (int argc, char *argv[])
                            zmin + (k + 0.5) * dz);
                   for (l = 0; l < 15; l++)
                     {
-                      ret_it = fread (&var1, sizeof (double), 1, fin);
+                      ret_it = fread (&density, sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
                           printf ("Failure in reading data. Exiting.\n");
                           exit (4);
                         }
-                      fprintf (fout, "%10.6e  ", var1);
+                      fprintf (fout, "%10.6e  ", density);
                     }
                   edens = 0;
                   for (p = 0; p < np; p++)
@@ -176,19 +179,25 @@ main (int argc, char *argv[])
                           printf ("Failure in reading data. Exiting.\n");
                           exit (4);
                         }
-                      ret_it = fread (&var1, sizeof (double), 1, fin);
+                      ret_it = fread (&bb, sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
                           printf ("Failure in reading data. Exiting.\n");
                           exit (4);
                         }
-                      ret_it = fread (&var2, sizeof (double), 1, fin);
+                      ret_it = fread (&had_edens, sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
                           printf ("Failure in reading data. Exiting.\n");
                           exit (4);
                         }
-                      edens = edens + var2;
+                      ret_it = fread (bb3, sizeof (double), 3, fin);
+                      if (ret_it == 0)
+                        {
+                          printf ("Failure in reading data. Exiting.\n");
+                          exit (4);
+                        }
+                      edens = edens + had_edens;
                     }
                   fprintf (fout, "%10.6e  ", edens); // total energy density
                   fprintf (fout, "\n");
@@ -204,7 +213,7 @@ main (int argc, char *argv[])
                 }
               else
                 {
-                  ret_it = fread (bitbucket, sizeof (double), 15 + 3 * np, fin);
+                  ret_it = fread (bitbucket, sizeof (double), 15 + entries * np, fin);
                   if (ret_it == 0)
                     {
                       printf ("Failure in reading data. Exiting.\n");

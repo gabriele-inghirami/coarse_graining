@@ -80,35 +80,35 @@ main (int argc, char *argv[])
 {
 
   double *Tp; //< The array containing the T_munu tensor for all particle species. It is a linear array of dimensions:
-              //nt*nx*ny*nz*np*10, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
-              //respectively, np is the number of particles and 10 corresponds to the ten energy momentum tensor
-              //components for each particle.
+              // nt*nx*ny*nz*np*10, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
+              // respectively, np is the number of particles and 10 corresponds to the ten energy momentum tensor
+              // components for each particle.
   double *Jp; //< The array containing the four current of all particle species. It is a linear array of dimensions:
-              //nt*nx*ny*nz*np*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
-              //respectively, np is the number of particles and 4 corresponds to the four covariant components for each
-              //particle.
+              // nt*nx*ny*nz*np*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
+              // respectively, np is the number of particles and 4 corresponds to the four covariant components for
+              // each particle.
   double *Jb; //< The array containing the net baryon four current. It is a linear array of dimensions: nt*nx*ny*nz*4,
-              //where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively and 4
-              //corresponds to the four covariant components.
+              // where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z respectively and 4
+              // corresponds to the four covariant components.
   double *Jc; //< The array containing the net electric four current. It is a linear array of dimensions:
-              //nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
-              //respectively and 4 corresponds to the four covariant components.
+              // nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
+              // respectively and 4 corresponds to the four covariant components.
   double *Js; //< The array containing the net strangeness four current. It is a linear array of dimensions:
-              //nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
-              //respectively and 4 corresponds to the four covariant components.
+              // nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
+              // respectively and 4 corresponds to the four covariant components.
   double *Jt; //< The array containing the total baryon four current. It is a linear array of dimensions:
-              //nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
-              //respectively and 4 corresponds to the four covariant components.
+              // nt*nx*ny*nz*4, where nt is the number of timesteps, nx, ny and nz are the cells along x, y and z
+              // respectively and 4 corresponds to the four covariant components.
   long int *Pnum; //< The array containing the total number of individual particle species. It is a linear array of
-                  //dimensions: nt*nx*ny*nz*np, where nt is the number of timesteps, nx, ny and nz are the cells along
-                  //x, y and z respectively, np is the number of particles. Each entry tells the total number of
-                  //particles of the species p.
+                  // dimensions: nt*nx*ny*nz*np, where nt is the number of timesteps, nx, ny and nz are the cells along
+                  // x, y and z respectively, np is the number of particles. Each entry tells the total number of
+                  // particles of the species p.
 
   long int nevents = 0; //< The number of events
   char *outputfile;
   int print_dens; //< The flag to decide whether to print or not the four current components into additional separate
-                  //files ( the four currents are always saved with the energy momentum tensors, but these additional
-                  //files make easier to extract their values in text format )
+                  // files ( the four currents are always saved with the energy momentum tensors, but these additional
+                  // files make easier to extract their values in text format )
 
   // in the worst case, the number of arguments must be at least 5
   if (argc < 5)
