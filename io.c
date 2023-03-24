@@ -215,8 +215,8 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
   */
   double rho_c, rho_s, rho_t;
   double vel_B[3], vel_c[3], vel_s[3], vel_h[3];
-  const double vel_null[3] = { 0, 0, 0 };
-  const double null_2[2] = { 0, 0 };
+  const double vel_null[3] = {0,0,0};
+  const double null_2[2] = {0,0};
   double u4[4];
   double Ic_diffusion[4], Is_diffusion[4];
   double Ic_diffcheck[4], Is_diffcheck[4];
@@ -224,7 +224,7 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
   int offset = 14;
 
   // uncomment the following line to print some debugging messages when printing densities
-  // #define DBG_DENS
+  #define DBG_DENS
 
   if (first_time == 0) // we print the grid informations
     {
@@ -529,11 +529,11 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                       if (jf_arg > 0)
                         {
                           rho = (Jp[J0 + JPL] * u4[0] - Jp[J1 + JPL] * u4[1] - Jp[J2 + JPL] * u4[2]
-                                 - Jp[J3 + JPL] * u4[3])
-                                / (cell_volume * nevents);
+                                - Jp[J3 + JPL] * u4[3])
+                               / (cell_volume * nevents);
                           eps = ((u4[0] * Tp[T00 + TLOC] - u4[1] * Tp[T10 + TLOC] - u4[2] * Tp[T20 + TLOC]
                                   - u4[3] * Tp[T30 + TLOC])
-                                     * u4[0]
+                                 * u4[0]
                                  - (u4[0] * Tp[T01 + TLOC] - u4[1] * Tp[T11 + TLOC] - u4[2] * Tp[T21 + TLOC]
                                     - u4[3] * Tp[T31 + TLOC])
                                        * u4[1]
@@ -546,7 +546,7 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                                 / (cell_volume * nevents);
                         }
                       jh_arg = (Jp[J0 + JPL] * Jp[J0 + JPL] - Jp[J1 + JPL] * Jp[J1 + JPL] - Jp[J2 + JPL] * Jp[J2 + JPL]
-                                - Jp[J3 + JPL] * Jp[J3 + JPL]);
+                        - Jp[J3 + JPL] * Jp[J3 + JPL]);
                       if (jh_arg > 0)
                         {
                           jf = sqrt (jh_arg);
@@ -555,7 +555,7 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                           u4[2] = Jp[J2 + JPL] / jf;
                           u4[3] = Jp[J3 + JPL] / jf;
                           for (l = 1; l < 4; l++)
-                            vel_h[l - 1] = u4[l] / u4[0];
+                              vel_h[l - 1] = u4[l] / u4[0];
                         }
                       tmp_value = (double)Pnum[PNLOC];
                       fwrite (&tmp_value, sizeof (double), 1, fTp);
@@ -587,8 +587,7 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                         {
                           fwrite (vel_h, sizeof (double), 3, fTp);
 #ifdef DBG_DENS
-                          printf ("w, i, j, k, p, vel p: %d  %d  %d  %d  %d  %lf  %lf  %lf\n", w, i, j, k, p, vel_h[0],
-                                  vel_h[1], vel_h[2]);
+                          printf ("w, i, j, k, p, vel p: %d  %d  %d  %d  %d  %lf  %lf  %lf\n", w, i, j, k, p, vel_h[0], vel_h[1], vel_h[2]);
 #endif
                         }
                       else
@@ -596,9 +595,9 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                           fwrite (vel_null, sizeof (double), 3, fTp);
                         }
 #ifdef DBG_DENS
-                      w += 3;
+                        w+=3;
 #endif
-                    } // end cycle over p
+                    } //end cycle over p
                   if (include_resonances)
                     {
                       for (r = 0; r < nr; r++)
@@ -622,8 +621,8 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                                            * u4[3])
                                     / (cell_volume * nevents);
                             }
-                          jh_arg = (Jr[J0 + JRL] * Jr[J0 + JRL] - Jr[J1 + JRL] * Jr[J1 + JRL]
-                                    - Jr[J2 + JRL] * Jr[J2 + JRL] - Jr[J3 + JRL] * Jr[J3 + JRL]);
+                          jh_arg = (Jr[J0 + JRL] * Jr[J0 + JRL] - Jr[J1 + JRL] * Jr[J1 + JRL] - Jr[J2 + JRL] * Jr[J2 + JRL]
+                            - Jr[J3 + JRL] * Jr[J3 + JRL]);
                           if (jh_arg > 0)
                             {
                               jf = sqrt (jh_arg);
@@ -632,7 +631,7 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                               u4[2] = Jr[J2 + JRL] / jf;
                               u4[3] = Jr[J3 + JRL] / jf;
                               for (l = 1; l < 4; l++)
-                                vel_h[l - 1] = u4[l] / u4[0];
+                                  vel_h[l - 1] = u4[l] / u4[0];
                             }
                           tmp_value = (double)Rnum[RNLOC];
                           fwrite (&tmp_value, sizeof (double), 1, fTp);
@@ -657,15 +656,14 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                             {
                               fwrite (&null_2, sizeof (double), 2, fTp);
 #ifdef DBG_DENS
-                              w += 2;
+                              w+=2;
 #endif
                             }
                           if (jh_arg > 0)
                             {
                               fwrite (vel_h, sizeof (double), 3, fTp);
 #ifdef DBG_DENS
-                              printf ("w, i, j, k, p, vel r: %d  %d  %d  %d  %d  %lf  %lf  %lf\n", w, i, j, k, r,
-                                      vel_h[0], vel_h[1], vel_h[2]);
+                              printf ("w, i, j, k, p, vel r: %d  %d  %d  %d  %d  %lf  %lf  %lf\n", w, i, j, k, r, vel_h[0], vel_h[1], vel_h[2]);
 #endif
                             }
                           else
@@ -673,7 +671,7 @@ write_densities (char *outputprefix, double *Tp, double *Jp, double *Jb, double 
                               fwrite (vel_null, sizeof (double), 3, fTp);
                             }
 #ifdef DBG_DENS
-                          w += 3;
+                          w+=3;
 #endif
                         }
                     }

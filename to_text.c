@@ -11,6 +11,8 @@ int total_baryon_included = 0;        // flag that will be set to > 0 if total_b
 int resonances_included = 0;          // flag that will be set to > 0 if resonances are included, to < 0 if not
 size_t ret_it;
 
+const int quantities_per_particle = 6; //currently n, rho, eps, vx, vy, vz
+
 void
 help ()
 {
@@ -168,9 +170,9 @@ main (int argc, char *argv[])
   if (total_baryon_included > 0)
     offset += 1;
   if (resonances_included > 0)
-    offset_res += 6 * nr;
+    offset_res += quantities_per_particle * nr;
 
-  datap = (double *)malloc (sizeof (double) * ny * nz * (6 * np + offset + offset_res));
+  datap = (double *)malloc (sizeof (double) * ny * nz * (quantities_per_particle * np + offset + offset_res));
 
   if (datap == NULL)
     {
@@ -205,86 +207,86 @@ main (int argc, char *argv[])
               h += offset;
               for (p = 0; p < np; p++)
                 {
-                  ret_it = fread (&datap[h + 3 * p], sizeof (double), 1, fin);
+                  ret_it = fread (&datap[h + quantities_per_particle * p], sizeof (double), 1, fin);
                   if (ret_it == 0)
                     {
                       printf ("Failure in reading n for hadron %d. Exiting.\n", p);
                       exit (4);
                     }
-                  ret_it = fread (&datap[h + 3 * p + 1], sizeof (double), 1, fin);
+                  ret_it = fread (&datap[h + quantities_per_particle * p + 1], sizeof (double), 1, fin);
                   if (ret_it == 0)
                     {
                       printf ("Failure in reading density for hadron %d. Exiting.\n", p);
                       exit (4);
                     }
-                  ret_it = fread (&datap[h + 3 * p + 2], sizeof (double), 1, fin);
+                  ret_it = fread (&datap[h + quantities_per_particle * p + 2], sizeof (double), 1, fin);
                   if (ret_it == 0)
                     {
                       printf ("Failure in reading en. dens. for hadron %d. Exiting.\n", p);
                       exit (4);
                     }
-                  ret_it = fread (&datap[h + 3 * p + 3], sizeof (double), 1, fin);
+                  ret_it = fread (&datap[h + quantities_per_particle * p + 3], sizeof (double), 1, fin);
                   if (ret_it == 0)
                     {
                       printf ("Failure in reading Vx for hadron %d. Exiting.\n", p);
                       exit (4);
                     }
-                  ret_it = fread (&datap[h + 3 * p + 4], sizeof (double), 1, fin);
+                  ret_it = fread (&datap[h + quantities_per_particle * p + 4], sizeof (double), 1, fin);
                   if (ret_it == 0)
                     {
                       printf ("Failure in reading Vy for hadron %d. Exiting.\n", p);
                       exit (4);
                     }
-                  ret_it = fread (&datap[h + 3 * p + 5], sizeof (double), 1, fin);
+                  ret_it = fread (&datap[h + quantities_per_particle * p + 5], sizeof (double), 1, fin);
                   if (ret_it == 0)
                     {
                       printf ("Failure in reading Vz for hadron %d. Exiting.\n", p);
                       exit (4);
                     }
                 }
-              h += 3 * p;
+              h += quantities_per_particle * p;
               if (resonances_included > 0)
                 {
                   for (r = 0; r < nr; r++)
                     {
-                      ret_it = fread (&datap[h + 3 * r], sizeof (double), 1, fin);
+                      ret_it = fread (&datap[h + quantities_per_particle * r], sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
                           printf ("Failure in reading n for resonance %d. Exiting.\n", p);
                           exit (4);
                         }
-                      ret_it = fread (&datap[h + 3 * r + 1], sizeof (double), 1, fin);
+                      ret_it = fread (&datap[h + quantities_per_particle * r + 1], sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
                           printf ("Failure in reading density for resonance %d. Exiting.\n", p);
                           exit (4);
                         }
-                      ret_it = fread (&datap[h + 3 * r + 2], sizeof (double), 1, fin);
+                      ret_it = fread (&datap[h + quantities_per_particle * r + 2], sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
                           printf ("Failure in reading en. dens for resonance %d. Exiting.\n", p);
                           exit (4);
                         }
-                      ret_it = fread (&datap[h + 3 * r + 3], sizeof (double), 1, fin);
+                      ret_it = fread (&datap[h + quantities_per_particle * r + 3], sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
                           printf ("Failure in reading Vx for hadron %d. Exiting.\n", p);
                           exit (4);
                         }
-                      ret_it = fread (&datap[h + 3 * r + 4], sizeof (double), 1, fin);
+                      ret_it = fread (&datap[h + quantities_per_particle * r + 4], sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
                           printf ("Failure in reading Vy for hadron %d. Exiting.\n", p);
                           exit (4);
                         }
-                      ret_it = fread (&datap[h + 3 * r + 5], sizeof (double), 1, fin);
+                      ret_it = fread (&datap[h + quantities_per_particle * r + 5], sizeof (double), 1, fin);
                       if (ret_it == 0)
                         {
                           printf ("Failure in reading Vz for hadron %d. Exiting.\n", p);
                           exit (4);
                         }
                     }
-                  h += 3 * r;
+                  h += quantities_per_particle * r;
                 }
             }
         }
@@ -320,16 +322,15 @@ main (int argc, char *argv[])
               entot = 0.;
               for (p = 0; p < np; p++)
                 {
-                  entot = entot + datap[3 * p + h + 2];
+                  entot = entot + datap[quantities_per_particle * p + h + 2];
                   fprintf (fout,
                            "Hadron kind: %4d, total cell number: %14ld, number density: "
                            "%14.9e, energy density: %14.9e, vx: %14.9e, vy: %14.9e, vz: %14.9e\n",
-                           p, (long int)datap[3 * p + h], datap[3 * p + h + 1], datap[3 * p + h + 2],
-                           datap[3 * p + h + 3], datap[3 * p + h + 4], datap[3 * p + h + 5]);
+                           p, (long int)datap[quantities_per_particle * p + h], datap[quantities_per_particle * p + h + 1], datap[quantities_per_particle * p + h + 2],  datap[quantities_per_particle * p + h + 3],  datap[quantities_per_particle * p + h + 4],  datap[quantities_per_particle * p + h + 5]);
                 }
               fprintf (fout, "total energy density: %14.9e\n", entot);
               fprintf (fout, "\n");
-              h += 6 * p;
+              h += quantities_per_particle * p;
               if (resonances_included > 0)
                 {
                   for (r = 0; r < nr; r++)
@@ -338,11 +339,10 @@ main (int argc, char *argv[])
                                "Resonance kind: %4d, total cell number: %14ld, number "
                                "density: %14.9e, energy "
                                "density: %14.9e, vx: %14.9e, vy: %14.9e, vz: %14.9e\n",
-                               r, (long int)datap[3 * r + h], datap[3 * r + h + 1], datap[3 * r + h + 2],
-                               datap[3 * r + h + 3], datap[3 * r + h + 4], datap[3 * r + h + 5]);
+                               r, (long int)datap[quantities_per_particle * r + h], datap[quantities_per_particle * r + h + 1], datap[quantities_per_particle * r + h + 2], datap[quantities_per_particle * r + h + 3], datap[quantities_per_particle * r + h + 4], datap[quantities_per_particle * r + h + 5]);
                     }
                   fprintf (fout, "\n");
-                  h += 6 * r;
+                  h += quantities_per_particle * r;
                 }
             }
         }
