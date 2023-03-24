@@ -189,8 +189,8 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
             }
           fclose (infile);
           printf ("File %s read.\n", files[idx + start_index]);
-          //dbg printf ("Allocated memory so far: %f\n", (pdata_totmem + big_arrays_allocated_mem)/oneGBsize);
-          if (((pdata_totmem + big_arrays_allocated_mem)/oneGBsize > max_memory_allocatable_data)
+          // dbg printf ("Allocated memory so far: %f\n", (pdata_totmem + big_arrays_allocated_mem)/oneGBsize);
+          if (((pdata_totmem + big_arrays_allocated_mem) / oneGBsize > max_memory_allocatable_data)
               && (idx < nf - 1)) // if we are working on the last file, we will process the data anyway
             {
               process_data (Tp, Jp, Jb, Jc, Js, Jt, Jr, Tr, Pnum, Rnum, *nevents, pdata_start);
@@ -466,7 +466,7 @@ compute (char **files, int ninfiles, double *Tp, double *Jp, double *Jb, double 
             }
           fclose (infile);
           printf ("File %s read, with events %u.\n", files[idx + start_index], event_number + 1);
-          if (((pdata_totmem + big_arrays_allocated_mem)/oneGBsize > max_memory_allocatable_data)
+          if (((pdata_totmem + big_arrays_allocated_mem) / oneGBsize > max_memory_allocatable_data)
               && (idx < nf - 1)) // if we are working on the last file, we will process the data anyway
             {
               process_data (Tp, Jp, Jb, Jc, Js, Jt, Jr, Tr, Pnum, Rnum, *nevents, pdata_start);
@@ -865,9 +865,9 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
             {
               r = p - shift_resonance_index; // we remove the offset
               p = np - 1;                    // we set the resonance index to the catch-all entry
-              //dbg printf("Rnum in process is %p\n",Rnum);
+              // dbg printf("Rnum in process is %p\n",Rnum);
               Rnum[RNLOC] += 1;
-              //dbg printf("Tr in process is %p\n",Tr);
+              // dbg printf("Tr in process is %p\n",Tr);
               Tr[T00 + RTLOC] += pdata_entry->en;
               Tr[T01 + RTLOC] += pdata_entry->px;
               Tr[T02 + RTLOC] += pdata_entry->py;
@@ -878,7 +878,7 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
               Tr[T22 + RTLOC] += (pdata_entry->py * pdata_entry->py) / (pdata_entry->en);
               Tr[T23 + RTLOC] += (pdata_entry->py * pdata_entry->pz) / (pdata_entry->en);
               Tr[T33 + RTLOC] += (pdata_entry->pz * pdata_entry->pz) / (pdata_entry->en);
-              //dbg printf("Jr in process is %p\n",Jr);
+              // dbg printf("Jr in process is %p\n",Jr);
               Jr[J0 + JRL] += 1;
               Jr[J1 + JRL] += (pdata_entry->px) / pdata_entry->en;
               Jr[J2 + JRL] += (pdata_entry->py) / pdata_entry->en;
@@ -886,9 +886,9 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
             }
         }
       // tot2=tot2+1;
-      //dbg printf("Pnum in process is %p\n",Pnum);
+      // dbg printf("Pnum in process is %p\n",Pnum);
       Pnum[PNLOC] += 1;
-      //dbg printf("Tp in process is %p\n",Tp);
+      // dbg printf("Tp in process is %p\n",Tp);
       Tp[T00 + TLOC] += pdata_entry->en;
       Tp[T01 + TLOC] += pdata_entry->px;
       Tp[T02 + TLOC] += pdata_entry->py;
@@ -899,7 +899,7 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
       Tp[T22 + TLOC] += (pdata_entry->py * pdata_entry->py) / (pdata_entry->en);
       Tp[T23 + TLOC] += (pdata_entry->py * pdata_entry->pz) / (pdata_entry->en);
       Tp[T33 + TLOC] += (pdata_entry->pz * pdata_entry->pz) / (pdata_entry->en);
-      //dbg printf("Jp in process is %p\n",Jp);
+      // dbg printf("Jp in process is %p\n",Jp);
       Jp[J0 + JPL] += 1;
       Jp[J1 + JPL] += (pdata_entry->px) / pdata_entry->en;
       Jp[J2 + JPL] += (pdata_entry->py) / pdata_entry->en;
@@ -942,7 +942,7 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
         {
           // printf("**B %lf  %lf  %lf  %lf\n",Jb[J0 + JBL], Jb[J1 + JBL], Jb[J2 + JBL], Jb[J3 + JBL]);
           // printf("jsign: %d\n",jsign);
-          //dbg printf("Jb in process is %p\n",Jb);
+          // dbg printf("Jb in process is %p\n",Jb);
           Jb[J0 + JBL] += jsign;
           Jb[J1 + JBL] += jsign * (pdata_entry->px) / pdata_entry->en;
           Jb[J2 + JBL] += jsign * (pdata_entry->py) / pdata_entry->en;
@@ -950,21 +950,21 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
           // printf("**A %lf  %lf  %lf  %lf\n",Jb[J0 + JBL], Jb[J1 + JBL], Jb[J2 + JBL], Jb[J3 + JBL]);
           if (include_total_baryon)
             {
-              //dbg printf("Jt in process is %p\n",Jt);
+              // dbg printf("Jt in process is %p\n",Jt);
               Jt[J0 + JBL] += 1;
               Jt[J1 + JBL] += (pdata_entry->px) / pdata_entry->en;
               Jt[J2 + JBL] += (pdata_entry->py) / pdata_entry->en;
               Jt[J3 + JBL] += (pdata_entry->pz) / pdata_entry->en;
             }
         }
-      //dbg printf("Jc in process is %p\n",Jc);
+      // dbg printf("Jc in process is %p\n",Jc);
       Jc[J0 + JBL] += (pdata_entry->charge);
       Jc[J1 + JBL] += (pdata_entry->charge) * (pdata_entry->px) / pdata_entry->en;
       Jc[J2 + JBL] += (pdata_entry->charge) * (pdata_entry->py) / pdata_entry->en;
       Jc[J3 + JBL] += (pdata_entry->charge) * (pdata_entry->pz) / pdata_entry->en;
       // printf("hadron: %d p: %d strangeness: %d B:
       // %d\n",pdata_entry->itype_or_pdg_id,p,strangeness, baryon_number);
-      //dbg printf("Js in process is %p\n",Js);
+      // dbg printf("Js in process is %p\n",Js);
       Js[J0 + JBL] += strangeness;
       Js[J1 + JBL] += strangeness * (pdata_entry->px) / pdata_entry->en;
       Js[J2 + JBL] += strangeness * (pdata_entry->py) / pdata_entry->en;
