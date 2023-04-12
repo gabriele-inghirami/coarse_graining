@@ -61,6 +61,6 @@ to_2D.exe: to_2D.c
 
 # target: to delete the products of the compilation (executable, object files, modules...)
 clean:
-		  \rm *.exe
+		  \rm -f *.exe
 
 
