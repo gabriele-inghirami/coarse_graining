@@ -23,7 +23,8 @@ double const dz = DZ_DEF;
 int const nx = NX_DEF;
 int const ny = NY_DEF;
 int const nz = NZ_DEF;
-int const np = NP + 1;
+int NP = 0; // number of identied particles
+int np = 1; // number of particle entries, including the generic "catch all" one: np = NP + 1
 
 const char Tplabel[] = "_Tmunu_";
 const char infolabel[] = "_Tmunu_info.dat";
@@ -138,6 +139,8 @@ main (int argc, char *argv[])
     }
 
   max_memory_allocatable_data = sysconf (_SC_PHYS_PAGES) * sysconf (_SC_PAGE_SIZE) * MAX_MEMORY_ALLOC;
+  NP = count_identified_particles();
+  np = NP + 1;
 
   // formal check of the parameters
   if ((strncmp (argv[1], "comp", 4) == 0) || (strncmp (argv[1], "avg", 3) == 0))

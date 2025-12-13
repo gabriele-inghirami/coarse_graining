@@ -6,6 +6,8 @@
  * get_particle_index and associate_particle_array_index
  */
 
+extern int NP;
+
 #ifdef URQMD
 // given the UrQMD particle itpye and iso3, it return the particle index
 int
@@ -283,6 +285,29 @@ get_particle_index (int pdg_id)
 
 #endif
 
+// it counts the number of lines (and therefore the number of particles)
+// of the file "particles_identified.txt"
+int count_identified_particles()
+{
+  FILE *idpart_file;
+  int num_newl = 0;
+  char c;
+
+  idpart_file = fopen("particles_identified.txt", "r");
+
+  if (idpart_file == NULL)
+  {
+    printf("Unable to open particles_identified.txt\n");
+    return 0;
+  }
+
+  for (c = getc(idpart_file); c != EOF; c = getc(idpart_file))
+    if (c == '\n') ++num_newl;
+
+  fclose(idpart_file);
+  return num_newl;
+}
+  
 // it returns the name of the particle given its array index
 const char *
 associate_particle_array_index (int index)

@@ -24,6 +24,12 @@
 #define URQMD
 //#define SMASH
 
+/**
+ * choice of the URQMD version (3.4 or 4.0)
+ *
+ */
+#define URQMD_version 4.0
+
 // we check that either URQMD or SMASH are defined, if not a compilation error is raised
 #ifdef URQMD
 #elif defined(SMASH)
@@ -124,16 +130,6 @@
 #define JPL 4 * (p + np * (k + nz * (j + ny * (i + (long)h * nx))))
 #define JBL 4 * (k + nz * (j + ny * (i + (long)h * nx)))
 #define PNLOC (p + np * (k + nz * (j + ny * (i + (long)h * nx))))
-
-/**
- * NP the number of particles: from 0 to all "stable" (lifetime > 10 fm) particles (maximum 35)
- * set NP=0, leaving just the "catchall" entry, if not interested in computing the individual hadron currents
- *
- */
-#define NP 35
-#if NP > 35
-#error NP cannot be larger than 35!
-#endif
 
 #ifdef URQMD
 /**
@@ -469,7 +465,7 @@ void get_had_prop (char *, int, int *, int *, int *);
  *  @param[in] the array of pinfo to be filled (plist)
  *
  *  @param[out] the number of hadrons registered into the array
- *
+ * 
  *  \callgraph
  */
 int fill (pinfo *);
@@ -477,6 +473,15 @@ int fill (pinfo *);
 /** @brief it returns the index in the array of times time_int_array corresponding to the given test_time
  */
 int check_test_time (double, double *, int);
+
+/** @brief it returns the number of lines of the file particles_identified.txt
+ *  and therefore the number of particles that are idenfitied
+ *
+ *  @param[out] the number of lines
+ *
+ *  \callgraph
+ */
+int count_identified_particles();
 
 void help ();
 

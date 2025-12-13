@@ -7,7 +7,7 @@
  */
 
 extern size_t pdata_totmem, max_memory_allocatable_data, big_arrays_allocated_mem;
-extern int nt, np;
+extern int np, nt, NP;
 extern const int nx, ny, nz;
 extern const double dx, dy, dz;
 extern const double xmin, ymin, zmin;
@@ -643,15 +643,18 @@ process_data (double *Tp, double *Jp, double *Jb, double *Jc, double *Js, double
           continue;
         }
       h = pdata_entry->t_index;
-#if (NP == 0)
-      p = 0;
-#else
+      if (NP == 0)
+        {
+          p = 0;
+        }
+      else
+        {
 #ifdef URQMD
-      p = get_particle_index (pdata_entry->itype, pdata_entry->iso3);
+          p = get_particle_index (pdata_entry->itype, pdata_entry->iso3);
 #elif defined(SMASH)
-      p = get_particle_index (pdata_entry->pdg_id);
+          p = get_particle_index (pdata_entry->pdg_id);
 #endif
-#endif
+	}
       // tot2=tot2+1;
       Pnum[PNLOC] += 1;
       Tp[T00 + TLOC] += pdata_entry->en;
