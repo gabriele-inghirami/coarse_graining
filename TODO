@@ -1,4 +1,4 @@
-- check and test to_landau.c
+- check and test to_landau.c and utilities/store_cgnew_w_landau_frame_testing.py
 - extend to_text.c to the output of to_landau.exe
 - extend to_2D.c to the output of to_landau.exe
 
