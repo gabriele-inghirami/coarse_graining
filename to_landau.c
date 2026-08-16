@@ -14,6 +14,7 @@ const int T32=T23;
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_blas.h>
@@ -27,7 +28,7 @@ const int T32=T23;
 
 void help()
 {
-printf("Syntax: ./to_landau.exe <Tmumu_inputfile> <density_file> [Tmunu_file]\n\n");
+printf("Syntax: ./to_landau.exe <Tmumu_inputfile> <density_file_outputfile>\n\n");
 }
 
 int main(int argc, char* argv[])
@@ -38,7 +39,7 @@ double *Tp, *Jb, *Jp, *Jc, *Js, *Jt, *Tp_Landau;
 long int *Pnum;
 long int nevents;
 double time, xmin, ymin, zmin;
-int i,j,k,p,h,l,mm,nn;
+int i,j,k,p,h,l,mm,nn,bp,maxbp;
 int nx, ny, nz, np;
 double dx, dy, dz;
 double rho_c, rho_s, rho_b, rho_t;
@@ -58,10 +59,10 @@ double glf1;
 int stop,go_on,success;
 double cell_volume,NF;
 double tmp_value;
-double *empty_arr;
+double *buffer,*emptybuffer;
 
 
-if((argc<3) || (argc>4))
+if(argc != 3)
 {
   help();
   exit(1);
@@ -79,16 +80,6 @@ if(fde==NULL)
 {
 	printf("Sorry, I was unable to create the density output file %s\n",argv[2]);
 	exit(2);
-}
-
-if(argc==4)
-{
-    ftm=fopen(argv[3],"wb");
-    if(ftm==NULL)
-    {
-	    printf("Sorry, I was unable to create the Tmunu output file %s\n",argv[3]);
-	    exit(2);
-    }
 }
 
 Tmunu=gsl_matrix_alloc(4, 4);
@@ -115,24 +106,21 @@ if(eval==NULL) {
   exit(4);
 } 
 
-if(argc==4) {
-     lambda_mat=gsl_matrix_alloc(4, 4);
-     if(lambda_mat==NULL) {
-          printf("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I am forced to quit.\n");
-          exit(4);
-     }
-     Tmunu_Landau=gsl_matrix_alloc(4, 4);
-     if(Tmunu_Landau==NULL) {
-          printf("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I am forced to quit.\n");
-          exit(4);
-     }
-     tmp_mat=gsl_matrix_alloc(4, 4);
-     if(tmp_mat==NULL) {
-          printf("Unable to allocate the gsl_matrix tmp_mat 2D (4,4) array. I am forced to quit.\n");
-          exit(4);
-     }
-} 
-
+lambda_mat=gsl_matrix_alloc(4, 4);
+if(lambda_mat==NULL) {
+  printf("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I am forced to quit.\n");
+  exit(4);
+}
+Tmunu_Landau=gsl_matrix_alloc(4, 4);
+if(Tmunu_Landau==NULL) {
+  printf("Unable to allocate the gsl_matrix lambda_mat 2D (4,4) array. I am forced to quit.\n");
+  exit(4);
+}
+tmp_mat=gsl_matrix_alloc(4, 4);
+if(tmp_mat==NULL) {
+  printf("Unable to allocate the gsl_matrix tmp_mat 2D (4,4) array. I am forced to quit.\n");
+  exit(4);
+}
 
 fread(&nevents,sizeof(long int),1,fin);
 fread(&time,sizeof(double),1,fin);
@@ -189,19 +177,24 @@ if(Pnum==NULL)
  printf("Sorry, but it is not possible to allocate the Pnum array inside main. I am forced to quit.\n");
  exit(4);
 }
-empty_arr=(double *)calloc((15+3*np),sizeof(double));
-if(empty_arr==NULL)
+maxbp=19+3*np+10;
+buffer=(double *)calloc(maxbp,sizeof(double));
+if(buffer==NULL)
 {
- printf("Sorry, but it is not possible to allocate the empty_arr array inside main. I am forced to quit.\n");
+ printf("Sorry, but it is not possible to allocate the buffer array inside main. I am forced to quit.\n");
  exit(4);
 }
-if(argc==4) {
-    Tp_Landau=(double *)calloc(nx*ny*nz*np*10,sizeof(double));
-    if(Tp_Landau==NULL)
-    {
-        printf("Sorry, but it is not possible to allocate the Tmunu array. I am forced to quit.\n");
-        exit(4);
-    }
+emptybuffer=(double *)calloc(maxbp,sizeof(double));
+if(buffer==NULL)
+{
+ printf("Sorry, but it is not possible to allocate the emptybuffer array inside main. I am forced to quit.\n");
+ exit(4);
+}
+Tp_Landau=(double *)calloc(10,sizeof(double));
+if(Tp_Landau==NULL)
+{
+ printf("Sorry, but it is not possible to allocate the Tmunu array. I am forced to quit.\n");
+ exit(4);
 }
 
   
@@ -268,6 +261,7 @@ for(i=0;i<nx;i++)
 
             stop=0;
             success=0;
+	    bp=0;
             for(mm=0;mm<4;mm++)
             {
                 go_on=0;
@@ -277,7 +271,7 @@ for(i=0;i<nx;i++)
                 eigenvec=gsl_matrix_complex_column (result,mm);
                 for(nn=0;nn<4;nn++)
 	       	{
-                   num=gsl_vector_complex_get(&eigenvec.vector,nn);
+                  num=gsl_vector_complex_get(&eigenvec.vector,nn);
                   if(GSL_IMAG(num)!=0)
                   {
                     go_on=1;
@@ -285,7 +279,11 @@ for(i=0;i<nx;i++)
                   }
                   v[nn]=GSL_REAL(num);
                 }
-                if((v[0]<=0) || (go_on == 1)) continue;
+                if(go_on == 1) continue;
+		if(v[0] < 0)
+		{
+                  for(nn=0;nn<4;nn++) v[nn]=-v[nn];
+		}
                 norm2=v[0]*v[0]-v[1]*v[1]-v[2]*v[2]-v[3]*v[3];
                 if(norm2 <= 0) continue;
                 norm=sqrt(norm2);
@@ -294,13 +292,17 @@ for(i=0;i<nx;i++)
                 break;
             }
             if(success==1) {
-
+              memcpy(&buffer[bp],u4,sizeof(double)*4);
+	      bp+=4;
 	      rho_b=(Jb[J0+JBL]*u4[0]-Jb[J1+JBL]*u4[1]-Jb[J2+JBL]*u4[2]-Jb[J3+JBL]*u4[3])/NF;
 	      rho_c=(Jc[J0+JBL]*u4[0]-Jc[J1+JBL]*u4[1]-Jc[J2+JBL]*u4[2]-Jc[J3+JBL]*u4[3])/NF;
 	      rho_s=(Js[J0+JBL]*u4[0]-Js[J1+JBL]*u4[1]-Js[J2+JBL]*u4[2]-Js[J3+JBL]*u4[3])/NF;
-              fwrite(&rho_b,sizeof(double),1,fde);
-              fwrite(&rho_c,sizeof(double),1,fde);
-              fwrite(&rho_s,sizeof(double),1,fde);
+              memcpy(&buffer[bp],&rho_b,sizeof(double));
+              bp+=1;	
+              memcpy(&buffer[bp],&rho_c,sizeof(double));
+              bp+=1;	
+              memcpy(&buffer[bp],&rho_s,sizeof(double));
+              bp+=1;	
               Ib_diffcheck[0]=(1-u4[0]*u4[0])*Jb[J0+JBL]+u4[0]*u4[1]*Jb[J1+JBL]+u4[0]*u4[2]*Jb[J2+JBL]+u4[0]*u4[3]*Jb[J3+JBL];
               Ib_diffcheck[1]=-u4[0]*u4[1]*Jb[J0+JBL]+(1+u4[1]*u4[1])*Jb[J1+JBL]+u4[1]*u4[2]*Jb[J2+JBL]+u4[1]*u4[3]*Jb[J3+JBL];
               Ib_diffcheck[2]=-u4[0]*u4[2]*Jb[J0+JBL]+u4[2]*u4[1]*Jb[J1+JBL]+(1+u4[2]*u4[2])*Jb[J2+JBL]+u4[2]*u4[3]*Jb[J3+JBL];
@@ -321,9 +323,12 @@ for(i=0;i<nx;i++)
                  if(fabs(Ic_diffusion[l]-Ic_diffcheck[l]/NF)>1.e-10) printf("Warning, mismatching in charge diffusion currents at i=%d, j=%d, k=%d!  %14.11e\n",i,j,k,Ic_diffusion[l]-Ic_diffcheck[l]/NF);
                  if(fabs(Is_diffusion[l]-Is_diffcheck[l]/NF)>1.e-10) printf("Warning, mismatching in strange diffusion currents at i=%d, j=%d, k=%d! %14.11e\n",i,j,k,Is_diffusion[l]-Is_diffcheck[l]/NF);
               }
-              fwrite(Ib_diffusion,sizeof(double),4,fde);
-              fwrite(Ic_diffusion,sizeof(double),4,fde);
-              fwrite(Is_diffusion,sizeof(double),4,fde);
+              memcpy(&buffer[bp],Ib_diffusion,sizeof(double)*4);
+              bp+=4;	
+              memcpy(&buffer[bp],Ic_diffusion,sizeof(double)*4);
+              bp+=4;	
+              memcpy(&buffer[bp],Is_diffusion,sizeof(double)*4);
+              bp+=4;	
 	      for(p=0;p<np;p++)	{
 		 rho=(Jp[J0+JPL]*u4[0]-Jp[J1+JPL]*u4[1]-Jp[J2+JPL]*u4[2]-Jp[J3+JPL]*u4[3])/(cell_volume*nevents);
 		 eps=((u4[0]*Tp[T00+TLOC]-u4[1]*Tp[T10+TLOC]-u4[2]*Tp[T20+TLOC]-u4[3]*Tp[T30+TLOC])*u4[0]-
@@ -331,90 +336,70 @@ for(i=0;i<nx;i++)
 		 (u4[0]*Tp[T02+TLOC]-u4[1]*Tp[T12+TLOC]-u4[2]*Tp[T22+TLOC]-u4[3]*Tp[T32+TLOC])*u4[2]-
 		 (u4[0]*Tp[T03+TLOC]-u4[1]*Tp[T13+TLOC]-u4[2]*Tp[T23+TLOC]-u4[3]*Tp[T33+TLOC])*u4[3])/(cell_volume*nevents);
                  tmp_value=(double)Pnum[PNLOC];
-                 fwrite(&tmp_value,sizeof(double),1,fde);
-		 fwrite(&rho,sizeof(double),1,fde);
-		 fwrite(&eps,sizeof(double),1,fde); 						 							   
+                 memcpy(&buffer[bp],&tmp_value,sizeof(double));
+		 bp+=1;
+                 memcpy(&buffer[bp],&rho,sizeof(double));
+		 bp+=1;
+                 memcpy(&buffer[bp],&eps,sizeof(double));
+		 bp+=1;
 	      }         
+
+              glf1=u4[0]+1;
+              gsl_matrix_set(lambda_mat, 0, 0, u4[0]);
+              gsl_matrix_set(lambda_mat, 0, 1, -u4[1]);
+              gsl_matrix_set(lambda_mat, 0, 2, -u4[2]);
+              gsl_matrix_set(lambda_mat, 0, 3, -u4[3]);
+              gsl_matrix_set(lambda_mat, 1, 0, -u4[1]);
+              gsl_matrix_set(lambda_mat, 1, 1, 1+u4[1]*u4[1]/glf1);
+              gsl_matrix_set(lambda_mat, 1, 2, u4[1]*u4[2]/glf1);
+              gsl_matrix_set(lambda_mat, 1, 3, u4[1]*u4[3]/glf1);
+              gsl_matrix_set(lambda_mat, 2, 0, -u4[2]);
+              gsl_matrix_set(lambda_mat, 2, 1, u4[2]*u4[1]/glf1);
+              gsl_matrix_set(lambda_mat, 2, 2, 1+u4[2]*u4[2]/glf1);
+              gsl_matrix_set(lambda_mat, 2, 3, u4[2]*u4[3]/glf1);
+              gsl_matrix_set(lambda_mat, 3, 0, -u4[3]);
+              gsl_matrix_set(lambda_mat, 3, 1, u4[3]*u4[1]/glf1);
+              gsl_matrix_set(lambda_mat, 3, 2, u4[3]*u4[2]/glf1);
+              gsl_matrix_set(lambda_mat, 3, 3, 1+u4[3]*u4[3]/glf1);
+         
+              gsl_blas_dgemm(CblasNoTrans,CblasNoTrans,1,lambda_mat,Tmunu,0.,tmp_mat);
+              gsl_blas_dgemm(CblasNoTrans,CblasNoTrans,1,tmp_mat,lambda_mat,0.,Tmunu_Landau);
+
+	      for(l=0;l<10;l++) Tp_Landau[l]=0;
+          
+              Tp_Landau[0]=gsl_matrix_get(Tmunu_Landau, 0, 0);
+              Tp_Landau[1]=gsl_matrix_get(Tmunu_Landau, 0, 1);
+              Tp_Landau[2]=gsl_matrix_get(Tmunu_Landau, 0, 2);
+              Tp_Landau[3]=gsl_matrix_get(Tmunu_Landau, 0, 3);
+              Tp_Landau[4]=gsl_matrix_get(Tmunu_Landau, 1, 1);
+              Tp_Landau[5]=gsl_matrix_get(Tmunu_Landau, 1, 2);
+              Tp_Landau[6]=gsl_matrix_get(Tmunu_Landau, 1, 3);   
+              Tp_Landau[7]=gsl_matrix_get(Tmunu_Landau, 2, 2);
+              Tp_Landau[8]=gsl_matrix_get(Tmunu_Landau, 2, 3);
+              Tp_Landau[9]=gsl_matrix_get(Tmunu_Landau, 3, 3);
+
+	      memcpy(&buffer[bp],Tp_Landau,sizeof(double)*10);
+              //printf("Successful computation of Landu frame fluid four velocity at index: i: %d, j: %d, k: %d\n",i,j,k);
+              fwrite(buffer,sizeof(double),maxbp,fde);
+	      memcpy(buffer,emptybuffer,sizeof(double)*maxbp); 
 	    }
 	    else
 	    {
               printf("Warning, undetermined Landau frame fluid four velocity at index: i: %d, j: %d, k: %d\n",i,j,k);
-              fwrite(empty_arr,sizeof(double),15+np*3,fde);
+              fwrite(emptybuffer,sizeof(double),maxbp,fde);
 	    }						
-	  
-      if ((argc==4) && (success==1)){ //we compute also Tmunu in the Landau frame
-          glf1=u4[0]+1;
-          gsl_matrix_set(lambda_mat, 0, 0, u4[0]);
-          gsl_matrix_set(lambda_mat, 0, 1, -u4[1]);
-          gsl_matrix_set(lambda_mat, 0, 2, -u4[2]);
-          gsl_matrix_set(lambda_mat, 0, 3, -u4[3]);
-          gsl_matrix_set(lambda_mat, 1, 0, -u4[1]);
-          gsl_matrix_set(lambda_mat, 1, 1, 1+u4[1]*u4[1]/glf1);
-          gsl_matrix_set(lambda_mat, 1, 2, u4[1]*u4[2]/glf1);
-          gsl_matrix_set(lambda_mat, 1, 3, u4[1]*u4[3]/glf1);
-          gsl_matrix_set(lambda_mat, 2, 0, -u4[2]);
-          gsl_matrix_set(lambda_mat, 2, 1, u4[2]*u4[1]/glf1);
-          gsl_matrix_set(lambda_mat, 2, 2, 1+u4[2]*u4[2]/glf1);
-          gsl_matrix_set(lambda_mat, 2, 3, u4[2]*u4[3]/glf1);
-          gsl_matrix_set(lambda_mat, 3, 0, -u4[3]);
-          gsl_matrix_set(lambda_mat, 3, 1, u4[3]*u4[1]/glf1);
-          gsl_matrix_set(lambda_mat, 3, 2, u4[3]*u4[2]/glf1);
-          gsl_matrix_set(lambda_mat, 3, 3, 1+u4[3]*u4[3]/glf1);
-          
-          gsl_blas_dgemm(CblasNoTrans,CblasNoTrans,1,lambda_mat,Tmunu,0.,tmp_mat);
-          gsl_blas_dgemm(CblasNoTrans,CblasNoTrans,1,tmp_mat,lambda_mat,0.,Tmunu_Landau);
-          
-          Tp_Landau[TLOC+T00]=gsl_matrix_get(Tmunu_Landau, 0, 0);
-          Tp_Landau[TLOC+T01]=gsl_matrix_get(Tmunu_Landau, 0, 1);
-          Tp_Landau[TLOC+T02]=gsl_matrix_get(Tmunu_Landau, 0, 2);
-          Tp_Landau[TLOC+T03]=gsl_matrix_get(Tmunu_Landau, 0, 3);
-          Tp_Landau[TLOC+T11]=gsl_matrix_get(Tmunu_Landau, 1, 1);
-          Tp_Landau[TLOC+T12]=gsl_matrix_get(Tmunu_Landau, 1, 2);
-          Tp_Landau[TLOC+T13]=gsl_matrix_get(Tmunu_Landau, 1, 3);   
-          Tp_Landau[TLOC+T22]=gsl_matrix_get(Tmunu_Landau, 2, 2);
-          Tp_Landau[TLOC+T23]=gsl_matrix_get(Tmunu_Landau, 2, 3);
-          Tp_Landau[TLOC+T33]=gsl_matrix_get(Tmunu_Landau, 3, 3);
-      }    
-     }    
-   }				
+	  }
+      }
   }
-
+	  
 fclose(fde);
 printf("Densities data saved in file %s.\n",argv[2]);
+
+//we free some memory
 gsl_eigen_nonsymmv_free(ws);
 gsl_matrix_free(Tmunu);
 gsl_matrix_complex_free(result);
 gsl_vector_complex_free(eval);
-if(argc==4){
- //now we write the results in the output file
-    fwrite(&nevents,sizeof(long int),1,ftm);
-    fwrite(&time,sizeof(double),1,ftm);
-    //we save the informations about the number of particles and the grid size because, for a few bytes more of disk space, we can perform a consistency check when averaging
-    fwrite(&np,sizeof(int),1,ftm);
-    fwrite(&nx,sizeof(int),1,ftm);
-    fwrite(&ny,sizeof(int),1,ftm);
-    fwrite(&nz,sizeof(int),1,ftm);
-    fwrite(&dx,sizeof(double),1,ftm);
-    fwrite(&dy,sizeof(double),1,ftm);
-    fwrite(&dz,sizeof(double),1,ftm);
-    fwrite(&xmin,sizeof(double),1,ftm);
-    fwrite(&ymin,sizeof(double),1,ftm);
-    fwrite(&zmin,sizeof(double),1,ftm);
-    fwrite(&Tp_Landau[nx*ny*nz*np*10],sizeof(double),nx*ny*nz*np*10,ftm);
-    fwrite(&Jp[nx*ny*nz*np*4],sizeof(double),nx*ny*nz*np*4,ftm);
-    fwrite(&Jb[nx*ny*nz*4],sizeof(double),nx*ny*nz*4,ftm);
-    fwrite(&Jc[nx*ny*nz*4],sizeof(double),nx*ny*nz*4,ftm);
-    fwrite(&Js[nx*ny*nz*4],sizeof(double),nx*ny*nz*4,ftm);
-    fwrite(&Jt[nx*ny*nz*4],sizeof(double),nx*ny*nz*4,ftm);
-    fwrite(&Pnum[h*nx*ny*nz*np],sizeof(long int),nx*ny*nz*np,ftm);
-gsl_matrix_free(lambda_mat);
-gsl_matrix_free(tmp_mat);
-gsl_matrix_free(Tmunu_Landau);
-free(Tp_Landau);
-fclose(ftm);
-printf("Tensor and current data saved in file %s.\n",argv[3]);
-}
-	   
 free(Tp);
 free(Jb);
 free(Jp);
@@ -422,5 +407,11 @@ free(Jc);
 free(Js);
 free(Jt);
 free(Pnum);
+gsl_matrix_free(lambda_mat);
+gsl_matrix_free(tmp_mat);
+gsl_matrix_free(Tmunu_Landau);
+free(Tp_Landau);
+free(buffer);
+free(emptybuffer);
 return 0;
 }

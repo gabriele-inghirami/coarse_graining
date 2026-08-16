@@ -35,37 +35,37 @@
  * DX_DEF the lenght (in fm) of the side x of the coarse grained cell
  *
  */
-#define DX_DEF 1.0
+#define DX_DEF 5.0
 
 /**
  * DY_DEF the lenght (in fm) of the side y of the coarse grained cell
  *
  */
-#define DY_DEF 1.0
+#define DY_DEF 5.0
 
 /**
  * DZ_DEF the lenght (in fm) of the side z of the coarse grained cell
  *
  */
-#define DZ_DEF 1.0
+#define DZ_DEF 5.0
 
 /**
  * NX_DEF the number of coarse grained cells in the x direction
  *
  */
-#define NX_DEF 7
+#define NX_DEF 5
 
 /**
  * NY_DEF the number of coarse grained cells in the y direction
  *
  */
-#define NY_DEF 7
+#define NY_DEF 5
 
 /**
  * NZ_DEF the number of coarse grained cells in the z direction
  *
  */
-#define NZ_DEF 7
+#define NZ_DEF 5
 
 /**
  * USE_CENTERED_GRID if 0 the grid is centered around 0, otherwise the grid starts at {X,Y,Z}_START
@@ -77,19 +77,19 @@
  * X_START the x position of the left border of first cell along the x axis
  *
  */
-#define X_START -0.5
+#define X_START -2.5
 
 /**
  * Y_START the y position of the left border of first cell along the y axis
  *
  */
-#define Y_START -0.5
+#define Y_START -2.5
 
 /**
  * Z_START the z position of the left border of first cell along the z axis
  *
  */
-#define Z_START -0.5
+#define Z_START -2.5
 
 /**
  * B_SELECTION if not zero (e.g. 1) it selects only events with impact parameter between BMIN and BMAX, chosen below.
@@ -124,6 +124,7 @@
 #define JPL 4 * (p + np * (k + nz * (j + ny * (i + (long)h * nx))))
 #define JBL 4 * (k + nz * (j + ny * (i + (long)h * nx)))
 #define PNLOC (p + np * (k + nz * (j + ny * (i + (long)h * nx))))
+#define LLOC 10 * (k + nz * (j + ny * (i + (long)h * nx)))
 
 /**
  * NP the number of particles: from 0 to all "stable" (lifetime > 10 fm) particles (maximum 35)

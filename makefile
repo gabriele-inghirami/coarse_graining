@@ -46,8 +46,8 @@ opt=-O3 -march=native
 #additional flag to ignore warning for unused returning values
 #opt+=-Wno-unused-result
 
-#all: cg.exe to_text.exe to_2D.exe to_landau.exe
-all: cg.exe to_text.exe to_2D.exe 
+all: cg.exe to_text.exe to_2D.exe to_landau.exe to_text_landau.exe
+#all: cg.exe to_text.exe to_2D.exe 
 
 cg.exe: main.c calculate.c tools.c io.c particles.c
 	$(comp) $? -o $@ $(ldflags) $(opt)
@@ -60,6 +60,9 @@ to_2D.exe: to_2D.c
 	$(comp) $? -o $@ $(ldflags) $(opt)
 
 to_landau.exe: to_landau.c
+	$(comp) $? -o $@ $(ldflags) $(gslflags) $(opt)
+
+to_text_landau.exe: to_text_landau.c
 	$(comp) $? -o $@ $(ldflags) $(gslflags) $(opt)
 
 # target: to delete the products of the compilation (executable, object files, modules...)

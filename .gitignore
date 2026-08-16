@@ -49,3 +49,11 @@
 *.su
 *.idb
 *.pdb
+
+# various file types produced during tests
+*.txt
+*bin
+*old
+*.dat
+*[0-9]
+
